@@ -1,0 +1,28 @@
+::selection {
+    color: #fff;
+    background:	#008B8B;
+}
+::-moz-selection {
+    color: #fff;
+    background:	#008B8B;
+}
+
+.card {
+    margin-bottom: 30px;
+}
+
+.head {
+    margin-bottom: 50px;
+}
+
+.footer {
+    margin-top: 50px;
+}
+
+body{
+  background: red; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(-37deg, #4B0082, #20B2AA, #7FFFD4); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(-37deg, #4B0082, #20B2AA, #7FFFD4); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(-37deg, #4B0082, #20B2AA, #7FFFD4); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(-37deg,  #4B0082, #20B2AA, #7FFFD4); /* Standard syntax */
+}
