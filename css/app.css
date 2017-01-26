@@ -35,15 +35,67 @@ h2,h3,h4,h5 {
     margin-bottom: 20px;
 }
 
+.info h4 {
+     color: #fff;
+    text-shadow: 2px 2px 1px #000;
+}
+
+.info, .header p { 
+    font-size: 2em;
+}
+
+footer {
+    font-size: 3em;
+    text-align: center;
+}
 
 body{
     font-family: 'Josefin Sans', sans-serif;
-    background: red; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(-37deg, #DB3370, #20B2AA, #7FFFD4); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(-37deg, #DB3370, #20B2AA, #7FFFD4); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(-37deg, #DB3370, #20B2AA, #7FFFD4); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(-37deg,  #DB3370, #20B2AA, #7FFFD4); /* Standard syntax */
+    background: #7FFFD4; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(-37deg, #ff69b4, #20B2AA, #69ffb4); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(-37deg, #ff69b4, #20B2AA, #69ffb4); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(-37deg, #ff69b4, #20B2AA, #69ffb4); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(-37deg,  #ff69b4, #20B2AA, #69ffb4); /* Standard syntax */
 
     -webkit-background-size: 100% 100%; /* Safari 3-4 */
     background-size: 100% 100%; /* Chrome, Firefox 4+, IE 9+, Opera, Safari 5+ */
+}
+
+a,a:visited,a:hover,a:active{
+  -webkit-backface-visibility:hidden;
+          backface-visibility:hidden;
+	position:relative;
+  transition:0.5s color ease;
+	text-decoration:none;
+	color:#151837;
+}
+a:hover{
+	color:#b4ff69;
+}
+
+a.before:before,a.after:after{
+  content: "";
+  transition:0.5s all ease;
+  -webkit-backface-visibility:hidden;
+          backface-visibility:hidden;
+  position:absolute;
+}
+a.before:before{
+  top:-0.25em;
+}
+a.after:after{
+  bottom:-0.25em;
+}
+a.before:before,a.after:after{
+  height:5px;
+  height:0.35rem;
+  width:0;
+  background:#d73444;
+}
+a.first:after{
+  left:0;
+}
+
+a.before:hover:before,a.after:hover:after{
+  width:100%;
 }
