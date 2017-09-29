@@ -1,3 +1,10 @@
+$(window).bind('scroll', function () {
+    if ($(window).scrollTop() > ($(window).height() * 1.05)) {
+        $('.navbar').removeClass('hide');
+    } else {
+        $('.navbar').addClass('hide');
+    }
+});
 
 Highcharts.chart('container', {
     chart: {
