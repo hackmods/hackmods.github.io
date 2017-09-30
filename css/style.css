@@ -67,7 +67,7 @@ display: none;
   background: #ededed;
   position: relative;
   z-index: 1;
-  padding:25px;
+  padding: 150px 25px 0 25px;
 }
 
 .wrapper-parallax {
@@ -107,9 +107,9 @@ header h1{
 footer
 {
   width: 100%;
-  height: 500px;
+  height: 600px;
   background: #FFD90F;
-  bottom: -500px;
+  bottom: -600px;
   position: fixed;
   z-index: -1;
   background-repeat: repeat-x;
@@ -119,7 +119,7 @@ footer
 
 footer h1
 {
-  line-height: 400px;
+  line-height: 600px;
   
 }
 
