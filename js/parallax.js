@@ -1,7 +1,7 @@
 function scrollFooter(scrollY, heightFooter)
 {
-    console.log(scrollY);
-    console.log(heightFooter);
+   // console.log(scrollY);
+   // console.log(heightFooter);
 
     if(scrollY >= heightFooter)
     {

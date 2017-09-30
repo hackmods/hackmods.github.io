@@ -62,12 +62,12 @@ display: none;
 
 .content
 {
-  height: 1000px;
+  /* height: 1000px;*/
   min-height: 1000px;
-  background: #ededed;
+  background: #fff;
   position: relative;
   z-index: 1;
-  padding: 150px 25px 0 25px;
+  padding: 150px 25px 50px 25px;
 }
 
 .wrapper-parallax {
