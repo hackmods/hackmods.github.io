@@ -1,4 +1,3 @@
-
 $(window).bind('scroll', function () {
     if ($(window).scrollTop() > ($(window).height() + 5)) {
         $('.navbar').removeClass('hide');
