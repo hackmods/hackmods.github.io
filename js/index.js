@@ -6,22 +6,22 @@ $(window).bind('scroll', function () {
     }
 });
 
-Highcharts.chart('chart-1', {
+Highcharts.chart('chart-writer', {
     chart: {
         type: 'column'
     },
     title: {
-        text: 'Browser market shares. January, 2015 to May, 2015'
+        text: 'Browser episodes writtten by individuals, Seasons 1 - 26'
     },
     subtitle: {
-        text: 'Click the columns to view versions. Source: <a href="http://netmarketshare.com">netmarketshare.com</a>.'
+        text: 'Click the columns to view by season breakdown. Source: <a href="https://github.com/hackmods/The-Simpsons-SQL">github.com/hackmods/The-Simpsons-SQL</a>.'
     },
     xAxis: {
         type: 'category'
     },
     yAxis: {
         title: {
-            text: 'Total percent market share'
+            text: 'Episodes Written'
         }
 
     },
@@ -33,232 +33,389 @@ Highcharts.chart('chart-1', {
             borderWidth: 0,
             dataLabels: {
                 enabled: true,
-                format: '{point.y:.1f}%'
+                format: '{point.y}'
             }
         }
     },
 
     tooltip: {
         headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}</b> of episodes<br/>'
     },
 
     series: [{
-        name: 'Brands',
+        name: 'Writers',
         colorByPoint: true,
         data: [{
-            name: 'Microsoft Internet Explorer',
-            y: 56.33,
-            drilldown: 'Microsoft Internet Explorer'
+            name: 'John Swartzwelder',
+            y: 59,
+            drilldown: 'John Swartzwelder'
         }, {
-            name: 'Chrome',
-            y: 24.03,
-            drilldown: 'Chrome'
-        }, {
-            name: 'Firefox',
-            y: 10.38,
-            drilldown: 'Firefox'
-        }, {
-            name: 'Safari',
-            y: 4.77,
-            drilldown: 'Safari'
-        }, {
-            name: 'Opera',
-            y: 0.91,
-            drilldown: 'Opera'
-        }, {
-            name: 'Proprietary or Undetectable',
-            y: 0.2,
-            drilldown: null
-        }]
+            name: 'Matt Selman',
+            y: 26,
+            drilldown: 'Matt Selman'
+        }, 
+		{
+            name: 'Tim Long',
+            y: 24,
+            drilldown: 'Tim Long'
+        }, 
+		{
+            name: 'John Frink',
+            y: 23,
+            drilldown: 'John Frink'
+        }, 
+		{
+            name: 'Jon Vitti',
+            y: 23,
+            drilldown: 'Jon Vitti'
+        }, 
+		{
+            name: 'Ian Maxtone-Graham',
+            y: 21,
+            drilldown: 'Ian Maxtone-Graham'
+        }, 
+		{
+            name: 'Joel H. Cohen',
+            y: 21,
+            drilldown: 'Joel H. Cohen'
+        }, 
+		
+		]
     }],
     drilldown: {
         series: [{
-            name: 'Microsoft Internet Explorer',
-            id: 'Microsoft Internet Explorer',
+            name: 'John Swartzwelder',
+            id: 'John Swartzwelder',
             data: [
                 [
-                    'v11.0',
-                    24.13
+                    'S 01',
+                    4
                 ],
-                [
-                    'v8.0',
-                    17.2
-                ],
-                [
-                    'v9.0',
-                    8.11
-                ],
-                [
-                    'v10.0',
-                    5.33
-                ],
-                [
-                    'v6.0',
-                    1.06
-                ],
-                [
-                    'v7.0',
-                    0.5
-                ]
-            ]
-        }, {
-            name: 'Chrome',
-            id: 'Chrome',
-            data: [
-                [
-                    'v40.0',
+				[
+                    'S 02',
                     5
-                ],
-                [
-                    'v41.0',
-                    4.32
-                ],
-                [
-                    'v42.0',
-                    3.68
-                ],
-                [
-                    'v39.0',
-                    2.96
-                ],
-                [
-                    'v36.0',
-                    2.53
-                ],
-                [
-                    'v43.0',
-                    1.45
-                ],
-                [
-                    'v31.0',
-                    1.24
-                ],
-                [
-                    'v35.0',
-                    0.85
-                ],
-                [
-                    'v38.0',
-                    0.6
-                ],
-                [
-                    'v32.0',
-                    0.55
-                ],
-                [
-                    'v37.0',
-                    0.38
-                ],
-                [
-                    'v33.0',
-                    0.19
-                ],
-                [
-                    'v34.0',
-                    0.14
-                ],
-                [
-                    'v30.0',
-                    0.14
-                ]
+                ],[
+                    'S 03',
+                    5
+                ],   [
+                    'S 04',
+                    3
+                ],   [
+                    'S 05',
+                    5
+                ],   [
+                    'S 06',
+                    4
+                ],   [
+                    'S 07',
+                    5
+                ],   [
+                    'S 08',
+                    5
+                ],   [
+                    'S 09',
+                    3
+                ],   [
+                    'S 10',
+                    5
+                ], [
+                    'S 11',
+                    3
+                ],   [
+                    'S 12',
+                    4
+                ],   [
+                    'S 13',
+                    5
+                ],   [
+                    'S 14',
+                    1
+                ],   [
+                    'S 15',
+                    2
+                ],        				
             ]
         }, {
-            name: 'Firefox',
-            id: 'Firefox',
+            name: 'Matt Selman',
+            id: 'Matt Selman',
             data: [
                 [
-                    'v35',
-                    2.76
-                ],
+                    'S 09',
+                    1
+                ],[
+                    'S 10',
+                    2
+                ],[
+                    'S 11',
+                    2
+                ],[
+                    'S 12',
+                    3
+                ],[
+                    'S 13',
+                    1
+                ],[
+                    'S 14',
+                    1
+                ],[
+                    'S 16',
+                    3
+                ],[
+                    'S 17',
+                    1
+                ],[
+                    'S 18',
+                    1
+                ],[
+                    'S 19',
+                    2
+                ],[
+                    'S 21',
+                    2
+                ],[
+                    'S 22',
+                    1
+                ],[
+                    'S 23',
+                    1
+                ],[
+                    'S 24',
+                    3
+                ],[
+                    'S 26',
+                    2
+                ]  
+				]
+            },
+			{
+            name: 'Tim Long',
+            id: 'Tim Long',
+            data: [
                 [
-                    'v36',
-                    2.32
-                ],
-                [
-                    'v37',
-                    2.31
-                ],
-                [
-                    'v34',
-                    1.27
-                ],
-                [
-                    'v38',
-                    1.02
-                ],
-                [
-                    'v31',
-                    0.33
-                ],
-                [
-                    'v33',
-                    0.22
-                ],
-                [
-                    'v32',
-                    0.15
-                ]
+                    'S 10',
+                    1
+                ],[
+                    'S 11',
+                    4
+                ],[
+                    'S 12',
+                    2
+                ],[
+                    'S 13',
+                    1
+                ],[
+                    'S 14',
+                    2
+                ],[
+                    'S 16',
+                    3
+                ],[
+                    'S 17',
+                    1
+                ],[
+                    'S 18',
+                    1
+                ],[
+                    'S 20',
+                    1
+                ],[
+                    'S 21',
+                    1
+                ],[
+                    'S 22',
+                    2
+                ],[
+                    'S 23',
+                    2
+                ],[
+                    'S 24',
+                    2
+                ],[
+                    'S 25',
+                    2
+                ]			
             ]
-        }, {
-            name: 'Safari',
-            id: 'Safari',
+        },
+		{
+            name: 'John Frink',
+            id: 'John Frink',
             data: [
                 [
-                    'v8.0',
-                    2.56
-                ],
-                [
-                    'v7.1',
-                    0.77
-                ],
-                [
-                    'v5.1',
-                    0.42
-                ],
-                [
-                    'v5.0',
-                    0.3
-                ],
-                [
-                    'v6.1',
-                    0.29
-                ],
-                [
-                    'v7.0',
-                    0.26
-                ],
-                [
-                    'v6.2',
-                    0.17
-                ]
+                    'S 12',
+                    4
+                ],[
+                    'S 13',
+                    2
+                ],[
+                    'S 14',
+                    2
+                ],[
+                    'S 15',
+                    2
+                ],[
+                    'S 17',
+                    2
+                ],[
+                    'S 18',
+                    1
+                ],[
+                    'S 19',
+                    1
+                ],[
+                    'S 20',
+                    2
+                ],[
+                    'S 21',
+                    2
+                ],[
+                    'S 22',
+                    2
+                ],[
+                    'S 23',
+                    1
+                ],[
+                    'S 24',
+                    1
+                ],[
+                    'S 25',
+                    1
+                ]           
             ]
-        }, {
-            name: 'Opera',
-            id: 'Opera',
+        },
+		{
+            name: 'Jon Vitti',
+            id: 'Jon Vitti',
             data: [
                 [
-                    'v12.x',
-                    0.34
-                ],
+                    'S 01',
+                    3
+                ],[
+                    'S 02',
+                    3
+                ],[
+                    'S 03',
+                    5
+                ],[
+                    'S 04',
+                    4
+                ],[
+                    'S 05',
+                    1
+                ],[
+                    'S 07',
+                    1
+                ],[
+                    'S 13',
+                    3
+                ],[
+                    'S 15',
+                    2
+                ],[
+                    'S 16',
+                    1
+                ]		
+            ]
+        },
+		{
+            name: 'Ian Maxtone-Graham',
+            id: 'Ian Maxtone-Graham',
+            data: [
                 [
-                    'v28',
-                    0.24
-                ],
+                    'S 08',
+                    1
+                ],[
+                    'S 09',
+                    3
+                ],[
+                    'S 10',
+                    1
+                ],[
+                    'S 11',
+                    2
+                ],[
+                    'S 12',
+                    1
+                ],[
+                    'S 13',
+                    1
+                ],[
+                    'S 14',
+                    2
+                ],[
+                    'S 15',
+                    1
+                ],[
+                    'S 16',
+                    1
+                ],[
+                    'S 17',
+                    1
+                ],[
+                    'S 18',
+                    1
+                ],[
+                    'S 20',
+                    2
+                ],[
+                    'S 21',
+                    1
+                ],[
+                    'S 23',
+                    1
+                ],  [
+                    'S 24',
+                    1
+                ],[
+                    'S 25',
+                    1
+                ]            
+            ]
+        },
+		{
+            name: 'Joel H. Cohen',
+            id: 'Joel H. Cohen',
+            data: [
                 [
-                    'v27',
-                    0.17
-                ],
-                [
-                    'v29',
-                    0.16
-                ]
+                    'S 13',
+                    2
+                ],[
+                    'S 15',
+                    2
+                ],[
+                    'S 16',
+                    2
+                ],[
+                    'S 17',
+                    3
+                ],[
+                    'S 18',
+                    1
+                ],[
+                    'S 19',
+                    3
+                ],[
+                    'S 20',
+                    1
+                ],[
+                    'S 22',
+                    3
+                ],[
+                    'S 24',
+                    2
+                ],[
+                    'S 25',
+                    1
+                ],[
+                    'S 26',
+                    1
+                ],			
             ]
         }]
-    }
+	}    
 });
 
-Highcharts.chart('chart-2', {
+Highcharts.chart('chart-pie', {
     chart: {
         plotBackgroundColor: null,
         plotBorderWidth: null,
@@ -266,7 +423,7 @@ Highcharts.chart('chart-2', {
         type: 'pie'
     },
     title: {
-        text: 'Browser market shares January, 2015 to May, 2015'
+        text: 'Breakdown percentage of episodes written by writer.'
     },
     tooltip: {
         pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -288,46 +445,61 @@ Highcharts.chart('chart-2', {
         name: 'Brands',
         colorByPoint: true,
         data: [{
-            name: 'Microsoft Internet Explorer',
-            y: 56.33
-        }, {
-            name: 'Chrome',
-            y: 24.03,
+            name: 'John Swartzwelder',
+            y: 59,
             sliced: true,
             selected: true
         }, {
-            name: 'Firefox',
-            y: 10.38
-        }, {
-            name: 'Safari',
-            y: 4.77
-        }, {
-            name: 'Opera',
-            y: 0.91
-        }, {
-            name: 'Proprietary or Undetectable',
-            y: 0.2
-        }]
+            name: 'Matt Selman',
+            y: 26,
+        }, 
+		{
+            name: 'Tim Long',
+            y: 24,
+        }, 
+		{
+            name: 'John Frink',
+            y: 23,
+        }, 
+		{
+            name: 'Jon Vitti',
+            y: 23,
+        }, 
+		{
+            name: 'Ian Maxtone-Graham',
+            y: 21,
+        }, 
+		{
+            name: 'Joel H. Cohen',
+            y: 21,
+        }, 
+		{
+            name: 'Other',
+            y: 403
+        }, 
+		
+		
+		]
     }]
 });
 
 
-Highcharts.chart('chart-3', {
+Highcharts.chart('chart-spread', {
     chart: {
         type: 'line'
     },
     title: {
-        text: 'Monthly Average Temperature'
+        text: 'Unique characters vs locations across the seasons'
     },
     subtitle: {
         text: 'Source: WorldClimate.com'
     },
     xAxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        categories: ['S01','S02','S03','S04','S05','S06','S07','S08','S09','S10','S11','S12','S13','S14','S15','S16','S17','S18','S19','S20']
     },
     yAxis: {
         title: {
-            text: 'Temperature (°C)'
+            text: 'Occurances'
         }
     },
     plotOptions: {
@@ -339,10 +511,10 @@ Highcharts.chart('chart-3', {
         }
     },
     series: [{
-        name: 'Tokyo',
-        data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+        name: 'Charcter',
+        data: [231,336,439,460,484,474,470,416,458,456,482,462,438,526,490,428,442,444,424,387]
     }, {
-        name: 'London',
-        data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+        name: 'Location',
+        data: [206,244,312,326,329,376,293,269,316,258,298,312,310,334,382,297,320,324,301,307]
     }]
 });
