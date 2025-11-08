@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trader Jokes Printer</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font family -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            @apply bg-gray-50;
+        }
+        /* Define a CSS variable for dynamic padding, applied by the JS sliders */
+        #outputContent {
+            --joke-padding: 24px; /* Default value */
+            /* Initial font size is set here */
+            font-size: 16pt;
+        }
+
+        /* --- Print Styles (Crucial for 8.5x11 Paper) --- */
+        @media print {
+            /* Set the page size and default margins for the paper */
+            @page {
+                size: Letter; /* 8.5in x 11in */
+                margin: 0.75in;
+            }
+
+            /* Hide all UI elements except the dedicated print area */
+            .no-print {
+                display: none !important;
+            }
+
+            /* Ensure the print area takes up the whole space */
+            .print-area {
+                width: 100% !important;
+                min-height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                background-color: white !important;
+            }
+
+            /* The core rule to prevent joke blocks from breaking mid-page */
+            /* Use the dynamic variable for spacing */
+            .joke-block {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                margin-bottom: var(--joke-padding) !important;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="app" class="max-w-4xl mx-auto">
+
+        <!-- Header - Non-Printable -->
+        <header class="mb-8 p-6 bg-white rounded-xl shadow-lg no-print">
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Trader Jokes Print Formatter</h1>
+            <p class="text-gray-500 mt-2">Customize the header and formatting below, then paste your joke text.</p>
+        </header>
+
+        <!-- Input and Control Area - Non-Printable -->
+        <div class="space-y-6 no-print">
+
+            <!-- Custom Header Inputs -->
+            <div class="bg-white p-6 rounded-xl shadow-lg grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="customTitle" class="block text-sm font-medium text-gray-700 mb-1">Print Title (e.g., Nov Show)</label>
+                    <input type="text" id="customTitle" value="TRADER JOKES" class="w-full p-2 border border-gray-300 rounded-lg text-gray-800" />
+                </div>
+                <div>
+                    <label for="customDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <!-- Date input will be set to today's date via script -->
+                    <input type="date" id="customDate" class="w-full p-2 border border-gray-300 rounded-lg text-gray-800" />
+                </div>
+                <div>
+                    <label for="recipientName" class="block text-sm font-medium text-gray-700 mb-1">Recipient Name (Optional)</label>
+                    <input type="text" id="recipientName" placeholder="Comedian's Name" class="w-full p-2 border border-gray-300 rounded-lg text-gray-800" />
+                </div>
+            </div>
+
+            <!-- Style Controls (Sliders) -->
+            <div class="bg-white p-6 rounded-xl shadow-lg space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Print Formatting</h3>
+
+                <!-- Font Size Control -->
+                <div>
+                    <label for="fontSizeSlider" class="block text-sm font-medium text-gray-700 mb-2">Font Size: <span id="fontSizeValue">16</span>pt</label>
+                    <input type="range" id="fontSizeSlider" min="12" max="24" value="16" step="2" oninput="updatePrintStyles()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg" />
+                </div>
+
+                <!-- Padding Control (Vertical Spacing between jokes) -->
+                <div>
+                    <label for="paddingSlider" class="block text-sm font-medium text-gray-700 mb-2">Vertical Joke Spacing: <span id="paddingValue">24</span>px</label>
+                    <input type="range" id="paddingSlider" min="12" max="60" value="24" step="6" oninput="updatePrintStyles()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg" />
+                </div>
+            </div>
+
+            <!-- Input Textarea -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <label for="jokeInput" class="block text-sm font-medium text-gray-700 mb-2">Paste Joke Text Here</label>
+                <textarea id="jokeInput" rows="15" oninput="formatAndRenderPreview()" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-800" placeholder="Paste all your jokes, even if they have weird spacing or formatting."></textarea>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="formatAndPrint()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-150 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
+                Format & Print Jokes
+            </button>
+        </div>
+
+        <!-- Print Preview Area -->
+        <div id="print-area" class="print-area mt-10 p-8 md:p-12 bg-white rounded-xl shadow-xl transition-all duration-300">
+            <h2 class="text-xl font-bold text-gray-500 text-center mb-6 no-print">Print Preview</h2>
+            <div id="outputContent" class="text-gray-900 leading-relaxed">
+                <p class="text-center italic text-gray-400 text-lg">Paste your jokes above and adjust settings to see the final, print-ready output here.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Global references
+        const jokeInput = document.getElementById('jokeInput');
+        const outputContent = document.getElementById('outputContent');
+        const customTitleInput = document.getElementById('customTitle');
+        const customDateInput = document.getElementById('customDate');
+        const recipientNameInput = document.getElementById('recipientName');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const paddingSlider = document.getElementById('paddingSlider');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const paddingValue = document.getElementById('paddingValue');
+
+
+        /**
+         * Updates the font size and padding styles on the output content for live preview.
+         */
+        function updatePrintStyles() {
+            const fs = fontSizeSlider.value;
+            const padding = paddingSlider.value;
+
+            // Update displayed values
+            fontSizeValue.textContent = fs;
+            paddingValue.textContent = padding;
+
+            // Apply styles to the output container for live preview
+            outputContent.style.fontSize = `${fs}pt`;
+            outputContent.style.setProperty('--joke-padding', `${padding}px`);
+
+            // Re-render the jokes immediately if content exists to update joke-block margins
+            if (jokeInput.value.trim()) {
+                formatAndRenderPreview();
+            }
+        }
+
+
+        /**
+         * Formats the raw text, applies custom header fields, and renders it into the preview area.
+         */
+        function formatAndRenderPreview() {
+            const rawText = jokeInput.value.trim();
+            let formattedHtml = '';
+
+            // Get custom header values
+            const title = customTitleInput.value.trim().toUpperCase() || "TRADER JOKES";
+            // Format the date input if it exists, otherwise use today's date
+            let dateStr;
+            if (customDateInput.value) {
+                 dateStr = new Date(customDateInput.value + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            } else {
+                 dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            const recipient = recipientNameInput.value.trim();
+
+
+            // Process the input text (split by two or more newlines)
+            const jokeBlocks = rawText
+                .replace(/\r\n/g, '\n') // Normalize CRLF to LF
+                .split(/\n{2,}/)       // Split by two or more consecutive newlines
+                .map(block => block.trim()) // Clean up whitespace around each block
+                .filter(block => block.length > 0); // Remove any empty blocks
+
+
+            // Set the print-specific title, date, and recipient (Comedian's Name)
+            let headerHtml = `
+                <div class="text-center pb-4 border-b border-gray-300 joke-block" style="margin-bottom: 30px !important;">
+                    <h1 class="font-extrabold mb-1">${title}</h1>
+                    <p class="font-medium">${dateStr}</p>
+                    ${recipient ? `<p class="font-semibold mt-2">${recipient}</p>` : ''}
+                </div>
+            `;
+
+            if (jokeBlocks.length > 0) {
+                // Map each joke block to a div with the anti-break class and line breaks converted
+                formattedHtml = jokeBlocks.map(block => `
+                    <div class="joke-block leading-relaxed">
+                        ${block.replace(/\n/g, '<br>')}
+                    </div>
+                `).join('');
+            } else {
+                 formattedHtml = '<p class="text-center italic text-gray-400">Paste your jokes above to see the output.</p>';
+            }
+
+            outputContent.innerHTML = headerHtml + formattedHtml;
+        }
+
+        /**
+         * Cleans, formats, and renders the text for print, then triggers the print dialog.
+         */
+        function formatAndPrint() {
+            if (!jokeInput.value.trim()) {
+                // Use a custom message box instead of alert()
+                showUserMessage("No Content", "Please paste your joke text into the box first.", "bg-yellow-500");
+                return;
+            }
+
+            // 1. Ensure latest styles and content are rendered
+            updatePrintStyles(); // Apply dynamic styles to outputContent
+            formatAndRenderPreview(); // Generate content based on inputs
+
+            // 2. Trigger Print
+            window.print();
+        }
+
+        // --- Custom Modal/Message Box (Replaces alert()) ---
+
+        function showUserMessage(title, message, bgColor) {
+            const modalId = 'custom-message-modal';
+            let modal = document.getElementById(modalId);
+
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = modalId;
+                modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 transition-opacity duration-300 opacity-0 pointer-events-none';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden w-full max-w-sm transform scale-90 transition-transform duration-300">
+                        <div id="modal-header" class="${bgColor} p-4 text-white">
+                            <h3 class="text-lg font-bold" id="modal-title"></h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 mb-6" id="modal-message"></p>
+                            <button onclick="document.getElementById('${modalId}').classList.add('opacity-0', 'pointer-events-none'); document.getElementById('${modalId}').classList.remove('opacity-100');"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition duration-150">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            // Update content and show
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-header').className = `${bgColor} p-4 text-white`;
+
+            // Use requestAnimationFrame to ensure CSS transition works
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-100');
+            });
+        }
+
+        // Initialize styles and date on load
+        window.onload = () => {
+             updatePrintStyles();
+             // Set the default date to today
+             customDateInput.valueAsDate = new Date();
+             formatAndRenderPreview(); // Initial render of the header
+        };
+    </script>
+</body>
+</html>
