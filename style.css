@@ -29,7 +29,7 @@ body {
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
-    font-family: 'Comic Sans MS', cursive, sans-serif; /* very 90s vibe */
+    font-family: 'Comic Sans MS', sans-serif; /*'Comic Sans MS', cursive, /* very 90s vibe */
 	text-shadow: 2px 2px 2px #000; /* subtle glow/shadow for retro feel */
     box-sizing: border-box;
 }
@@ -149,7 +149,8 @@ button {
     font-family: inherit;
 }
 
-button {
+button,
+.btn {
     background: #c0c0c0;
     border: 2px outset #fff;
     cursor: pointer;
