@@ -22,7 +22,7 @@ body {
 
 .marquee-container {
     background: #ff0000;
-    color: #FFFF00;      /* Neon yellow text for contrast */
+    color: #FFFF33;      /* Neon yellow text for contrast */
     padding: 10px 0;
     font-weight: bold;
     border-bottom: 2px solid #000;
@@ -30,7 +30,7 @@ body {
     overflow: hidden;
     white-space: nowrap;
     font-family: 'Comic Sans MS', cursive, sans-serif; /* very 90s vibe */
-	text-shadow: 1px 1px 2px #000; /* subtle glow/shadow for retro feel */
+	text-shadow: 2px 2px 2px #000; /* subtle glow/shadow for retro feel */
     box-sizing: border-box;
 }
 
