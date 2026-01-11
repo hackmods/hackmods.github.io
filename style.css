@@ -6,7 +6,7 @@ html {
 
 body {
     background-color: #008080;
-    background-image: url('./black-paper.png');
+    /*background-image: url('./black-paper.png');*/
     font-family: "MS Sans Serif", "Courier New", monospace;
     padding-bottom: 100px;
     /* Extra room for taskbar */
@@ -14,6 +14,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+	margin: 0;
 }
 
 
@@ -21,21 +22,33 @@ body {
 
 .marquee-container {
     background: #ff0000;
-    color: #fff;
-    padding: 5px;
+    color: #FFFF00;      /* Neon yellow text for contrast */
+    padding: 10px 0;
     font-weight: bold;
     border-bottom: 2px solid #000;
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* very 90s vibe */
+	text-shadow: 1px 1px 2px #000; /* subtle glow/shadow for retro feel */
+    box-sizing: border-box;
 }
 
 .marquee-text {
     display: inline-block;
-    animation: scroll 15s linear infinite;
+    animation: scrollMarquee 15s linear infinite;
 }
 
-@keyframes scroll {
+@keyframes scrollMarquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes scrollLeftRight {
     0% {
         transform: translateX(100%);
     }
