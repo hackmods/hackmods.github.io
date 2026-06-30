@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" data-palette="lumon-default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0c10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Innie-Cam">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Lumon Innie-Cam — Floor 7 / MDR</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-view="desk">
+
+  <!-- ═══ CRT DISPLAY ARTIFACTS (decorative, GPU-only) ════════════════ -->
+  <div class="crt" aria-hidden="true">
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="crt-vignette"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- VIEW 1 — PASSIVE CAMERA MONITOR (the Lofi MDR office scene)      -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <main id="office-scene" class="office-scene" aria-label="Innie-Cam workspace feed">
+
+    <div class="scene-stage">
+
+      <!-- ceiling light matrix -->
+      <div class="ceiling" aria-hidden="true">
+        <div class="ceiling-grid" id="ceiling-grid"></div>
+      </div>
+
+      <!-- back + side partition walls -->
+      <div class="wall wall-back" aria-hidden="true"></div>
+      <div class="wall wall-left" aria-hidden="true"></div>
+      <div class="wall wall-right" aria-hidden="true"></div>
+
+      <!-- green carpet floor -->
+      <div class="floor" aria-hidden="true"><div class="floor-grain"></div></div>
+
+      <!-- the workstation cluster -->
+      <div class="workstation">
+
+        <!-- employee standing at the partition (pixel sprite) -->
+        <div class="employee" aria-hidden="true">
+          <svg class="employee-svg" viewBox="0 0 16 28" shape-rendering="crispEdges">
+            <!-- hair -->
+            <rect x="5" y="0" width="6" height="2" fill="#2b2218"/>
+            <rect x="4" y="1" width="8" height="2" fill="#3a2e20"/>
+            <!-- face -->
+            <rect x="5" y="2" width="6" height="4" fill="#d8a98a"/>
+            <rect x="5" y="2" width="1" height="4" fill="#3a2e20"/>
+            <rect x="10" y="2" width="1" height="4" fill="#3a2e20"/>
+            <!-- neck -->
+            <rect x="6" y="6" width="4" height="1" fill="#c79877"/>
+            <!-- suit shoulders/torso -->
+            <rect x="3" y="7" width="10" height="11" fill="#1c2738"/>
+            <rect x="3" y="7" width="10" height="1" fill="#2a3850"/>
+            <!-- white shirt + tie -->
+            <rect x="7" y="7" width="2" height="7" fill="#e9eef2"/>
+            <rect x="7" y="7" width="2" height="6" fill="#7a1f2b"/>
+            <rect x="7" y="7" width="2" height="1" fill="#9c2a38"/>
+            <!-- arms -->
+            <rect x="3" y="8" width="2" height="9" fill="#161f2d"/>
+            <rect x="11" y="8" width="2" height="9" fill="#161f2d"/>
+            <!-- hands -->
+            <rect x="3" y="17" width="2" height="2" fill="#d8a98a"/>
+            <rect x="11" y="17" width="2" height="2" fill="#d8a98a"/>
+            <!-- trousers -->
+            <rect x="4" y="18" width="8" height="8" fill="#13161c"/>
+            <rect x="7" y="18" width="2" height="8" fill="#0c0e12"/>
+            <!-- shoes -->
+            <rect x="4" y="26" width="3" height="2" fill="#0a0a0a"/>
+            <rect x="9" y="26" width="3" height="2" fill="#0a0a0a"/>
+          </svg>
+        </div>
+
+        <!-- dark green privacy partition -->
+        <div class="partition" aria-hidden="true"></div>
+
+        <!-- the white desk -->
+        <div class="desk" aria-hidden="true">
+          <div class="desk-top"></div>
+          <div class="desk-leg desk-leg-l"></div>
+          <div class="desk-leg desk-leg-r"></div>
+          <div class="desk-drawers"></div>
+        </div>
+
+        <!-- desk lamp -->
+        <div class="desk-lamp" aria-hidden="true"></div>
+
+        <!-- refinement input device (the trackball/handset) -->
+        <div class="refine-device" aria-hidden="true"></div>
+
+        <!-- office chairs -->
+        <div class="chair chair-l" aria-hidden="true"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-base"></div></div>
+        <div class="chair chair-r" aria-hidden="true"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-base"></div></div>
+
+        <!-- THE CRT MONITOR — clickable, zooms to terminal -->
+        <button type="button" id="crt-monitor" class="crt-monitor" aria-label="Open Refinement Terminal">
+          <span class="crt-bezel">
+            <span class="crt-screen">
+              <span class="crt-drift" id="cam-drift" aria-hidden="true"></span>
+              <span class="crt-logo" aria-hidden="true">LUMON</span>
+            </span>
+          </span>
+          <span class="crt-stand"></span>
+          <span class="crt-prompt">▶ CLICK TO REFINE</span>
+        </button>
+
+      </div>
+
+      <!-- camera HUD overlay -->
+      <div class="cam-hud" aria-hidden="true">
+        <span class="cam-rec"><span class="cam-rec-dot"></span>REC</span>
+        <span class="cam-feed-id">INNIE-CAM · FLOOR 7 · MDR</span>
+        <span class="cam-clock" id="cam-clock">--:--:--</span>
+      </div>
+      <div class="cam-ambient" id="cam-ambient" aria-hidden="true">STATUS: NOMINAL</div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- VIEW 2 — REFINEMENT TERMINAL OVERLAY (retro CLI)                 -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div id="terminal-overlay" class="terminal-overlay" role="dialog" aria-modal="true" aria-label="Refinement Terminal" aria-hidden="true">
+    <div class="terminal-frame">
+
+      <header class="terminal-titlebar">
+        <span class="tt-title">LUMON · MACRODATA REFINEMENT TERMINAL</span>
+        <button type="button" id="btn-return-desk" class="btn-return">⎋ ESC · RETURN TO DESK</button>
+      </header>
+
+      <div class="cli-statline">
+        <span id="subject-designation">SUBJECT #4229</span>
+        <span id="refinement-tier">TIER: UNINITIALIZED</span>
+        <span id="prestige-multiplier">x1.0</span>
+        <span id="quota-cumulative">XP 0000</span>
+        <span class="accent" id="allocation-credits">CR 0000</span>
+        <span id="live-clock">--:--:--</span>
+        <span id="clock-date" class="muted">---</span>
+      </div>
+
+      <nav class="terminal-tabbar" role="tablist" aria-label="MDR application modules">
+        <button type="button" class="tab-btn active" role="tab" id="tab-btn-data-matrix" data-tab="data-matrix" aria-selected="true" aria-controls="tab-data-matrix">[01 // DATA_MATRIX]</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-btn-resourcing" data-tab="resourcing" aria-selected="false" aria-controls="tab-resourcing">[02 // RESOURCING]</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-btn-compliance" data-tab="compliance" aria-selected="false" aria-controls="tab-compliance">[03 // COMPLIANCE]</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-btn-utilities" data-tab="utilities" aria-selected="false" aria-controls="tab-utilities">[04 // UTILITIES]</button>
+        <button type="button" class="tab-btn tab-btn-log" id="btn-toggle-log" title="Alt+L">[ALT+L // TERMINAL_OUTPUT]</button>
+      </nav>
+
+      <p id="compliance-advisory" class="cli-advisory hidden" role="alert"></p>
+
+      <div class="terminal-workspace">
+
+        <main class="terminal-main" id="terminal-main">
+
+          <!-- TAB 01: DATA_MATRIX -->
+          <section class="tab-panel active" id="tab-data-matrix" role="tabpanel" aria-labelledby="tab-btn-data-matrix">
+            <div class="matrix-workspace">
+              <div id="mdr-data-node" data-avatar-stage="ghost" data-state="baseline" data-dominant="frolic">
+                <div id="mdr-grid-bg" class="mdr-grid-bg" aria-hidden="true"></div>
+                <div class="mdr-quadrants" aria-hidden="true">
+                  <div class="quad quad-wo" id="quad-wo"><span class="quad-label">WO</span><span class="quad-val">00</span></div>
+                  <div class="quad quad-fc" id="quad-fc"><span class="quad-label">FC</span><span class="quad-val">00</span></div>
+                  <div class="quad quad-dr" id="quad-dr"><span class="quad-label">DR</span><span class="quad-val">00</span></div>
+                  <div class="quad quad-ma" id="quad-ma"><span class="quad-label">MA</span><span class="quad-val">00</span></div>
+                </div>
+                <div id="mdr-avatar" class="mdr-avatar" data-stage="ghost" data-file-variant="0" aria-label="Refinement subject avatar">
+                  <svg class="mdr-avatar-svg" viewBox="0 0 32 44" shape-rendering="crispEdges" aria-hidden="true">
+                    <rect class="av-halo" x="4" y="2" width="24" height="36" fill="none" stroke="#ff8fc4" stroke-width="1" opacity="0"/>
+                    <rect class="av-frame" x="6" y="4" width="20" height="32" fill="none" stroke="#ffb000" stroke-width="1" opacity="0"/>
+                    <g class="av-body">
+                      <rect class="av-suit" x="10" y="18" width="12" height="14"/>
+                      <rect class="av-shirt" x="14" y="18" width="4" height="8"/>
+                      <rect class="av-tie" x="14" y="18" width="4" height="7"/>
+                      <rect class="av-head" x="12" y="8" width="8" height="9"/>
+                      <rect class="av-hair" x="11" y="6" width="10" height="4"/>
+                      <rect class="av-eye-l" x="13" y="11" width="2" height="2"/>
+                      <rect class="av-eye-r" x="17" y="11" width="2" height="2"/>
+                      <rect class="av-leg-l" x="11" y="32" width="4" height="8"/>
+                      <rect class="av-leg-r" x="17" y="32" width="4" height="8"/>
+                    </g>
+                    <g class="av-accessory av-eraser"><rect x="22" y="22" width="4" height="6"/><rect x="22" y="20" width="4" height="2"/></g>
+                    <g class="av-accessory av-trap"><rect x="8" y="20" width="3" height="8"/><rect x="21" y="20" width="3" height="8"/></g>
+                    <g class="av-accessory av-cozy"><rect x="6" y="24" width="3" height="4"/><rect x="5" y="22" width="5" height="2"/></g>
+                    <g class="av-accessory av-crystal"><polygon points="16,2 20,6 16,10 12,6"/></g>
+                    <text class="av-file-badge" x="16" y="42" text-anchor="middle">F-0001</text>
+                  </svg>
+                </div>
+                <div class="mdr-crosshair" aria-hidden="true"></div>
+              </div>
+              <p class="matrix-meta"><span id="avatar-temper-label">STAGE: LATENT SIGNAL</span> · <span id="avatar-visibility-label">VISIBILITY: 8%</span> · <span id="tempers-readout">DOMINANT: FROLIC</span> · <span id="mdr-status-label">NODE: BASELINE</span></p>
+            </div>
+
+            <div class="temper-bars">
+              <p class="cli-h">// TEMPER SORTING BINS</p>
+              <div class="temper-bar-row temper-wo"><span class="temper-key">WOE</span><span class="cli-bar" id="temper-woe-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="temper-woe-val">0%</span></div>
+              <div class="temper-bar-row temper-fc"><span class="temper-key">FROLIC</span><span class="cli-bar" id="temper-frolic-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="temper-frolic-val">0%</span></div>
+              <div class="temper-bar-row temper-dr"><span class="temper-key">DREAD</span><span class="cli-bar" id="temper-dread-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="temper-dread-val">0%</span></div>
+              <div class="temper-bar-row temper-ma"><span class="temper-key">MALICE</span><span class="cli-bar" id="temper-malice-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="temper-malice-val">0%</span></div>
+            </div>
+
+            <div class="matrix-footer">
+              <div class="cli-metric compact"><span class="cli-key" id="file-designation">FILE-0001</span><span class="cli-bar" id="file-bar">[░░░░░░░░░░░░░░]</span><span class="cli-pct" id="file-value">0%</span></div>
+              <p class="cli-sub" id="milestone-line">MILESTONES: [ ]10% [ ]25% [ ]75% [ ]100%</p>
+              <div id="inventory-badges" class="inventory-badges"></div>
+            </div>
+          </section>
+
+          <!-- TAB 02: RESOURCING -->
+          <section class="tab-panel" id="tab-resourcing" role="tabpanel" aria-labelledby="tab-btn-resourcing" hidden>
+            <p class="cli-h">// FLUID_EFFICIENCY · SUSTENANCE_COMPONENT</p>
+            <div class="cli-metric"><span class="cli-key">FLUID_EFFICIENCY</span><span class="cli-bar" id="fluid-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="fluid-value">0%</span></div>
+            <div class="cli-metric"><span class="cli-key">SUSTENANCE_COMPONENT</span><span class="cli-bar" id="sustenance-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="sustenance-value">0%</span></div>
+
+            <div class="cli-cmd">
+              <span class="cli-cmd-label">&gt; HYDRATE_UNIT</span>
+              <span class="cli-cmd-stat">TODAY · <span id="fluid-intake-today">0</span>/2000ml</span>
+              <span class="cli-cmd-actions">
+                <button type="button" id="btn-rehydrate-250" class="btn-cli">+250</button>
+                <button type="button" id="btn-rehydrate-500" class="btn-cli">+500</button>
+                <input type="number" id="fluid-intake-input" min="0" step="50" placeholder="ml" aria-label="Fluid ml">
+                <button type="button" id="btn-rehydrate-unit" class="btn-cli btn-cli-go">LOG</button>
+              </span>
+            </div>
+
+            <div class="cli-cmd">
+              <span class="cli-cmd-label">&gt; SUSTENANCE</span>
+              <span class="cli-cmd-stat">TODAY · <span id="sustenance-today">0</span>/3 comp</span>
+              <span class="cli-cmd-actions">
+                <button type="button" class="btn-cli sustenance-preset" data-level="18">SMALL</button>
+                <button type="button" class="btn-cli sustenance-preset" data-level="34">STD</button>
+                <button type="button" class="btn-cli sustenance-preset" data-level="52">LARGE</button>
+              </span>
+            </div>
+          </section>
+
+          <!-- TAB 03: COMPLIANCE -->
+          <section class="tab-panel" id="tab-compliance" role="tabpanel" aria-labelledby="tab-btn-compliance" hidden>
+            <p class="cli-h">// QUOTA_PROGRESSION · COMPLIANCE INJECTION</p>
+            <div class="cli-metric"><span class="cli-key">QUOTA_PROGRESSION</span><span class="cli-bar" id="quota-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="quota-value">0%</span></div>
+            <div class="cli-metric"><span class="cli-key">COMPLIANCE_STANDING</span><span class="cli-bar" id="compliance-bar">[░░░░░░░░░░]</span><span class="cli-pct" id="compliance-value">0%</span></div>
+            <p id="compliance-freeze-notice" class="cli-note hidden">◈ EGG BAR ACTIVE — DECAY SUSPENDED</p>
+
+            <div class="cli-cmd">
+              <span class="cli-cmd-label">&gt; LOG_ACTIVITY</span>
+              <span class="cli-cmd-stat">TODAY · <span id="activity-units-today">0</span>/8000u</span>
+              <span class="cli-cmd-actions">
+                <button type="button" class="btn-cli activity-preset" data-units="1000">1K</button>
+                <button type="button" class="btn-cli activity-preset" data-units="2500">2.5K</button>
+                <button type="button" class="btn-cli activity-preset" data-units="5000">5K</button>
+                <input type="number" id="activity-units-input" min="0" step="100" placeholder="u" aria-label="Activity units">
+                <button type="button" id="btn-log-activity" class="btn-cli btn-cli-go">LOG</button>
+              </span>
+            </div>
+
+            <div class="cli-cmd">
+              <span class="cli-cmd-label">&gt; AM_INJECTION</span>
+              <span class="cli-cmd-stat"><span id="morning-dose-time">NOT RECORDED</span> <em id="morning-window-indicator"></em></span>
+              <span class="cli-cmd-actions"><button type="button" id="btn-administer-morning" class="btn-cli btn-cli-go">ADMINISTER</button></span>
+            </div>
+
+            <div class="cli-cmd">
+              <span class="cli-cmd-label">&gt; PM_INJECTION</span>
+              <span class="cli-cmd-stat"><span id="compliance-dose-time">NOT RECORDED</span> <em id="afternoon-window-indicator"></em></span>
+              <span class="cli-cmd-actions"><button type="button" id="btn-administer-dose" class="btn-cli btn-cli-go">ADMINISTER</button></span>
+            </div>
+          </section>
+
+          <!-- TAB 04: UTILITIES -->
+          <section class="tab-panel" id="tab-utilities" role="tabpanel" aria-labelledby="tab-btn-utilities" hidden>
+            <p class="cli-h">// EMPLOYEE SUBSYSTEMS</p>
+            <div class="util-grid">
+              <button type="button" id="btn-incentives" class="util-card"><span class="util-id">INC-01</span><span class="util-name">INCENTIVES</span><span class="util-desc">Spend allocation credits</span></button>
+              <button type="button" id="btn-procurement" class="util-card"><span class="util-id">PRC-02</span><span class="util-name">PROCUREMENT</span><span class="util-desc">Palettes &amp; geometries</span></button>
+              <button type="button" id="btn-archival" class="util-card"><span class="util-id">ARC-03</span><span class="util-name">ARCHIVAL</span><span class="util-desc">Encrypted sync protocol</span></button>
+              <button type="button" id="btn-orientation" class="util-card"><span class="util-id">ORI-04</span><span class="util-name">ORIENTATION</span><span class="util-desc">Employee briefing</span></button>
+            </div>
+
+            <section id="finger-trap-widget" class="util-widget hidden">
+              <p class="cli-h">// CHINESE FINGER TRAP</p>
+              <button type="button" id="btn-finger-trap" class="btn-cli btn-cli-go">TAP TO STRUGGLE</button>
+              <span id="finger-trap-count" class="cli-sub">0 STRUGGLES</span>
+            </section>
+
+            <section id="laser-crystal-footer" class="util-widget hidden" aria-hidden="true">
+              <p class="cli-h">// REFINER OF THE QUARTER</p>
+              <pre class="crystal-ascii">   /\\
+  /  \\
+ /____\\
+ \\    /
+  \\  /
+   \\/</pre>
+            </section>
+          </section>
+
+        </main>
+
+        <aside class="terminal-log-sidebar open" id="log-sidebar" aria-label="Terminal output log">
+          <div class="log-sidebar-head">
+            <span class="cli-h">// TERMINAL_OUTPUT</span>
+            <button type="button" id="btn-close-log" class="btn-close-log" aria-label="Close log panel">×</button>
+          </div>
+          <ol id="activity-log-list" class="activity-log-list" reversed>
+            <li class="log-entry log-entry--init">STREAM INITIALIZED</li>
+          </ol>
+          <span class="cli-cursor" aria-hidden="true">_</span>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DRAWERS / MODALS (shared across views) ══════════════════════ -->
+
+  <aside id="incentives-drawer" class="drawer hidden" aria-label="Employee incentives">
+    <div class="drawer-header"><h2>EMPLOYEE INCENTIVES</h2><button type="button" id="btn-close-incentives" class="btn-close" aria-label="Close">×</button></div>
+    <p class="drawer-note">Spend Credits on items approved by the Lumon Wellness Division.</p>
+    <div id="incentives-catalog" class="catalog"></div>
+  </aside>
+
+  <aside id="procurement-drawer" class="drawer hidden" aria-label="Lumon Procurement">
+    <div class="drawer-header"><h2>LUMON PROCUREMENT</h2><button type="button" id="btn-close-procurement" class="btn-close" aria-label="Close">×</button></div>
+    <p class="drawer-note">Unlock department palettes and refinement node geometries with Credits.</p>
+    <section class="procurement-section"><h3>DEPARTMENT PALETTES</h3><div id="palette-catalog" class="catalog"></div></section>
+    <section class="procurement-section"><h3>NODE GEOMETRIES</h3><div id="geometry-catalog" class="catalog"></div></section>
+  </aside>
+
+  <aside id="archival-sync-panel" class="drawer hidden" aria-label="Archival transmission">
+    <div class="drawer-header"><h2>ARCHIVAL TRANSMISSION</h2><button type="button" id="btn-close-archival" class="btn-close" aria-label="Close">×</button></div>
+    <p class="drawer-note">Optional encrypted cross-device sync. Terminal operates fully offline without this.</p>
+    <label class="toggle-row"><input type="checkbox" id="archival-enabled"><span>ENABLE ARCHIVAL PROTOCOL</span></label>
+    <label class="field-label" for="archival-endpoint">ARCHIVAL ENDPOINT</label>
+    <input type="url" id="archival-endpoint" placeholder="https://example.com/api" class="field-input">
+    <label class="field-label" for="archival-hash">ARCHIVAL HASH</label>
+    <div class="hash-row"><code id="archival-hash">—</code><button type="button" id="btn-copy-hash" class="btn-secondary">COPY</button><button type="button" id="btn-regenerate-hash" class="btn-secondary">REGEN</button></div>
+    <label class="field-label" for="archival-passphrase">PASSPHRASE (OPTIONAL)</label>
+    <input type="password" id="archival-passphrase" class="field-input" autocomplete="off">
+    <button type="button" id="btn-transmit-record" class="btn-primary btn-full">TRANSMIT RECORD</button>
+    <p id="archival-status" class="archival-status"></p>
+  </aside>
+
+  <div id="conflict-modal" class="modal hidden" role="dialog" aria-labelledby="conflict-title">
+    <div class="modal-content"><h2 id="conflict-title">ARCHIVAL CONFLICT DETECTED</h2><p>Local and archival records diverge. Select resolution protocol.</p>
+      <div class="modal-actions"><button type="button" id="btn-retain-local" class="btn-primary">RETAIN LOCAL RECORD</button><button type="button" id="btn-accept-archival" class="btn-primary">ACCEPT ARCHIVAL RECORD</button></div>
+    </div>
+  </div>
+
+  <div id="orientation-modal" class="orientation-modal hidden" role="dialog" aria-modal="true" aria-labelledby="orientation-title">
+    <div class="orientation-inner">
+      <div class="orientation-header"><h2 id="orientation-title">◆ EMPLOYEE ORIENTATION</h2><button type="button" id="btn-close-orientation" class="btn-close" aria-label="Close">×</button></div>
+      <div class="orientation-pages">
+        <div class="orientation-page active" data-page="1">
+          <p class="orient-heading">WELCOME, INNIE.</p>
+          <p class="orient-body">You are <strong>SUBJECT #4229</strong>. This window is a live <strong>Innie-Cam</strong> feed of your workspace on Floor 7. Leave it open during your day.</p>
+          <p class="orient-body">Click the <strong>CRT monitor</strong> to open your Refinement Terminal. Use the <strong>tab bar</strong> to switch between Data Matrix, Resourcing, Compliance, and Utilities modules. Press <strong>Alt+L</strong> to toggle the output log. Press <strong>ESC</strong> to return to the camera view.</p>
+        </div>
+        <div class="orientation-page" data-page="2">
+          <p class="orient-heading">DAILY PROTOCOLS</p>
+          <table class="orient-table"><thead><tr><th>ENDPOINT</th><th>COMMAND</th><th>REWARD</th></tr></thead>
+          <tbody>
+            <tr><td>FLUID</td><td>HYDRATE_UNIT (2000ml)</td><td>+25 / +5</td></tr>
+            <tr><td>QUOTA</td><td>LOG_ACTIVITY (8000u)</td><td>+25 / +5</td></tr>
+            <tr><td>COMPLIANCE</td><td>AM + PM INJECTION</td><td>+25 / +5</td></tr>
+            <tr><td>SUSTENANCE</td><td>SUSTENANCE (3 comp)</td><td>+25 / +5</td></tr>
+            <tr><td>ALL</td><td>full compliance bonus</td><td>+25 / +5</td></tr>
+          </tbody></table>
+          <p class="orient-note">PM injection missed after 14:00 reduces Compliance Standing by 20.</p>
+        </div>
+        <div class="orientation-page" data-page="3">
+          <p class="orient-heading">THE FOUR TEMPERS</p>
+          <p class="orient-body">The node sorts your state into <strong>WO</strong> (Woe), <strong>FC</strong> (Frolic), <strong>DR</strong> (Dread), <strong>MA</strong> (Malice). Healthy metrics raise Frolic; low sustenance and missed injections raise Woe and Dread.</p>
+          <p class="orient-body">Daily completions fill the <strong>Active File</strong>. At 100% a <strong>Waffle Party</strong> grants a permanent ×1.5 XP multiplier.</p>
+        </div>
+      </div>
+      <div class="orientation-nav"><button type="button" id="btn-orient-prev" class="btn-secondary" disabled>← PREV</button><span id="orient-page-indicator" class="orient-page-num">1 / 3</span><button type="button" id="btn-orient-next" class="btn-secondary">NEXT →</button></div>
+    </div>
+  </div>
+
+  <!-- fullscreen events -->
+  <div id="mde-overlay" class="fullscreen-event hidden" role="dialog" aria-label="Music Dance Experience">
+    <div class="mde-content"><p class="mde-title">MUSIC DANCE EXPERIENCE</p><p class="mde-sub">WELLNESS INCENTIVE — 60 SECONDS</p><div id="mde-node" class="mde-node"></div><p class="mde-timer" id="mde-countdown">60</p></div>
+  </div>
+
+  <div id="waffle-overlay" class="fullscreen-event hidden" role="dialog" aria-label="Waffle Party">
+    <div class="waffle-scene"><div class="waffle-plate" aria-hidden="true"><div class="waffle-grid"></div><div class="milk-goblet"></div></div><p class="waffle-title">WAFFLE PARTY</p><p class="waffle-sub">FILE COMPLETE — PRESTIGE CYCLE INITIATED</p><p id="waffle-subject-next" class="waffle-next"></p></div>
+  </div>
+
+  <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
