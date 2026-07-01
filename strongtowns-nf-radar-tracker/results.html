@@ -12,9 +12,6 @@
 <body>
   <main id="results-app">
     <header class="site-header site-header--results">
-      <div class="logo-wrap">
-        <img src="logo.png" alt="Strong Towns" class="logo" width="140" height="78" onerror="this.closest('.logo-wrap').hidden=true">
-      </div>
       <div class="brand-text">
         <p class="eyebrow" id="chapter-eyebrow">Strong Towns</p>
         <h1 id="event-title">Speed Radar Results</h1>
@@ -23,10 +20,12 @@
       </div>
     </header>
 
-    <nav class="results-nav">
+    <nav class="site-nav" aria-label="Site">
       <a href="index.html">Log speeds</a>
       <span class="nav-sep">·</span>
       <span class="nav-current">Results</span>
+      <span class="nav-sep">·</span>
+      <a href="guide.html">How to run</a>
     </nav>
 
     <div id="event-picker-wrap" class="event-picker-wrap" hidden>
@@ -89,9 +88,9 @@
               <tr>
                 <th>Street</th>
                 <th>Readings</th>
-                <th>Median (km/hr)</th>
-                <th>85th % (km/hr)</th>
-                <th id="threshold-col-header">% over 50 km/hr</th>
+                <th>Median</th>
+                <th>85th %</th>
+                <th id="threshold-col-header">% over 50</th>
               </tr>
             </thead>
             <tbody id="street-table-body"></tbody>
@@ -125,7 +124,7 @@
       </section>
     </div>
 
-    <footer class="results-footer">
+    <footer class="site-footer">
       <p><a href="index.html">← Back to speed radar</a></p>
       <p class="footer-credit">Strong Towns community speed radar</p>
     </footer>

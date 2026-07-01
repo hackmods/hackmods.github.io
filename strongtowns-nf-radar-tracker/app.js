@@ -15,10 +15,6 @@ const CONFIG = {
 
 const SPEED_UNIT = 'km/hr';
 
-function formatSpeed(value) {
-  return value + ' ' + SPEED_UNIT;
-}
-
 const loginOverlay = document.getElementById('login-overlay');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
@@ -163,7 +159,7 @@ function renderRecentLog() {
     const li = document.createElement('li');
     const dir = entry.direction ? ' ' + entry.direction : '';
     li.innerHTML =
-      '<span class="recent-main">' + escapeHtml(entry.street) + dir + ' · ' + formatSpeed(entry.speed) + '</span>' +
+      '<span class="recent-main">' + escapeHtml(entry.street) + dir + ' · ' + entry.speed + ' ' + SPEED_UNIT + '</span>' +
       '<span class="recent-meta">' + formatRecentTime(entry.timestamp) + '</span>';
     recentList.appendChild(li);
   });

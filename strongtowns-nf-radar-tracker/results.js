@@ -234,25 +234,6 @@ function statCard(value, label, unit, highlight) {
   );
 }
 
-function formatSpeed(value) {
-  return value + ' ' + SPEED_UNIT;
-}
-
-function speedAxisTitle() {
-  return {
-    display: true,
-    text: 'Speed (' + SPEED_UNIT + ')',
-    color: CHART_COLORS.navyMid,
-    font: { size: 11, weight: '600' },
-  };
-}
-
-function speedTooltipLabel(context, valueAxis = 'y') {
-  const raw = valueAxis === 'x' ? context.parsed.x : context.parsed.y;
-  const value = raw == null ? context.raw : raw;
-  return (context.dataset.label || 'Speed') + ': ' + formatSpeed(value);
-}
-
 function getThreshold(event) {
   const t = Number(event.speedThreshold);
   return Number.isFinite(t) && t > 0 ? t : DEFAULT_THRESHOLD;
@@ -305,12 +286,12 @@ function renderStatGrids(rows, threshold, event) {
     statCard(Math.round(median(speeds)), 'Median', SPEED_UNIT) +
     statCard(Math.round(percentile(speeds, 85)), '85th %', SPEED_UNIT) +
     statCard(Math.max(...speeds), 'Highest', SPEED_UNIT, true) +
-    statCard(pctOver(speeds, threshold) + '%', 'Over ' + threshold + ' ' + SPEED_UNIT, '');
+    statCard(pctOver(speeds, threshold) + '%', 'Over ' + threshold, '');
 
   const pct = pctOver(speeds, threshold);
   els.thresholdCallout.textContent =
-    pct + '% of observed vehicles were traveling faster than ' + formatSpeed(threshold) + '.';
-  els.thresholdColHeader.textContent = '% over ' + formatSpeed(threshold);
+    pct + '% of observed vehicles were traveling faster than ' + threshold + ' ' + SPEED_UNIT + '.';
+  els.thresholdColHeader.textContent = '% over ' + threshold;
 }
 
 function chartDefaults() {
@@ -351,7 +332,7 @@ function renderDistributionChart(canvasId, speeds) {
   chartInstances[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: SPEED_BUCKETS.map((b) => b.label + ' ' + SPEED_UNIT),
+      labels: SPEED_BUCKETS.map((b) => b.label),
       datasets: [{
         label: 'Vehicles',
         data: bucketCounts(speeds),
@@ -364,7 +345,6 @@ function renderDistributionChart(canvasId, speeds) {
       plugins: { legend: { display: false } },
       scales: {
         ...chartDefaults().scales,
-        x: { ...chartDefaults().scales.x, title: speedAxisTitle() },
         y: { ...chartDefaults().scales.y, beginAtZero: true, ticks: { ...chartDefaults().scales.y.ticks, stepSize: 1 } },
       },
     },
@@ -399,13 +379,9 @@ function renderStreetsAvgChart(groups) {
     options: {
       indexAxis: 'y',
       ...chartDefaults(),
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: (ctx) => speedTooltipLabel(ctx, 'x') } },
-      },
+      plugins: { legend: { display: false } },
       scales: {
         ...chartDefaults().scales,
-        x: { ...chartDefaults().scales.x, title: speedAxisTitle() },
       },
     },
   });
@@ -482,8 +458,8 @@ function renderStreetTable(groups, threshold) {
       '<tr>' +
       '<td>' + escapeHtml(g.name) + '</td>' +
       '<td>' + g.rows.length + '</td>' +
-      '<td>' + formatSpeed(Math.round(median(speeds))) + '</td>' +
-      '<td>' + formatSpeed(Math.round(percentile(speeds, 85))) + '</td>' +
+      '<td>' + Math.round(median(speeds)) + '</td>' +
+      '<td>' + Math.round(percentile(speeds, 85)) + '</td>' +
       '<td>' + pctOver(speeds, threshold) + '%</td>' +
       '</tr>'
     );
@@ -511,7 +487,7 @@ function renderStreetThresholdChart(groups, threshold) {
   }
 
   els.streetThresholdWrap.hidden = false;
-  els.streetThresholdTitle.textContent = '% over ' + formatSpeed(threshold) + ' by street';
+  els.streetThresholdTitle.textContent = '% over ' + threshold + ' km/h by street';
   setBarChartHeight('chart-street-threshold', qualifying.length);
 
   const ctx = document.getElementById('chart-street-threshold').getContext('2d');
@@ -521,7 +497,7 @@ function renderStreetThresholdChart(groups, threshold) {
     data: {
       labels: qualifying.map((s) => s.name),
       datasets: [{
-        label: '% over ' + formatSpeed(threshold),
+        label: '% over ' + threshold + ' km/h',
         data: qualifying.map((s) => s.pct),
         backgroundColor: CHART_COLORS.accentDark,
         borderRadius: 4,

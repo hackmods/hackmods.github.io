@@ -31,6 +31,9 @@
   --success: #1e6b3a;
   --radius: 10px;
   --shadow: 0 2px 12px rgba(26, 47, 77, 0.08);
+  --page-max-width: 72rem;
+  --page-padding: clamp(1rem, 3vw, 2rem);
+  --content-narrow: 32rem;
 }
 
 html {
@@ -58,11 +61,18 @@ h1 {
   font-size: 2rem;
 }
 
-main,
 .overlay-card {
   max-width: 28rem;
   margin: 0 auto;
   padding: 1.25rem;
+}
+
+#app,
+#results-app,
+#guide-app {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 1.25rem var(--page-padding);
 }
 
 .site-header {
@@ -82,12 +92,117 @@ main,
   border-radius: var(--radius);
 }
 
+.site-header--tracker,
+.site-header--results,
+.site-header--guide {
+  margin: -1.25rem calc(-1 * var(--page-padding)) 1rem;
+  padding: 1.35rem var(--page-padding);
+}
+
+.site-header--tracker h1,
+.site-header--results h1,
+.site-header--guide h1 {
+  font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  font-size: 0.95rem;
+}
+
+.site-nav a {
+  color: var(--st-navy-mid);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  text-decoration: underline;
+}
+
+.site-nav .nav-sep {
+  color: var(--muted);
+}
+
+.site-nav .nav-current {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.page-content {
+  width: 100%;
+  margin-inline: auto;
+}
+
+.page-content--tracker {
+  max-width: var(--content-narrow);
+}
+
+.page-content--tracker .site-footer {
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .page-content--tracker {
+    max-width: 28rem;
+  }
+}
+
+.page-content--prose {
+  max-width: 52rem;
+}
+
+.page-content--prose .site-footer {
+  text-align: left;
+}
+
+.site-footer {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.site-footer a {
+  color: var(--st-navy-mid);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+.site-footer p {
+  margin: 0.35rem 0;
+}
+
+.footer-credit {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+}
+
 .logo-wrap {
   flex-shrink: 0;
-  background: #fff;
-  padding: 0.45rem 0.65rem;
-  border-radius: 8px;
   line-height: 0;
+}
+
+.site-header .logo-wrap {
+  background: transparent;
+  padding: 0;
+}
+
+.logo-wrap[hidden] {
+  display: none !important;
 }
 
 .logo {
@@ -265,14 +380,11 @@ footer p {
   margin: 0.25rem 0;
 }
 
-.footer-link a {
-  color: var(--st-navy-mid);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.footer-link a:hover {
-  text-decoration: underline;
+#radar-form {
+  background: var(--surface);
+  padding: 1.15rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 #queue-line {
@@ -326,11 +438,4 @@ footer p {
   color: var(--muted);
   font-size: 0.8rem;
   white-space: nowrap;
-}
-
-#radar-form {
-  background: var(--surface);
-  padding: 1.15rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
 }

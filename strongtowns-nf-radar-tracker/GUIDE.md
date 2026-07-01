@@ -1,5 +1,7 @@
 # Strong Towns Speed Radar — Activity Guide
 
+> **Shareable web version:** [guide.html](guide.html) — email this link to volunteers and chapter organizers.
+
 A playbook for local Strong Towns chapters running a monthly community speed radar event, collecting data with the tracker, and publishing results for advocacy.
 
 ## Overview

@@ -60,7 +60,11 @@ Share the URL and password (`Eddie`) with volunteers.
 
 ## Results page
 
-After an event, publish results at [`results.html`](results.html). See **[GUIDE.md](GUIDE.md)** for the full monthly activity playbook and how to export CSV + update [`data/manifest.json`](data/manifest.json).
+After an event, publish results at [`results.html`](results.html).
+
+**Event operations (volunteers + organizers):** see **[guide.html](guide.html)** — how to run the activity, enter data, publish results, and present findings.
+
+**Technical publish workflow:** see **[GUIDE.md](GUIDE.md)** for the monthly CSV + manifest checklist. **One-time setup:** see this README.
 
 ## Sheet columns
 
