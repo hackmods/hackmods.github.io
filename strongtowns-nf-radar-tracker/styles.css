@@ -265,6 +265,16 @@ footer p {
   margin: 0.25rem 0;
 }
 
+.footer-link a {
+  color: var(--st-navy-mid);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-link a:hover {
+  text-decoration: underline;
+}
+
 #queue-line {
   color: var(--st-accent-dark);
 }

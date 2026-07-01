@@ -13,6 +13,12 @@ const CONFIG = {
   SPEED_MAX: 250,
 };
 
+const SPEED_UNIT = 'km/hr';
+
+function formatSpeed(value) {
+  return value + ' ' + SPEED_UNIT;
+}
+
 const loginOverlay = document.getElementById('login-overlay');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
@@ -157,7 +163,7 @@ function renderRecentLog() {
     const li = document.createElement('li');
     const dir = entry.direction ? ' ' + entry.direction : '';
     li.innerHTML =
-      '<span class="recent-main">' + escapeHtml(entry.street) + dir + ' · ' + entry.speed + ' km/h</span>' +
+      '<span class="recent-main">' + escapeHtml(entry.street) + dir + ' · ' + formatSpeed(entry.speed) + '</span>' +
       '<span class="recent-meta">' + formatRecentTime(entry.timestamp) + '</span>';
     recentList.appendChild(li);
   });
@@ -277,7 +283,7 @@ async function submitReading(street, direction, speed) {
 function validateForm(street, speed) {
   if (!street) return 'Street is required.';
   if (!Number.isFinite(speed) || speed < 1 || speed > CONFIG.SPEED_MAX) {
-    return 'Speed must be between 1 and ' + CONFIG.SPEED_MAX + ' km/h.';
+    return 'Speed must be between 1 and ' + CONFIG.SPEED_MAX + ' ' + SPEED_UNIT + '.';
   }
   return null;
 }
