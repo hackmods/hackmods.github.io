@@ -1,0 +1,51 @@
+HOW TO UPDATE YOUR SHOW SCHEDULE
+================================
+
+You do NOT need to edit the website code.
+
+Option A — Easiest (edit this folder’s spreadsheet file)
+--------------------------------------------------------
+1. Open the file named:  shows.csv
+   (You can open it in Excel, Google Sheets, or Notepad.)
+
+2. Keep the first line exactly as:
+   Title,Date,Location,Link
+
+3. Add or change one show per line. Example:
+   Legion Laughs,2026-08-15,Fort Erie Legion Branch 71,https://forterieradio.ca/
+
+4. Rules of thumb:
+   - Put the date as YYYY-MM-DD (example: 2026-08-15)
+   - Do not use commas inside the Location name (write "Fort Erie Legion" not "Fort Erie, ON")
+   - If there is no ticket link yet, leave the Link box empty
+   - Leave the Link empty = no "Buy Tickets" button on the site
+
+5. Save the file.
+
+6. Tell Ryan (or whoever hosts the site) to upload / redeploy,
+   OR if the site is on the Proxmox box, run:
+   git -C /var/www/dickie-lakeshore pull
+
+
+Option B — Update forever without redeploying (Google Sheet)
+------------------------------------------------------------
+1. Create a Google Sheet with the same four columns:
+   Title | Date | Location | Link
+
+2. In Google Sheets: File → Share → Publish to web → choose CSV → Publish
+
+3. Copy the published CSV link.
+
+4. Open app.js and paste that link into SHOWS_CSV_URL near the top.
+   (Ask Ryan to do this once.)
+
+5. After that, just edit the Google Sheet. The website updates itself.
+
+
+Sample row (copy/paste into shows.csv)
+--------------------------------------
+Spotlight Open Mic,2026-08-22,Spotlight Comedy Club,
+Talkin Funny Live,2026-09-05,Niagara Falls,https://example.com/tickets
+
+
+Questions? Email richard.gibbs2016@gmail.com or call 905-714-3622.

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page not found | Dickie Lakeshore</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'canadian-red': '#c8102e',
+            'midnight-blue': '#00203f',
+            'off-white': '#f9f9f9',
+          },
+          fontFamily: {
+            display: ['"Playfair Display"', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-off-white text-midnight-blue font-sans min-h-screen flex items-center justify-center px-4">
+  <main class="text-center max-w-md">
+    <h1 class="font-display text-4xl font-bold mb-4">404</h1>
+    <p class="text-midnight-blue/70 mb-8">That page wandered off stage. Let’s get you back to the show.</p>
+    <a href="/" class="inline-block bg-canadian-red hover:bg-red-800 text-white font-semibold py-3 px-6 rounded transition-colors">
+      Back to Dickie Lakeshore
+    </a>
+  </main>
+</body>
+</html>
