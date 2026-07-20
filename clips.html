@@ -146,15 +146,17 @@
     </div>
 
     <nav class="taskbar" aria-label="Site navigation">
-        <a href="index.html" class="start-btn">🏁 Start</a>
-        <a href="index.html#window-bio" class="active-app">📄 bio.txt</a>
-        <a href="index.html#window-nav" class="active-app">🗂️ programs</a>
-        <a href="clips.html" class="active-app is-current">🎬 clips.exe</a>
-        <a href="index.html#window-shorts" class="active-app">📱 shorts.vlc</a>
-        <a href="shows.html" class="active-app">📅 shows.sys</a>
-        <a href="about.html" class="active-app">📰 about.txt</a>
-        <a href="shows.html#window-booking" class="active-app">📩 booking</a>
-        <div class="system-tray" id="clock">12:00 PM</div>
+        <button type="button" class="start-btn" id="start-btn">🏁 Start</button>
+        <div class="taskbar-apps">
+            <a href="index.html#window-bio" class="active-app">📄 bio.txt</a>
+            <a href="index.html#window-nav" class="active-app">🗂️ programs</a>
+            <a href="clips.html" class="active-app is-current">🎬 clips.exe</a>
+            <a href="index.html#window-shorts" class="active-app">📱 shorts.vlc</a>
+            <a href="shows.html" class="active-app">📅 shows.sys</a>
+            <a href="about.html" class="active-app">📰 about.txt</a>
+            <a href="shows.html#window-booking" class="active-app">📩 booking</a>
+        </div>
+        <div class="system-tray"><span id="clock">12:00 PM</span></div>
     </nav>
 
     <script>
@@ -275,19 +277,8 @@
             listEl.appendChild(li);
             if (index === 0) selectClip(clip, btn);
         });
-
-        function updateClock() {
-            const now = new Date();
-            let h = now.getHours();
-            let m = now.getMinutes();
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
-            m = m < 10 ? '0' + m : m;
-            document.getElementById('clock').textContent = h + ':' + m + ' ' + ampm;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
     </script>
+    <script src="desktop.js" defer></script>
 </body>
 
 </html>

@@ -7,12 +7,14 @@ html {
 body {
     background-color: #008080;
     font-family: "MS Sans Serif", "Courier New", monospace;
-    padding-bottom: 100px;
+    padding-bottom: 120px;
     color: #000;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 0;
+    overflow-x: hidden;
+    max-width: 100vw;
 }
 
 
@@ -56,6 +58,7 @@ body {
     width: 90%;
     max-width: 700px;
     margin: 20px auto;
+    box-sizing: border-box;
 }
 
 .window-wide {
@@ -426,6 +429,11 @@ button:active,
     line-height: 1.25;
     min-height: 88px;
     justify-content: center;
+    font-family: inherit;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
 }
 
 .nav-tile:hover {
@@ -526,8 +534,226 @@ button:active,
     font-weight: bold;
 }
 
-.content a:not(.btn):not(.nav-tile):not(.press-thumb):not(.active-app):not(.start-btn) {
+.content a:not(.btn):not(.nav-tile):not(.press-thumb):not(.active-app):not(.start-btn):not(.start-item) {
     color: #000080;
+}
+
+
+/* START MENU */
+
+.start-menu {
+    position: fixed;
+    left: 4px;
+    bottom: 48px;
+    z-index: 10040;
+    display: flex;
+    width: min(320px, calc(100vw - 12px));
+    max-height: min(70vh, 520px);
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 4px 4px 0 #000;
+    font-size: 0.85rem;
+}
+
+.start-menu[hidden] {
+    display: none !important;
+}
+
+.start-menu-sidebar {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    background: linear-gradient(180deg, #000080, #1084d0);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    padding: 12px 6px;
+    flex-shrink: 0;
+}
+
+.start-menu-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.start-section-label {
+    font-size: 0.68rem;
+    font-weight: bold;
+    color: #555;
+    padding: 6px 12px 2px;
+    text-transform: uppercase;
+}
+
+.start-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    min-height: 36px;
+}
+
+.start-item:hover,
+.start-item:focus {
+    background: #000080;
+    color: #fff;
+    outline: none;
+}
+
+.start-flyout-wrap {
+    position: relative;
+}
+
+.start-flyout {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    min-width: 180px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 3px 3px 0 #000;
+    z-index: 2;
+}
+
+.start-flyout[hidden] {
+    display: none !important;
+}
+
+
+/* FLOATING WIDGETS */
+
+.float-window {
+    position: fixed;
+    width: min(380px, calc(100vw - 16px));
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 4px 4px 0 #000;
+    z-index: 10050;
+}
+
+.float-window[hidden] {
+    display: none !important;
+}
+
+.float-window .title-bar {
+    cursor: move;
+    user-select: none;
+    align-items: center;
+}
+
+.win-close {
+    width: auto;
+    min-width: 22px;
+    min-height: 22px;
+    margin: 0;
+    padding: 0 6px;
+    font-size: 1rem;
+    line-height: 1;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    cursor: pointer;
+}
+
+.win-close:active {
+    border-style: inset;
+}
+
+.notepad-area {
+    width: 100%;
+    min-height: 160px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    border: 2px inset #fff;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.clock-widget {
+    text-align: center;
+}
+
+.clock-digital {
+    font-family: 'Courier New', monospace;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 8px 0 4px;
+}
+
+.calc-display {
+    background: #000;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 1.3rem;
+    padding: 8px;
+    text-align: right;
+    border: 2px inset #808080;
+    margin-bottom: 8px;
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+
+.calc-key {
+    width: 100%;
+    margin: 0;
+    min-height: 40px;
+    font-weight: bold;
+}
+
+.hackmods-links {
+    margin: 0.5rem 0 0;
+    padding-left: 1.2rem;
+}
+
+.hackmods-links li {
+    margin-bottom: 0.4rem;
+}
+
+.saber-canvas,
+.duck-canvas {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    background: #1a1a2e;
+    border: 2px inset #808080;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.duck-canvas {
+    background: #87ceeb;
+}
+
+.saber-colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.saber-color.is-active {
+    background: #000080;
+    color: #fff;
+}
+
+.duck-hud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 6px;
 }
 
 
@@ -554,7 +780,7 @@ button:active,
 .start-btn {
     background: #c0c0c0;
     border: 2px outset #fff;
-    padding: 2px 10px;
+    padding: 4px 12px;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -562,6 +788,15 @@ button:active,
     text-decoration: none;
     color: black;
     font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    min-height: 32px;
+}
+
+.start-btn.is-open,
+.start-btn:active {
+    border-style: inset;
+    background: #e0e0e0;
 }
 
 .active-app {
@@ -589,13 +824,51 @@ button:active,
 
 .system-tray {
     border: 2px inset #fff;
-    padding: 0 10px;
+    padding: 0 4px;
     margin-right: 10px;
     margin-left: auto;
     font-size: 0.85rem;
     display: flex;
     align-items: center;
-    height: 28px;
+    gap: 2px;
+    height: 32px;
+}
+
+.tray-btn,
+.tray-clock {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    min-height: 28px;
+    color: #000;
+}
+
+.tray-btn:hover,
+.tray-clock:hover {
+    background: #e0e0e0;
+}
+
+.taskbar-apps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+@media (max-width: 900px) {
+    .window {
+        width: calc(100% - 24px);
+        max-width: none;
+    }
+
+    .nav-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 640px) {
@@ -603,9 +876,10 @@ button:active,
         padding-bottom: 6px;
     }
 
-    .active-app {
+    .taskbar-apps .active-app {
         font-size: 0.72rem;
-        padding: 2px 6px;
+        padding: 4px 6px;
+        min-height: 32px;
     }
 
     .video-frame iframe {
@@ -614,5 +888,50 @@ button:active,
 
     .system-tray {
         margin-left: 0;
+    }
+
+    .start-menu {
+        left: 0;
+        right: 0;
+        bottom: auto;
+        top: auto;
+        width: 100%;
+        max-width: none;
+        max-height: 60vh;
+        border-left: none;
+        border-right: none;
+        /* sit above taskbar: JS sets bottom via CSS var fallback */
+        bottom: 52px;
+    }
+
+    .start-flyout {
+        position: static;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid #808080;
+        margin: 0 0 4px 12px;
+    }
+
+    .float-window {
+        left: 0 !important;
+        right: 0 !important;
+        top: auto !important;
+        bottom: 52px;
+        width: 100%;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-radius: 0;
+    }
+
+    .float-window .title-bar {
+        cursor: default;
+    }
+
+    .nav-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .short-frame {
+        max-width: 220px;
     }
 }

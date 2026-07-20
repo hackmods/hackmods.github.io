@@ -60,7 +60,9 @@
           "sameAs": [
             "https://www.youtube.com/@RyanMorrisComedy",
             "https://www.instagram.com/ryanmorriscomedy/",
-            "https://x.com/RyanMorrisComedy"
+            "https://x.com/RyanMorrisComedy",
+            "https://github.com/hackmods",
+            "https://www.linkedin.com/in/ryanjamesmorris"
           ]
         },
         {
@@ -81,7 +83,7 @@
 
     <div class="marquee-container" aria-hidden="true">
         <div class="marquee-text">
-          ⚡ RYAN MORRIS COMEDY ⚡ SET COUNT: 125 ⚡ NO CLICKBAIT ⚡ JUST GROWTH ⚡ LIVE COMEDY ⚡ NIAGARA FALLS ⚡ ST. CATHARINES ⚡ BUFFALO FAN BILL ⚡ LAUGH LAB ⚡ SUPPORT LOCAL COMEDY ⚡ COMICS SUPPORTING FELLOW COMICS ⚡
+          ⚡ RYAN MORRIS COMEDY ⚡ SET COUNT: 125 ⚡ HACKMODS ⚡ GITHUB.COM/HACKMODS ⚡ NO CLICKBAIT ⚡ JUST GROWTH ⚡ LIVE COMEDY ⚡ NIAGARA FALLS ⚡ ST. CATHARINES ⚡ BUFFALO FAN BILL ⚡ LAUGH LAB ⚡ SUPPORT LOCAL COMEDY ⚡
         </div>
     </div>
 
@@ -139,6 +141,39 @@
                     <span class="nav-label">YT Shorts</span>
                     <span class="nav-desc">Full shorts feed</span>
                 </a>
+                <a class="nav-tile" href="https://github.com/hackmods" target="_blank" rel="noopener">
+                    <span class="nav-icon">⌘</span>
+                    <span class="nav-label">hackmods</span>
+                    <span class="nav-desc">GitHub / code</span>
+                </a>
+                <button type="button" class="nav-tile" data-open-widget="saber">
+                    <span class="nav-icon">⚔️</span>
+                    <span class="nav-label">lightsaber</span>
+                    <span class="nav-desc">Dashboard widget</span>
+                </button>
+                <button type="button" class="nav-tile" data-open-widget="duckhunt">
+                    <span class="nav-icon">🦆</span>
+                    <span class="nav-label">duckhunt</span>
+                    <span class="nav-desc">Dashboard game</span>
+                </button>
+                <button type="button" class="nav-tile" data-open-widget="hackmods">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-label">HACKMODS.EXE</span>
+                    <span class="nav-desc">Dev desktop</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="window-hackmods">
+        <div class="title-bar"><span>HACKMODS.TXT</span><span>[X]</span></div>
+        <div class="content">
+            <h2>Programming side</h2>
+            <p>By day Ryan works in tech (systems / data). By night he treats stand-up like a repo: number the set, film it, review it, ship the next one. The brand is COMEDY.EXE — craft over virality.</p>
+            <div class="btn-row" style="justify-content: flex-start;">
+                <a class="btn" href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub</a>
+                <a class="btn" href="https://www.linkedin.com/in/ryanjamesmorris" target="_blank" rel="noopener">LinkedIn</a>
+                <button type="button" class="btn btn-primary" data-open-widget="hackmods">Open HACKMODS.EXE</button>
             </div>
         </div>
     </div>
@@ -250,15 +285,19 @@
     </div>
 
     <nav class="taskbar" aria-label="Site navigation">
-        <a href="index.html" class="start-btn">🏁 Start</a>
-        <a href="#window-bio" class="active-app is-current">📄 bio.txt</a>
-        <a href="#window-nav" class="active-app">🗂️ programs</a>
-        <a href="clips.html" class="active-app">🎬 clips.exe</a>
-        <a href="#window-shorts" class="active-app">📱 shorts.vlc</a>
-        <a href="shows.html" class="active-app">📅 shows.sys</a>
-        <a href="about.html" class="active-app">📰 about.txt</a>
-        <a href="#window-booking" class="active-app">📩 booking</a>
-        <div class="system-tray" id="clock">12:00 PM</div>
+        <button type="button" class="start-btn" id="start-btn">🏁 Start</button>
+        <div class="taskbar-apps">
+            <a href="#window-bio" class="active-app is-current">📄 bio.txt</a>
+            <a href="#window-nav" class="active-app">🗂️ programs</a>
+            <a href="clips.html" class="active-app">🎬 clips.exe</a>
+            <a href="#window-shorts" class="active-app">📱 shorts.vlc</a>
+            <a href="shows.html" class="active-app">📅 shows.sys</a>
+            <a href="about.html" class="active-app">📰 about.txt</a>
+            <a href="#window-booking" class="active-app">📩 booking</a>
+        </div>
+        <div class="system-tray" id="system-tray">
+            <span id="clock">12:00 PM</span>
+        </div>
     </nav>
 
     <script>
@@ -298,19 +337,8 @@
             shortsList.appendChild(li);
             if (index === 0) selectShort(short, btn);
         });
-
-        function updateClock() {
-            const now = new Date();
-            let h = now.getHours();
-            let m = now.getMinutes();
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
-            m = m < 10 ? '0' + m : m;
-            document.getElementById('clock').textContent = h + ':' + m + ' ' + ampm;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
     </script>
+    <script src="desktop.js" defer></script>
 </body>
 
 </html>

@@ -53,7 +53,8 @@
         "https://www.youtube.com/@RyanMorrisComedy",
         "https://www.instagram.com/ryanmorriscomedy/",
         "https://x.com/RyanMorrisComedy",
-        "https://github.com/hackmods"
+        "https://github.com/hackmods",
+        "https://www.linkedin.com/in/ryanjamesmorris"
       ]
     }
     </script>
@@ -76,9 +77,13 @@
             <h1>About Ryan Morris</h1>
             <p class="lead">Ryan Morris is a Niagara Region stand-up comedian who documents comedy the way a programmer documents code: every set numbered, recorded, and reviewed. By day he works in tech; by night he bombs and kills on purpose — building material through volume at rooms like Laugh Lab / Bomb Comedy Tour, Spotlight Comedy Club, and open mics across Southern Ontario.</p>
             <p>His stage persona leans observational and self-aware: dad life, cat jokes, topical bits, puppets, props, and unhinged crowd work. Recurring character energy includes Buffalo Fan Bill. The brand is <strong>COMEDY.EXE</strong> — authenticity over algorithm chasing.</p>
+            <h2>Day job / night mic</h2>
+            <p>Systems and data by day (see <a href="https://github.com/hackmods" target="_blank" rel="noopener">github.com/hackmods</a>). Stand-up craft logs by night. Same iteration loop — ship, review, improve.</p>
             <div class="btn-row">
                 <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy">YouTube</a>
                 <a class="btn" href="https://www.instagram.com/ryanmorriscomedy/">Instagram</a>
+                <a class="btn" href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub</a>
+                <a class="btn" href="https://www.linkedin.com/in/ryanjamesmorris" target="_blank" rel="noopener">LinkedIn</a>
                 <a class="btn btn-primary" href="shows.html#window-booking">Book Ryan</a>
             </div>
         </div>
@@ -142,35 +147,26 @@
                 <li><b>Sets documented:</b> 125+</li>
                 <li><b>Style:</b> Observational, self-aware, crowd work, props</li>
                 <li><b>Booking:</b> <a href="shows.html#window-booking">ryanmorris.ca/shows.html</a></li>
+                <li><b>Also:</b> <a href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub / hackmods</a> · programming side projects</li>
             </ul>
         </div>
     </div>
 
     <nav class="taskbar" aria-label="Site navigation">
-        <a href="index.html" class="start-btn">🏁 Start</a>
-        <a href="index.html#window-bio" class="active-app">📄 bio.txt</a>
-        <a href="index.html#window-nav" class="active-app">🗂️ programs</a>
-        <a href="clips.html" class="active-app">🎬 clips.exe</a>
-        <a href="index.html#window-shorts" class="active-app">📱 shorts.vlc</a>
-        <a href="shows.html" class="active-app">📅 shows.sys</a>
-        <a href="about.html" class="active-app is-current">📰 about.txt</a>
-        <a href="shows.html#window-booking" class="active-app">📩 booking</a>
-        <div class="system-tray" id="clock">12:00 PM</div>
+        <button type="button" class="start-btn" id="start-btn">🏁 Start</button>
+        <div class="taskbar-apps">
+            <a href="index.html#window-bio" class="active-app">📄 bio.txt</a>
+            <a href="index.html#window-nav" class="active-app">🗂️ programs</a>
+            <a href="clips.html" class="active-app">🎬 clips.exe</a>
+            <a href="index.html#window-shorts" class="active-app">📱 shorts.vlc</a>
+            <a href="shows.html" class="active-app">📅 shows.sys</a>
+            <a href="about.html" class="active-app is-current">📰 about.txt</a>
+            <a href="shows.html#window-booking" class="active-app">📩 booking</a>
+        </div>
+        <div class="system-tray"><span id="clock">12:00 PM</span></div>
     </nav>
 
-    <script>
-        function updateClock() {
-            const now = new Date();
-            let h = now.getHours();
-            let m = now.getMinutes();
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
-            m = m < 10 ? '0' + m : m;
-            document.getElementById('clock').textContent = h + ':' + m + ' ' + ampm;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script>
+    <script src="desktop.js" defer></script>
 </body>
 
 </html>
