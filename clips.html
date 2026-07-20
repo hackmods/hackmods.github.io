@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comedy Clips &amp; Set Archive | Ryan Morris Comedy</title>
+    <link rel="canonical" href="https://ryanmorris.ca/clips.html">
+    <link rel="icon" href="./favicon.png" sizes="16x16">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="description" content="Curated stand-up clips from Ryan Morris Comedy — crowd work, puppets, divorced-dad bits, and Niagara open mics. Watch set #66 through #125 and more on YouTube.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Ryan Morris">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Ryan Morris Comedy">
+    <meta property="og:url" content="https://ryanmorris.ca/clips.html">
+    <meta property="og:title" content="Comedy Clips &amp; Set Archive | Ryan Morris Comedy">
+    <meta property="og:description" content="Curated live stand-up clips from Niagara comedian Ryan Morris — crowd work, puppets, and open-mic chaos.">
+    <meta property="og:image" content="https://ryanmorris.ca/RyanMorrisGroupPhoto.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@RyanMorrisComedy">
+    <meta name="twitter:title" content="Comedy Clips &amp; Set Archive | Ryan Morris Comedy">
+    <meta name="twitter:description" content="Curated live stand-up clips from Niagara comedian Ryan Morris.">
+    <meta name="twitter:image" content="https://ryanmorris.ca/RyanMorrisGroupPhoto.jpg">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Ryan Morris Comedy — Curated Sets",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "VideoObject",
+            "name": "His Christmas In July Bit Went Completely Off The Rails (#125)",
+            "embedUrl": "https://www.youtube.com/embed/upYiwuCMF9M",
+            "thumbnailUrl": "https://i.ytimg.com/vi/upYiwuCMF9M/hqdefault.jpg",
+            "url": "https://www.youtube.com/watch?v=upYiwuCMF9M"
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "VideoObject",
+            "name": "The Real Reason Divorced Dads Love Half Christmas (#124)",
+            "embedUrl": "https://www.youtube.com/embed/Fk7gRNqkeKs",
+            "thumbnailUrl": "https://i.ytimg.com/vi/Fk7gRNqkeKs/hqdefault.jpg",
+            "url": "https://www.youtube.com/watch?v=Fk7gRNqkeKs"
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "VideoObject",
+            "name": "Comedian Brings A Keyboard And Instant Chaos (#123)",
+            "embedUrl": "https://www.youtube.com/embed/2BsmOzu8JFA",
+            "thumbnailUrl": "https://i.ytimg.com/vi/2BsmOzu8JFA/hqdefault.jpg",
+            "url": "https://www.youtube.com/watch?v=2BsmOzu8JFA"
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "VideoObject",
+            "name": "He Brought An Owl Puppet To A Comedy Club (#121)",
+            "embedUrl": "https://www.youtube.com/embed/b3p9mBinPog",
+            "thumbnailUrl": "https://i.ytimg.com/vi/b3p9mBinPog/hqdefault.jpg",
+            "url": "https://www.youtube.com/watch?v=b3p9mBinPog"
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "item": {
+            "@type": "VideoObject",
+            "name": "Set #66 Bomb Comedy Tour Laugh Lab",
+            "embedUrl": "https://www.youtube.com/embed/V-DcIs_8KWg",
+            "thumbnailUrl": "https://i.ytimg.com/vi/V-DcIs_8KWg/hqdefault.jpg",
+            "url": "https://www.youtube.com/watch?v=V-DcIs_8KWg"
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+
+    <div class="marquee-container" aria-hidden="true">
+        <div class="marquee-text">
+          ⚡ CLIP_LIBRARY.EXE ⚡ CURATED SETS ⚡ FULL ARCHIVE ON YOUTUBE ⚡ NIAGARA STAND-UP ⚡ CROWD WORK ⚡ PUPPETS ⚡
+        </div>
+    </div>
+
+    <div class="window window-wide" id="window-clips">
+        <div class="title-bar"><span>CLIP_LIBRARY.EXE</span><span>[X]</span></div>
+        <div class="content">
+            <h1>Comedy Clips &amp; Set Archive</h1>
+            <p class="lead">Pick a set from the file list. Hook titles match the YouTube uploads — owl puppets, keyboards, paper bags, and divorced-dad bits from Niagara rooms.</p>
+
+            <div class="clip-layout">
+                <div>
+                    <h2 class="sr-only">Set list</h2>
+                    <ul class="clip-list" id="clip-list" role="listbox" aria-label="Curated comedy sets"></ul>
+                </div>
+                <div class="clip-player">
+                    <h2 id="clip-title">Loading…</h2>
+                    <p class="muted" id="clip-meta"></p>
+                    <div class="video-frame">
+                        <iframe id="clip-frame" title="Selected Ryan Morris comedy set" allowfullscreen></iframe>
+                    </div>
+                    <p id="clip-notes"></p>
+                </div>
+            </div>
+
+            <p style="margin-top: 1rem;">
+                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy">Full archive on YouTube →</a>
+                <a class="btn" href="shows.html">See upcoming shows</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="window" id="window-index">
+        <div class="title-bar"><span>README.TXT</span><span>[X]</span></div>
+        <div class="content">
+            <h2>Also on the channel</h2>
+            <ul>
+                <li><strong>Owl Puppet Open Mic | Set #121</strong> — host lost it</li>
+                <li><strong>Paper Bag Front-Row Roast | Set #120</strong></li>
+                <li><strong>Ghost Puppet Open Mic | Set #119</strong></li>
+                <li><strong>Unhinged Puppet Comedy | Set #118</strong></li>
+                <li><strong>Expired Condoms Front Row | Set #117</strong></li>
+            </ul>
+            <p class="muted">Text above is crawlable; use the player for embeds. Swap video IDs in the page script anytime.</p>
+        </div>
+    </div>
+
+    <nav class="taskbar" aria-label="Site navigation">
+        <a href="index.html" class="start-btn">🏁 Start</a>
+        <a href="index.html#window-bio" class="active-app">📄 bio.txt</a>
+        <a href="clips.html" class="active-app is-current">🎬 clips.exe</a>
+        <a href="shows.html" class="active-app">📅 shows.sys</a>
+        <a href="about.html" class="active-app">📰 about.txt</a>
+        <a href="shows.html#window-booking" class="active-app">📩 booking</a>
+        <div class="system-tray" id="clock">12:00 PM</div>
+    </nav>
+
+    <script>
+        const CLIPS = [
+            {
+                id: 'upYiwuCMF9M',
+                set: 125,
+                title: 'His "Christmas In July" Bit Went Completely Off The Rails (#125)',
+                venue: 'Live stand-up',
+                notes: 'Holiday bit goes off the rails. Crowd work energy.'
+            },
+            {
+                id: 'Fk7gRNqkeKs',
+                set: 124,
+                title: 'The Real Reason Divorced Dads Love "Half Christmas" (#124)',
+                venue: 'Live stand-up',
+                notes: 'Divorced-dad observational bit.'
+            },
+            {
+                id: '2BsmOzu8JFA',
+                set: 123,
+                title: 'Comedian Brings A Keyboard And Instant Chaos (#123)',
+                venue: 'Live stand-up',
+                notes: 'Prop comedy. Instant chaos.'
+            },
+            {
+                id: '8a6c1inMrxQ',
+                set: 122,
+                title: 'He Brought Puppets To A Comedy Show (It Got Weird) (#122)',
+                venue: 'Live stand-up',
+                notes: 'Puppet set. It got weird.'
+            },
+            {
+                id: 'b3p9mBinPog',
+                set: 121,
+                title: 'He Brought An Owl Puppet To A Comedy Club... The Host Lost It (#121)',
+                venue: 'Comedy club',
+                notes: 'Owl puppet. Host lost it.'
+            },
+            {
+                id: 'ftc4sssVTc4',
+                set: 120,
+                title: 'He Brought A Paper Bag To A Comedy Club... And Roasted The Front Row (#120)',
+                venue: 'Comedy club',
+                notes: 'Paper bag prop. Front-row roast.'
+            },
+            {
+                id: 'UevZFqrmsFo',
+                set: 119,
+                title: 'Why I Brought A Ghost Puppet To An Open Mic (#119)',
+                venue: 'Open mic',
+                notes: 'Ghost puppet open mic.'
+            },
+            {
+                id: 'L-nSzHmYS5M',
+                set: 118,
+                title: 'Unhinged Puppet Comedy & Bizarre Turtle Facts (#118)',
+                venue: 'Open mic',
+                notes: 'Puppets + bizarre turtle facts.'
+            },
+            {
+                id: 'ZuJPG0gCcRA',
+                set: 117,
+                title: 'I Handed Out Expired Condoms To The Front Row... (#117)',
+                venue: 'Live stand-up',
+                notes: 'High-risk crowd interaction.'
+            },
+            {
+                id: '7nIkuRAhTSs',
+                set: 116,
+                title: 'Treating A Comedy Open Mic Like An Unhinged Therapy Session (#116)',
+                venue: 'Open mic',
+                notes: 'Therapy-session energy.'
+            },
+            {
+                id: 'V-DcIs_8KWg',
+                set: 66,
+                title: 'Set #66 — Bomb Comedy Tour | Laugh Lab — Classic Monster Jokes',
+                venue: 'Laugh Lab / Bomb Comedy Tour',
+                notes: 'Reading classic monster jokes. Act outs. Crowd work.'
+            },
+            {
+                id: 'SXMp7WTexQ0',
+                set: 78,
+                title: 'Set 78 — Comedy Christmas Party (family friendly) @ Taps Apps and Laughs',
+                venue: 'Taps Apps & Laughs',
+                notes: 'Family-friendly Christmas party set.'
+            }
+        ];
+
+        const listEl = document.getElementById('clip-list');
+        const frameEl = document.getElementById('clip-frame');
+        const titleEl = document.getElementById('clip-title');
+        const metaEl = document.getElementById('clip-meta');
+        const notesEl = document.getElementById('clip-notes');
+        let selectedBtn = null;
+
+        function selectClip(clip, btn) {
+            titleEl.textContent = clip.title;
+            metaEl.textContent = 'Set #' + clip.set + ' · ' + clip.venue;
+            notesEl.innerHTML = '<strong>Notes:</strong> ' + clip.notes;
+            frameEl.src = 'https://www.youtube.com/embed/' + clip.id;
+            frameEl.title = clip.title;
+            if (selectedBtn) selectedBtn.classList.remove('is-selected');
+            btn.classList.add('is-selected');
+            selectedBtn = btn;
+        }
+
+        CLIPS.forEach(function (clip, index) {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'clip-row';
+            btn.setAttribute('role', 'option');
+            btn.innerHTML = clip.title + '<span class="clip-meta">#' + clip.set + ' · ' + clip.venue + '</span>';
+            btn.addEventListener('click', function () { selectClip(clip, btn); });
+            li.appendChild(btn);
+            listEl.appendChild(li);
+            if (index === 0) selectClip(clip, btn);
+        });
+
+        function updateClock() {
+            const now = new Date();
+            let h = now.getHours();
+            let m = now.getMinutes();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            m = m < 10 ? '0' + m : m;
+            document.getElementById('clock').textContent = h + ':' + m + ' ' + ampm;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+
+</html>

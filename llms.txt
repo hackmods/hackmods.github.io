@@ -1,0 +1,22 @@
+# Ryan Morris Comedy
+
+> Niagara-based stand-up comedian documenting live sets across Southern Ontario. Brand: COMEDY.EXE.
+
+Ryan Morris performs observational, self-aware stand-up with crowd work, act-outs, and experimental open-mic bits. He tracks every set, records everything, and treats comedy like a craft. Based in the Niagara Region (Niagara Falls / St. Catharines), performing venues including Laugh Lab / Bomb Comedy Tour, Spotlight Comedy Club, Local Laughs, Failed To Render, and Rose City Comedy Collective.
+
+## Pages
+
+- [Home](https://ryanmorris.ca/): Bio, featured sets, booking CTA
+- [Clips](https://ryanmorris.ca/clips.html): Curated YouTube set archive
+- [Shows](https://ryanmorris.ca/shows.html): Upcoming dates, venues, booking form
+- [About / Press](https://ryanmorris.ca/about.html): Bio, press kit, headshots
+
+## Social
+
+- YouTube: https://www.youtube.com/@RyanMorrisComedy
+- Instagram: https://www.instagram.com/ryanmorriscomedy/
+- X: https://x.com/RyanMorrisComedy
+
+## Booking
+
+Use the form on https://ryanmorris.ca/shows.html or https://ryanmorris.ca/#window-booking for showcases, club dates, and events in Niagara, St. Catharines, Hamilton, and the Buffalo corridor.

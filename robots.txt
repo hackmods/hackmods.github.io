@@ -1,5 +1,12 @@
 # www.robotstxt.org/
 
-# Allow crawling of all content
 User-agent: *
-Disallow:
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://ryanmorris.ca/sitemap.xml
