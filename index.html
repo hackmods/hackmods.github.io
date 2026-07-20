@@ -97,8 +97,48 @@
                 <a class="btn" href="https://www.instagram.com/ryanmorriscomedy/">Instagram</a>
                 <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy">YouTube</a>
                 <a class="btn" href="clips.html">Clips</a>
+                <a class="btn" href="#window-shorts">Shorts</a>
                 <a class="btn" href="shows.html">Shows</a>
                 <a class="btn btn-primary" href="shows.html#window-booking">Book</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="window-nav">
+        <div class="title-bar"><span>PROGRAM_MANAGER.EXE</span><span>[X]</span></div>
+        <div class="content">
+            <h2>Open a program</h2>
+            <div class="nav-grid">
+                <a class="nav-tile" href="clips.html">
+                    <span class="nav-icon">🎬</span>
+                    <span class="nav-label">clips.exe</span>
+                    <span class="nav-desc">Set archive #66–#125</span>
+                </a>
+                <a class="nav-tile" href="#window-shorts">
+                    <span class="nav-icon">📱</span>
+                    <span class="nav-label">shorts.vlc</span>
+                    <span class="nav-desc">Vertical clips</span>
+                </a>
+                <a class="nav-tile" href="shows.html">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-label">shows.sys</span>
+                    <span class="nav-desc">Dates &amp; venues</span>
+                </a>
+                <a class="nav-tile" href="about.html">
+                    <span class="nav-icon">📰</span>
+                    <span class="nav-label">about.txt</span>
+                    <span class="nav-desc">Press kit &amp; bio</span>
+                </a>
+                <a class="nav-tile" href="shows.html#window-booking">
+                    <span class="nav-icon">📩</span>
+                    <span class="nav-label">booking</span>
+                    <span class="nav-desc">Book a show</span>
+                </a>
+                <a class="nav-tile" href="https://www.youtube.com/@RyanMorrisComedy/shorts">
+                    <span class="nav-icon">▶️</span>
+                    <span class="nav-label">YT Shorts</span>
+                    <span class="nav-desc">Full shorts feed</span>
+                </a>
             </div>
         </div>
     </div>
@@ -129,12 +169,37 @@
         <div class="content">
             <h2>Current Status</h2>
             <ul>
-                <li><b>Location:</b> Niagara Region, ON, CA</li>
-                <li><b>Topics:</b> Dad life, cat jokes, topical bits, puppets, crowd work</li>
-                <li><b>Sets Completed:</b> <span class="visitor-counter">000125</span></li>
-                <li><b>Recurring bit:</b> Buffalo Fan Bill</li>
+                <li><b>Location:</b> Niagara Region, ON, CA — <a href="shows.html">see rooms</a></li>
+                <li><b>Topics:</b> <a href="clips.html">Dad life, cat jokes, topical bits, puppets, crowd work</a></li>
+                <li><b>Sets Completed:</b> <span class="visitor-counter">000125</span> — <a href="clips.html">watch clips</a></li>
+                <li><b>Recurring bit:</b> <a href="about.html">Buffalo Fan Bill</a></li>
+                <li><b>Shorts:</b> <a href="#window-shorts">puppet bits &amp; quick hits</a> · <a href="https://www.youtube.com/@RyanMorrisComedy/shorts">YouTube feed</a></li>
             </ul>
-            <p>Documenting the craft one bomb and one kill at a time. Authenticity over algorithm chasing.</p>
+            <p>Documenting the craft one bomb and one kill at a time. Authenticity over algorithm chasing. <a href="about.html">Read the full bio →</a></p>
+        </div>
+    </div>
+
+    <div class="window" id="window-shorts">
+        <div class="title-bar"><span>SHORTS_PLAYER.VLC</span><span>[X]</span></div>
+        <div class="content">
+            <h2>YouTube Shorts</h2>
+            <p class="muted">Quick vertical hits — puppets, crowd work, and chaos between full sets.</p>
+            <div class="shorts-layout">
+                <div>
+                    <ul class="shorts-list" id="shorts-list" role="listbox" aria-label="Ryan Morris YouTube Shorts"></ul>
+                </div>
+                <div class="shorts-player">
+                    <h3 id="short-title">Loading…</h3>
+                    <div class="short-frame">
+                        <iframe id="short-frame" title="Selected Ryan Morris YouTube Short" allowfullscreen></iframe>
+                    </div>
+                    <p id="short-notes" style="margin-top: 10px;"></p>
+                </div>
+            </div>
+            <p style="margin-top: 12px;">
+                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy/shorts">All Shorts on YouTube →</a>
+                <a class="btn" href="clips.html">Full set archive</a>
+            </p>
         </div>
     </div>
 
@@ -146,7 +211,10 @@
                 <iframe src="https://www.youtube.com/embed/upYiwuCMF9M" title="His Christmas In July Bit Went Completely Off The Rails (#125)" allowfullscreen loading="lazy"></iframe>
             </div>
             <p><strong>Notes:</strong> Christmas in July bit goes off the rails. Crowd work. High risk, high reward.</p>
-            <p><a class="btn" href="clips.html">Open clip library</a></p>
+            <p>
+                <a class="btn" href="clips.html">Open clip library</a>
+                <a class="btn" href="#window-shorts">Watch Shorts</a>
+            </p>
         </div>
     </div>
 
@@ -158,6 +226,7 @@
                 <iframe src="https://www.youtube.com/embed/V-DcIs_8KWg" title="Set #66 Bomb Comedy Tour Laugh Lab — Ryan Reads Classic Literature" allowfullscreen loading="lazy"></iframe>
             </div>
             <p><strong>Notes:</strong> Reading classic monster jokes at Laugh Lab / Bomb Comedy Tour. Act outs. Crowd work.</p>
+            <p><a class="btn" href="clips.html">More sets in clip library →</a></p>
         </div>
     </div>
 
@@ -183,7 +252,9 @@
     <nav class="taskbar" aria-label="Site navigation">
         <a href="index.html" class="start-btn">🏁 Start</a>
         <a href="#window-bio" class="active-app is-current">📄 bio.txt</a>
+        <a href="#window-nav" class="active-app">🗂️ programs</a>
         <a href="clips.html" class="active-app">🎬 clips.exe</a>
+        <a href="#window-shorts" class="active-app">📱 shorts.vlc</a>
         <a href="shows.html" class="active-app">📅 shows.sys</a>
         <a href="about.html" class="active-app">📰 about.txt</a>
         <a href="#window-booking" class="active-app">📩 booking</a>
@@ -191,6 +262,43 @@
     </nav>
 
     <script>
+        const SHORTS = [
+            { id: 'W7DnvQ_2seE', title: 'Seducing the crowd with my puppet', notes: 'Puppet crowd work short.' },
+            { id: 'XvUaf6bDneU', title: 'Replaced my ex with a puppet', notes: 'Puppet bit — relationship chaos.' },
+            { id: 'NPpO1jt1mq0', title: 'Hypnotic puppet eyes?', notes: 'Stand-up comedy short.' },
+            { id: 'xBqvdhGUuig', title: 'The ultimate dry-mouth life hack', notes: 'Quick hit from stage.' },
+            { id: '7l8DlsbEA_o', title: 'Cookie Monster is woke now', notes: 'Character / topical short.' }
+        ];
+
+        const shortsList = document.getElementById('shorts-list');
+        const shortFrame = document.getElementById('short-frame');
+        const shortTitle = document.getElementById('short-title');
+        const shortNotes = document.getElementById('short-notes');
+        let selectedShortBtn = null;
+
+        function selectShort(short, btn) {
+            shortTitle.textContent = short.title;
+            shortNotes.innerHTML = '<strong>Notes:</strong> ' + short.notes;
+            shortFrame.src = 'https://www.youtube.com/embed/' + short.id;
+            shortFrame.title = short.title;
+            if (selectedShortBtn) selectedShortBtn.classList.remove('is-selected');
+            btn.classList.add('is-selected');
+            selectedShortBtn = btn;
+        }
+
+        SHORTS.forEach(function (short, index) {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'shorts-row';
+            btn.setAttribute('role', 'option');
+            btn.textContent = short.title;
+            btn.addEventListener('click', function () { selectShort(short, btn); });
+            li.appendChild(btn);
+            shortsList.appendChild(li);
+            if (index === 0) selectShort(short, btn);
+        });
+
         function updateClock() {
             const now = new Date();
             let h = now.getHours();
