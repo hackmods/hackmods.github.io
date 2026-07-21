@@ -1583,10 +1583,17 @@
     wrap.className = 'taskbar-overflow';
     wrap.innerHTML =
       '<button type="button" class="active-app taskbar-more-btn" id="taskbar-more-btn" aria-haspopup="true" aria-expanded="false" title="More pages">' +
-      '<span class="app-ico" aria-hidden="true">☰</span><span class="app-label">Apps</span></button>' +
-      '<div class="taskbar-more-flyout" id="taskbar-more-flyout" hidden role="menu" aria-label="Site pages"></div>';
+      '<span class="app-ico" aria-hidden="true">☰</span><span class="app-label">Apps</span></button>';
 
-    var flyout = wrap.querySelector('#taskbar-more-flyout');
+    // Portal flyout to body so it can never stretch the fixed taskbar flex row
+    var flyout = document.createElement('div');
+    flyout.className = 'taskbar-more-flyout';
+    flyout.id = 'taskbar-more-flyout';
+    flyout.hidden = true;
+    flyout.setAttribute('role', 'menu');
+    flyout.setAttribute('aria-label', 'Site pages');
+    document.body.appendChild(flyout);
+
     var moreBtn = wrap.querySelector('#taskbar-more-btn');
     var desktopSlot = document.createElement('div');
     desktopSlot.className = 'taskbar-secondary';
@@ -1681,7 +1688,9 @@
 
     document.addEventListener('click', function (e) {
       if (suppressDocClose) return;
-      if (!flyout.hidden && !wrap.contains(e.target)) closeTaskbarMore();
+      if (!flyout.hidden && !flyout.contains(e.target) && !wrap.contains(e.target)) {
+        closeTaskbarMore();
+      }
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeTaskbarMore();
@@ -1694,7 +1703,10 @@
   function adjustBodyPadding() {
     var tb = document.querySelector('.taskbar');
     if (!tb) return;
-    var h = tb.offsetHeight || 48;
+    // Prefer the pinned chrome height; clamp so a leaked in-flow menu can't
+    // blow out --taskbar-h and shove overlays off-screen.
+    var h = Math.round(tb.getBoundingClientRect().height) || 48;
+    if (h > 80) h = 52;
     document.body.style.paddingBottom = Math.max(100, h + 24) + 'px';
     document.documentElement.style.setProperty('--taskbar-h', h + 'px');
     var menu = document.getElementById('start-menu');
