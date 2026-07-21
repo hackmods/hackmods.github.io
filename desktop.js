@@ -234,9 +234,10 @@
     } else {
       var canvas = getHomeCanvas();
       var cw = canvas ? canvas.clientWidth : vw;
-      var ch = Math.max(canvas ? canvas.clientHeight : vh, vh - tb);
+      // Page windows live on a tall scrollable stage — never clamp top to the
+      // collapsed canvas height (absolute children fall out of flow).
       left = Math.min(Math.max(left, 8 - width + minVis), Math.max(0, cw - minVis));
-      top = Math.min(Math.max(top, 0), Math.max(0, ch - minVis));
+      top = Math.max(0, top);
     }
     return { left: left, top: top, width: width, height: height };
   }
@@ -654,30 +655,34 @@
       };
     });
 
+    var maxBottom = 0;
+    snapshots.forEach(function (s) {
+      maxBottom = Math.max(maxBottom, s.top + s.height + 48);
+    });
+
+    // Size the stage BEFORE absolute children leave normal flow / get clamped
+    canvas.style.minHeight = Math.max(maxBottom, window.innerHeight * 0.75) + 'px';
     document.body.classList.add('desktop-freefloat');
     loadLayout().__freefloat = true;
 
-    var maxBottom = 0;
     snapshots.forEach(function (s) {
-      applyGeometry(
-        s.el,
-        {
-          left: Math.max(0, s.left),
-          top: Math.max(0, s.top),
-          width: Math.max(minSizeFor(s.el).w, s.width),
-          height: null
-        },
-        false
-      );
+      var left = Math.max(0, Math.round(s.left));
+      var top = Math.max(0, Math.round(s.top));
+      var width = Math.max(minSizeFor(s.el).w, Math.round(s.width));
+      s.el.style.left = left + 'px';
+      s.el.style.top = top + 'px';
+      s.el.style.width = width + 'px';
       s.el.style.height = 'auto';
       s.el.dataset.placed = '1';
-      captureWinGeometry(s.el);
       var rec = getWinRecord(s.el.id);
-      rec.width = Math.round(Math.max(minSizeFor(s.el).w, s.width));
-      maxBottom = Math.max(maxBottom, s.top + Math.max(s.height, s.el.offsetHeight) + 40);
+      rec.left = left;
+      rec.top = top;
+      rec.width = width;
+      delete rec.height;
+      rec.userSized = false;
+      rec.hidden = !!s.el.hidden;
     });
 
-    if (maxBottom > 400) canvas.style.minHeight = maxBottom + 'px';
     saveLayoutSoon();
     return true;
   }
