@@ -87,7 +87,8 @@
         </div>
     </div>
 
-    <div class="window" id="window-bio">
+    <main class="desktop-canvas desktop-canvas--home">
+    <div class="window window-hero" id="window-bio">
         <div class="title-bar"><span>RYAN_MORRIS_BIO.TXT</span><span>[X]</span></div>
         <div class="content" style="text-align: center;">
             <div class="headshot-box">
@@ -106,7 +107,7 @@
         </div>
     </div>
 
-    <div class="window" id="window-nav">
+    <div class="window window-wide" id="window-nav">
         <div class="title-bar"><span>PROGRAM_MANAGER.EXE</span><span>[X]</span></div>
         <div class="content">
             <h2>Open a program</h2>
@@ -156,6 +157,11 @@
                     <span class="nav-label">duckhunt</span>
                     <span class="nav-desc">Dashboard game</span>
                 </button>
+                <button type="button" class="nav-tile" data-open-widget="solitaire">
+                    <span class="nav-icon">🃏</span>
+                    <span class="nav-label">solitaire</span>
+                    <span class="nav-desc">Klondike classic</span>
+                </button>
                 <button type="button" class="nav-tile" data-open-widget="hackmods">
                     <span class="nav-icon">💻</span>
                     <span class="nav-label">HACKMODS.EXE</span>
@@ -178,7 +184,7 @@
         </div>
     </div>
 
-    <div class="window" id="window-stats">
+    <div class="window window-narrow" id="window-stats">
         <div class="title-bar"><span>SYSTEM_RESOURCES.EXE</span><span>[X]</span></div>
         <div class="content">
             <strong>Set Pacing:</strong>
@@ -191,7 +197,7 @@
         </div>
     </div>
 
-    <div class="window" id="window-counter">
+    <div class="window window-narrow" id="window-counter">
         <div class="title-bar"><span>SET_COUNTER.EXE</span><span>[X]</span></div>
         <div class="content" style="text-align: center;">
             <span class="visitor-counter">000125</span>
@@ -214,7 +220,7 @@
         </div>
     </div>
 
-    <div class="window" id="window-shorts">
+    <div class="window window-wide" id="window-shorts">
         <div class="title-bar"><span>SHORTS_PLAYER.VLC</span><span>[X]</span></div>
         <div class="content">
             <h2>YouTube Shorts</h2>
@@ -238,7 +244,7 @@
         </div>
     </div>
 
-    <div class="window" id="window-latest">
+    <div class="window window-media" id="window-latest">
         <div class="title-bar"><span>MEDIA_PLAYER.VLC — LATEST</span><span>[X]</span></div>
         <div class="content">
             <h2>Latest Set: #125</h2>
@@ -253,7 +259,7 @@
         </div>
     </div>
 
-    <div class="window" id="window-set">
+    <div class="window window-media" id="window-set">
         <div class="title-bar"><span>MEDIA_PLAYER.VLC — FEATURED</span><span>[X]</span></div>
         <div class="content">
             <h2>Featured Set: #66</h2>
@@ -283,6 +289,7 @@
             <p><a href="shows.html">Full show calendar &amp; booking page →</a></p>
         </div>
     </div>
+    </main>
 
     <nav class="taskbar" aria-label="Site navigation">
         <button type="button" class="start-btn" id="start-btn">🏁 Start</button>

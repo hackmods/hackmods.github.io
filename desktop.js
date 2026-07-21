@@ -11,8 +11,12 @@
   var saberGain = null;
   var duckHuntRaf = null;
   var duckHuntState = null;
+  var solitaireState = null;
   var isNarrow = function () {
     return window.matchMedia('(max-width: 640px)').matches;
+  };
+  var isCompact = function () {
+    return window.matchMedia('(max-width: 900px)').matches;
   };
 
   function pageBase() {
@@ -141,6 +145,8 @@
       '<button type="button" class="start-item" data-open="clock">CLOCK.EXE</button>' +
       '<button type="button" class="start-item" data-open="calc">CALC.EXE</button>' +
       '<button type="button" class="start-item" data-open="volume">SNDVOL.EXE</button>' +
+      '<div class="start-section-label">Games</div>' +
+      '<button type="button" class="start-item" data-open="solitaire">SOLITAIRE.EXE</button>' +
       '<div class="start-section-label">Dashboard</div>' +
       '<button type="button" class="start-item" data-open="saber">LIGHTSABER.WDGT</button>' +
       '<button type="button" class="start-item" data-open="duckhunt">DUCKHUNT.WDGT</button>' +
@@ -210,6 +216,27 @@
           '<canvas id="duck-canvas" class="duck-canvas" width="360" height="240"></canvas>' +
           '<p class="muted" id="duck-msg">Tap/click to shoot. Original geometric ducks — no ROM packs.</p>' +
           '<button type="button" class="btn" id="duck-restart">Restart</button>'
+      ) +
+      floatShell(
+        'widget-solitaire',
+        'SOLITAIRE.EXE',
+        '<div class="solitaire" id="solitaire-root">' +
+          '<div class="sol-toolbar">' +
+          '<button type="button" class="btn" id="sol-deal">Deal</button>' +
+          '<button type="button" class="btn" id="sol-undo">Undo</button>' +
+          '<button type="button" class="btn" id="sol-draw-mode" title="Toggle draw mode">Draw 3</button>' +
+          '<span class="sol-stat" id="sol-score">Score: 0</span>' +
+          '<span class="sol-stat" id="sol-moves">Moves: 0</span>' +
+          '<span class="sol-stat" id="sol-time">Time: 0:00</span></div>' +
+          '<div class="sol-board" id="sol-board" aria-label="Klondike Solitaire">' +
+          '<div class="sol-row sol-top">' +
+          '<div class="sol-stock-waste">' +
+          '<button type="button" class="sol-pile sol-stock" id="sol-stock" aria-label="Stock"></button>' +
+          '<div class="sol-pile sol-waste" id="sol-waste" aria-label="Waste"></div></div>' +
+          '<div class="sol-foundations" id="sol-foundations"></div></div>' +
+          '<div class="sol-tableau" id="sol-tableau"></div></div>' +
+          '<p class="muted sol-msg" id="sol-msg">Klondike — click to select, click again to move. Double-click sends to foundation.</p>' +
+          '</div>'
       );
 
     document.body.appendChild(wrap);
@@ -242,7 +269,8 @@
     btn.id = 'start-btn';
     btn.setAttribute('aria-haspopup', 'true');
     btn.setAttribute('aria-expanded', 'false');
-    btn.innerHTML = '🏁 Start';
+    btn.innerHTML =
+      '<span class="start-ico" aria-hidden="true">🏁</span><span class="start-label">Start</span>';
     if (old) {
       old.replaceWith(btn);
     } else {
@@ -268,6 +296,7 @@
       if (trig) trig.setAttribute('aria-expanded', 'false');
     }
     function openMenu() {
+      closeTaskbarMore();
       menu.hidden = false;
       btn.classList.add('is-open');
       btn.setAttribute('aria-expanded', 'true');
@@ -328,7 +357,8 @@
     volume: 'widget-volume',
     hackmods: 'widget-hackmods',
     saber: 'widget-saber',
-    duckhunt: 'widget-duckhunt'
+    duckhunt: 'widget-duckhunt',
+    solitaire: 'widget-solitaire'
   };
 
   function focusWidget(el) {
@@ -344,13 +374,15 @@
     el.hidden = false;
     if (!isNarrow() && !el.dataset.placed) {
       var offset = Object.keys(widgetMap).indexOf(name) * 18;
-      el.style.left = Math.min(40 + offset, window.innerWidth - 320) + 'px';
+      var maxLeft = name === 'solitaire' ? window.innerWidth - 580 : window.innerWidth - 320;
+      el.style.left = Math.min(40 + offset, Math.max(8, maxLeft)) + 'px';
       el.style.top = Math.min(60 + offset, window.innerHeight - 280) + 'px';
       el.dataset.placed = '1';
     }
     focusWidget(el);
     if (name === 'saber') initSaber(true);
     if (name === 'duckhunt') initDuckHunt(true);
+    if (name === 'solitaire') initSolitaire(false);
     if (name === 'clock') drawClockFace();
   }
 
@@ -361,6 +393,9 @@
     }
     if (el.id === 'widget-duckhunt') {
       stopDuckHunt();
+    }
+    if (el.id === 'widget-solitaire') {
+      stopSolitaireTimer();
     }
   }
 
@@ -625,6 +660,670 @@
     }
   }
 
+  /* ---- SOLITAIRE.EXE (Klondike) ---- */
+
+  var SOL_SUITS = ['S', 'H', 'D', 'C'];
+  var SOL_RANKS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+  var SOL_SYMBOLS = { S: '♠', H: '♥', D: '♦', C: '♣' };
+  var SOL_RED = { H: true, D: true, S: false, C: false };
+  var SOL_DRAW_KEY = 'comedy-solitaire-draw';
+
+  function solRankLabel(r) {
+    if (r === 1) return 'A';
+    if (r === 11) return 'J';
+    if (r === 12) return 'Q';
+    if (r === 13) return 'K';
+    return String(r);
+  }
+
+  function solCloneState(state) {
+    return JSON.parse(JSON.stringify(state));
+  }
+
+  function solNewDeck() {
+    var deck = [];
+    var i;
+    var j;
+    for (i = 0; i < SOL_SUITS.length; i++) {
+      for (j = 0; j < SOL_RANKS.length; j++) {
+        deck.push({
+          suit: SOL_SUITS[i],
+          rank: SOL_RANKS[j],
+          faceUp: false,
+          id: SOL_SUITS[i] + SOL_RANKS[j]
+        });
+      }
+    }
+    for (i = deck.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      var t = deck[i];
+      deck[i] = deck[j];
+      deck[j] = t;
+    }
+    return deck;
+  }
+
+  function solIsRed(card) {
+    return !!SOL_RED[card.suit];
+  }
+
+  function solCanStackTableau(moving, onto) {
+    if (!onto) return moving.rank === 13;
+    return solIsRed(moving) !== solIsRed(onto) && moving.rank === onto.rank - 1;
+  }
+
+  function solCanStackFoundation(moving, onto) {
+    if (!onto) return moving.rank === 1;
+    return moving.suit === onto.suit && moving.rank === onto.rank + 1;
+  }
+
+  function stopSolitaireTimer() {
+    if (solitaireState && solitaireState.timerId) {
+      clearInterval(solitaireState.timerId);
+      solitaireState.timerId = null;
+    }
+  }
+
+  function startSolitaireTimer() {
+    if (!solitaireState || solitaireState.won || solitaireState.timerId) return;
+    solitaireState.started = true;
+    solitaireState.timerId = setInterval(function () {
+      if (!solitaireState || solitaireState.won) return;
+      var win = document.getElementById('widget-solitaire');
+      if (!win || win.hidden) return;
+      solitaireState.elapsed += 1;
+      solUpdateHud();
+    }, 1000);
+  }
+
+  function solFormatTime(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function solUpdateHud() {
+    if (!solitaireState) return;
+    var scoreEl = document.getElementById('sol-score');
+    var movesEl = document.getElementById('sol-moves');
+    var timeEl = document.getElementById('sol-time');
+    var modeBtn = document.getElementById('sol-draw-mode');
+    if (scoreEl) scoreEl.textContent = 'Score: ' + solitaireState.score;
+    if (movesEl) movesEl.textContent = 'Moves: ' + solitaireState.moves;
+    if (timeEl) timeEl.textContent = 'Time: ' + solFormatTime(solitaireState.elapsed);
+    if (modeBtn) modeBtn.textContent = 'Draw ' + solitaireState.drawCount;
+  }
+
+  function solSetMsg(text) {
+    var msg = document.getElementById('sol-msg');
+    if (msg) msg.textContent = text;
+  }
+
+  function solPushUndo() {
+    if (!solitaireState) return;
+    solitaireState.undo.push({
+      stock: solCloneState(solitaireState.stock),
+      waste: solCloneState(solitaireState.waste),
+      foundations: solCloneState(solitaireState.foundations),
+      tableau: solCloneState(solitaireState.tableau),
+      score: solitaireState.score,
+      moves: solitaireState.moves
+    });
+    if (solitaireState.undo.length > 40) solitaireState.undo.shift();
+  }
+
+  function solCardHtml(card, opts) {
+    opts = opts || {};
+    var classes = 'sol-card';
+    if (!card.faceUp) classes += ' is-back';
+    else classes += solIsRed(card) ? ' is-red' : ' is-black';
+    if (opts.selected) classes += ' is-selected';
+    if (opts.offset) classes += ' is-stacked';
+    var style = opts.offset ? ' style="top:' + opts.offset + 'px"' : '';
+    var label = card.faceUp
+      ? solRankLabel(card.rank) + SOL_SYMBOLS[card.suit]
+      : '';
+    var aria = card.faceUp
+      ? solRankLabel(card.rank) + ' of ' + card.suit
+      : 'Face down';
+    return (
+      '<div class="' +
+      classes +
+      '" data-card="' +
+      card.id +
+      '" role="button" tabindex="0" aria-label="' +
+      aria +
+      '"' +
+      style +
+      '>' +
+      (card.faceUp
+        ? '<span class="sol-corner sol-tl">' +
+          solRankLabel(card.rank) +
+          '<br>' +
+          SOL_SYMBOLS[card.suit] +
+          '</span>' +
+          '<span class="sol-pip">' +
+          SOL_SYMBOLS[card.suit] +
+          '</span>' +
+          '<span class="sol-corner sol-br">' +
+          solRankLabel(card.rank) +
+          '<br>' +
+          SOL_SYMBOLS[card.suit] +
+          '</span>'
+        : '<span class="sol-back-pattern" aria-hidden="true"></span>') +
+      '<span class="sol-sr-only">' +
+      label +
+      '</span></div>'
+    );
+  }
+
+  function solFindCard(cardId) {
+    var i;
+    var j;
+    var pile;
+    for (i = 0; i < solitaireState.waste.length; i++) {
+      if (solitaireState.waste[i].id === cardId) {
+        return { zone: 'waste', pile: 0, index: i, card: solitaireState.waste[i] };
+      }
+    }
+    for (i = 0; i < 4; i++) {
+      pile = solitaireState.foundations[i];
+      for (j = 0; j < pile.length; j++) {
+        if (pile[j].id === cardId) {
+          return { zone: 'foundation', pile: i, index: j, card: pile[j] };
+        }
+      }
+    }
+    for (i = 0; i < 7; i++) {
+      pile = solitaireState.tableau[i];
+      for (j = 0; j < pile.length; j++) {
+        if (pile[j].id === cardId) {
+          return { zone: 'tableau', pile: i, index: j, card: pile[j] };
+        }
+      }
+    }
+    return null;
+  }
+
+  function solGetRunFromTableau(col, index) {
+    var pile = solitaireState.tableau[col];
+    if (!pile[index] || !pile[index].faceUp) return null;
+    var run = pile.slice(index);
+    var k;
+    for (k = 0; k < run.length - 1; k++) {
+      if (!solCanStackTableau(run[k + 1], run[k])) return null;
+    }
+    return run;
+  }
+
+  function solRender() {
+    if (!solitaireState) return;
+    var stockEl = document.getElementById('sol-stock');
+    var wasteEl = document.getElementById('sol-waste');
+    var foundationsEl = document.getElementById('sol-foundations');
+    var tableauEl = document.getElementById('sol-tableau');
+    var sel = solitaireState.selection;
+    var i;
+    var j;
+    var pile;
+    var html;
+    var card;
+    var isSel;
+    var overlap = isNarrow() ? 18 : 22;
+
+    if (stockEl) {
+      stockEl.innerHTML = solitaireState.stock.length
+        ? '<div class="sol-card is-back sol-stock-card"><span class="sol-back-pattern"></span></div>'
+        : '<div class="sol-slot-empty sol-recycle" title="Recycle waste">↻</div>';
+      stockEl.classList.toggle('is-empty', !solitaireState.stock.length);
+    }
+
+    if (wasteEl) {
+      html = '';
+      var wasteStart = Math.max(0, solitaireState.waste.length - solitaireState.drawCount);
+      var wasteVisible = solitaireState.waste.slice(wasteStart);
+      for (i = 0; i < wasteVisible.length; i++) {
+        card = wasteVisible[i];
+        isSel =
+          sel &&
+          sel.zone === 'waste' &&
+          sel.cards.length === 1 &&
+          sel.cards[0].id === card.id;
+        html += solCardHtml(card, {
+          selected: isSel,
+          offset: i * (isNarrow() ? 14 : 18)
+        });
+      }
+      if (!wasteVisible.length) html = '<div class="sol-slot-empty"></div>';
+      wasteEl.innerHTML = html;
+    }
+
+    if (foundationsEl) {
+      html = '';
+      for (i = 0; i < 4; i++) {
+        pile = solitaireState.foundations[i];
+        html += '<div class="sol-pile sol-foundation" data-foundation="' + i + '" aria-label="Foundation ' + (i + 1) + '">';
+        if (pile.length) {
+          card = pile[pile.length - 1];
+          isSel =
+            sel &&
+            sel.zone === 'foundation' &&
+            sel.pile === i &&
+            sel.cards[0].id === card.id;
+          html += solCardHtml(card, { selected: isSel });
+        } else {
+          html +=
+            '<div class="sol-slot-empty">' +
+            SOL_SYMBOLS[SOL_SUITS[i]] +
+            '</div>';
+        }
+        html += '</div>';
+      }
+      foundationsEl.innerHTML = html;
+    }
+
+    if (tableauEl) {
+      html = '';
+      for (i = 0; i < 7; i++) {
+        pile = solitaireState.tableau[i];
+        html += '<div class="sol-pile sol-column" data-tableau="' + i + '" aria-label="Tableau ' + (i + 1) + '">';
+        if (!pile.length) {
+          html += '<div class="sol-slot-empty sol-king-slot">K</div>';
+        } else {
+          for (j = 0; j < pile.length; j++) {
+            card = pile[j];
+            isSel =
+              sel &&
+              sel.zone === 'tableau' &&
+              sel.pile === i &&
+              j >= sel.index;
+            html += solCardHtml(card, {
+              selected: isSel,
+              offset: j * overlap
+            });
+          }
+        }
+        html += '</div>';
+      }
+      tableauEl.innerHTML = html;
+    }
+
+    solUpdateHud();
+  }
+
+  function solCheckWin() {
+    var i;
+    for (i = 0; i < 4; i++) {
+      if (solitaireState.foundations[i].length !== 13) return false;
+    }
+    return true;
+  }
+
+  function solCelebrate() {
+    solitaireState.won = true;
+    stopSolitaireTimer();
+    solitaireState.score += 200;
+    solSetMsg('You win! Deal again for another round — document the craft.');
+    playBeep(523, 0.08, 'square');
+    setTimeout(function () {
+      playBeep(659, 0.08, 'square');
+    }, 100);
+    setTimeout(function () {
+      playBeep(784, 0.12, 'square');
+    }, 200);
+    solUpdateHud();
+  }
+
+  function solFlipTop(col) {
+    var pile = solitaireState.tableau[col];
+    if (pile.length && !pile[pile.length - 1].faceUp) {
+      pile[pile.length - 1].faceUp = true;
+      solitaireState.score += 5;
+    }
+  }
+
+  function solClearSelection() {
+    solitaireState.selection = null;
+  }
+
+  function solTryMoveToFoundation(loc) {
+    if (!loc || !loc.card.faceUp) return false;
+    if (loc.zone === 'tableau') {
+      var pile = solitaireState.tableau[loc.pile];
+      if (loc.index !== pile.length - 1) return false;
+    }
+    if (loc.zone === 'waste' && loc.index !== solitaireState.waste.length - 1) return false;
+    if (loc.zone === 'foundation') return false;
+
+    var f;
+    var onto;
+    for (f = 0; f < 4; f++) {
+      onto = solitaireState.foundations[f].length
+        ? solitaireState.foundations[f][solitaireState.foundations[f].length - 1]
+        : null;
+      if (solCanStackFoundation(loc.card, onto)) {
+        solPushUndo();
+        startSolitaireTimer();
+        var card;
+        if (loc.zone === 'waste') card = solitaireState.waste.pop();
+        else {
+          card = solitaireState.tableau[loc.pile].pop();
+          solFlipTop(loc.pile);
+        }
+        solitaireState.foundations[f].push(card);
+        solitaireState.moves += 1;
+        solitaireState.score += 10;
+        solClearSelection();
+        if (solCheckWin()) solCelebrate();
+        else solSetMsg('To foundation.');
+        solRender();
+        playBeep(440, 0.04, 'triangle');
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function solMoveSelectionTo(destZone, destPile) {
+    var sel = solitaireState.selection;
+    if (!sel) return false;
+    var moving = sel.cards[0];
+    var onto = null;
+    var destArr = null;
+
+    if (destZone === 'foundation') {
+      if (sel.cards.length !== 1) return false;
+      destArr = solitaireState.foundations[destPile];
+      onto = destArr.length ? destArr[destArr.length - 1] : null;
+      if (!solCanStackFoundation(moving, onto)) return false;
+    } else if (destZone === 'tableau') {
+      destArr = solitaireState.tableau[destPile];
+      onto = destArr.length ? destArr[destArr.length - 1] : null;
+      if (!solCanStackTableau(moving, onto)) return false;
+      if (sel.zone === 'tableau' && sel.pile === destPile) {
+        solClearSelection();
+        solRender();
+        return true;
+      }
+    } else {
+      return false;
+    }
+
+    solPushUndo();
+    startSolitaireTimer();
+
+    var moved;
+    if (sel.zone === 'waste') {
+      moved = [solitaireState.waste.pop()];
+    } else if (sel.zone === 'foundation') {
+      moved = [solitaireState.foundations[sel.pile].pop()];
+      solitaireState.score = Math.max(0, solitaireState.score - 15);
+    } else {
+      moved = solitaireState.tableau[sel.pile].splice(sel.index);
+      solFlipTop(sel.pile);
+    }
+
+    if (destZone === 'foundation') {
+      destArr.push(moved[0]);
+      solitaireState.score += 10;
+    } else {
+      Array.prototype.push.apply(destArr, moved);
+      if (sel.zone === 'waste' || sel.zone === 'foundation') solitaireState.score += 5;
+    }
+
+    solitaireState.moves += 1;
+    solClearSelection();
+    if (solCheckWin()) solCelebrate();
+    else solSetMsg('Moved.');
+    solRender();
+    playBeep(330, 0.035, 'triangle');
+    return true;
+  }
+
+  function solSelectFrom(loc) {
+    if (!loc || !loc.card.faceUp) {
+      solClearSelection();
+      solRender();
+      return;
+    }
+    if (loc.zone === 'waste' && loc.index !== solitaireState.waste.length - 1) {
+      solClearSelection();
+      solRender();
+      return;
+    }
+    if (loc.zone === 'foundation' && loc.index !== solitaireState.foundations[loc.pile].length - 1) {
+      solClearSelection();
+      solRender();
+      return;
+    }
+
+    var cards;
+    if (loc.zone === 'tableau') {
+      cards = solGetRunFromTableau(loc.pile, loc.index);
+      if (!cards) {
+        solClearSelection();
+        solRender();
+        return;
+      }
+    } else {
+      cards = [loc.card];
+    }
+
+    solitaireState.selection = {
+      zone: loc.zone,
+      pile: loc.pile,
+      index: loc.index,
+      cards: cards
+    };
+    solSetMsg('Selected — click a pile to move.');
+    solRender();
+  }
+
+  function solOnStockClick() {
+    if (solitaireState.won) return;
+    startSolitaireTimer();
+    solPushUndo();
+    solClearSelection();
+
+    if (solitaireState.stock.length) {
+      var n = Math.min(solitaireState.drawCount, solitaireState.stock.length);
+      var i;
+      for (i = 0; i < n; i++) {
+        var c = solitaireState.stock.pop();
+        c.faceUp = true;
+        solitaireState.waste.push(c);
+      }
+      solitaireState.moves += 1;
+      if (solitaireState.drawCount === 3) solitaireState.score = Math.max(0, solitaireState.score - 1);
+      solSetMsg('Drew ' + n + '.');
+      playBeep(280, 0.03, 'square');
+    } else if (solitaireState.waste.length) {
+      while (solitaireState.waste.length) {
+        var back = solitaireState.waste.pop();
+        back.faceUp = false;
+        solitaireState.stock.push(back);
+      }
+      solitaireState.moves += 1;
+      solitaireState.score = Math.max(0, solitaireState.score - 100);
+      solSetMsg('Recycled stock.');
+      playBeep(180, 0.05, 'square');
+    }
+    solRender();
+  }
+
+  function solDeal(freshDraw) {
+    stopSolitaireTimer();
+    var drawCount = 3;
+    try {
+      var saved = localStorage.getItem(SOL_DRAW_KEY);
+      if (saved === '1' || saved === '3') drawCount = parseInt(saved, 10);
+    } catch (e) {}
+    if (freshDraw === 1 || freshDraw === 3) drawCount = freshDraw;
+
+    var deck = solNewDeck();
+    var tableau = [[], [], [], [], [], [], []];
+    var i;
+    var j;
+    for (i = 0; i < 7; i++) {
+      for (j = 0; j <= i; j++) {
+        var card = deck.pop();
+        card.faceUp = j === i;
+        tableau[i].push(card);
+      }
+    }
+
+    solitaireState = {
+      stock: deck,
+      waste: [],
+      foundations: [[], [], [], []],
+      tableau: tableau,
+      drawCount: drawCount,
+      score: 0,
+      moves: 0,
+      elapsed: 0,
+      started: false,
+      won: false,
+      selection: null,
+      undo: [],
+      timerId: null
+    };
+    solSetMsg(
+      'Klondike — click to select, click again to move. Double-click sends to foundation.'
+    );
+    solRender();
+  }
+
+  function solUndo() {
+    if (!solitaireState || !solitaireState.undo.length || solitaireState.won) {
+      solSetMsg('Nothing to undo.');
+      return;
+    }
+    var prev = solitaireState.undo.pop();
+    solitaireState.stock = prev.stock;
+    solitaireState.waste = prev.waste;
+    solitaireState.foundations = prev.foundations;
+    solitaireState.tableau = prev.tableau;
+    solitaireState.score = prev.score;
+    solitaireState.moves = prev.moves;
+    solClearSelection();
+    solSetMsg('Undone.');
+    solRender();
+    playBeep(200, 0.04, 'triangle');
+  }
+
+  function solToggleDrawMode() {
+    if (!solitaireState) return;
+    var next = solitaireState.drawCount === 3 ? 1 : 3;
+    try {
+      localStorage.setItem(SOL_DRAW_KEY, String(next));
+    } catch (e) {}
+    solDeal(next);
+    solSetMsg('New deal — draw ' + next + '.');
+  }
+
+  function initSolitaire(redeal) {
+    var root = document.getElementById('solitaire-root');
+    if (!root) return;
+
+    if (redeal || !solitaireState) {
+      solDeal();
+    } else {
+      solRender();
+      if (solitaireState.started && !solitaireState.won && !solitaireState.timerId) {
+        startSolitaireTimer();
+      }
+    }
+
+    if (root.dataset.wired) return;
+    root.dataset.wired = '1';
+
+    document.getElementById('sol-deal').addEventListener('click', function () {
+      solDeal(solitaireState ? solitaireState.drawCount : undefined);
+      playBeep(360, 0.05, 'square');
+    });
+    document.getElementById('sol-undo').addEventListener('click', solUndo);
+    document.getElementById('sol-draw-mode').addEventListener('click', solToggleDrawMode);
+
+    document.getElementById('sol-stock').addEventListener('click', function (e) {
+      e.preventDefault();
+      solOnStockClick();
+    });
+
+    root.addEventListener('click', function (e) {
+      if (!solitaireState || solitaireState.won) return;
+      var cardEl = e.target.closest('[data-card]');
+      var foundation = e.target.closest('[data-foundation]');
+      var tableau = e.target.closest('[data-tableau]');
+      var waste = e.target.closest('#sol-waste');
+
+      if (cardEl) {
+        var loc = solFindCard(cardEl.getAttribute('data-card'));
+        if (!loc) return;
+
+        if (solitaireState.selection) {
+          if (
+            solitaireState.selection.cards.some(function (c) {
+              return c.id === loc.card.id;
+            })
+          ) {
+            if (solTryMoveToFoundation(loc)) return;
+            solClearSelection();
+            solRender();
+            return;
+          }
+          if (loc.zone === 'foundation') {
+            if (solMoveSelectionTo('foundation', loc.pile)) return;
+          }
+          if (loc.zone === 'tableau') {
+            if (solMoveSelectionTo('tableau', loc.pile)) return;
+          }
+        }
+        solSelectFrom(loc);
+        return;
+      }
+
+      if (solitaireState.selection) {
+        if (foundation) {
+          solMoveSelectionTo('foundation', parseInt(foundation.getAttribute('data-foundation'), 10));
+          return;
+        }
+        if (tableau) {
+          solMoveSelectionTo('tableau', parseInt(tableau.getAttribute('data-tableau'), 10));
+          return;
+        }
+      }
+
+      if (!cardEl && !foundation && !tableau && !waste) {
+        solClearSelection();
+        solRender();
+      }
+    });
+
+    root.addEventListener('dblclick', function (e) {
+      if (!solitaireState || solitaireState.won) return;
+      var cardEl = e.target.closest('[data-card]');
+      if (!cardEl) return;
+      e.preventDefault();
+      var loc = solFindCard(cardEl.getAttribute('data-card'));
+      if (loc) solTryMoveToFoundation(loc);
+    });
+
+    root.addEventListener('keydown', function (e) {
+      if (!solitaireState || solitaireState.won) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var cardEl = e.target.closest('[data-card]');
+      if (!cardEl) return;
+      e.preventDefault();
+      var loc = solFindCard(cardEl.getAttribute('data-card'));
+      if (!loc) return;
+      if (solitaireState.selection) {
+        if (loc.zone === 'tableau' && solMoveSelectionTo('tableau', loc.pile)) return;
+        if (loc.zone === 'foundation' && solMoveSelectionTo('foundation', loc.pile)) return;
+      }
+      solSelectFrom(loc);
+    });
+  }
+
   function initDuckHunt(restart) {
     var canvas = document.getElementById('duck-canvas');
     if (!canvas) return;
@@ -809,6 +1508,144 @@
     });
   }
 
+  function closeTaskbarMore() {
+    var fly = document.getElementById('taskbar-more-flyout');
+    var btn = document.getElementById('taskbar-more-btn');
+    if (fly) fly.hidden = true;
+    if (btn) {
+      btn.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function isTaskbarPrimaryApp(el) {
+    if (el.classList.contains('is-current')) return true;
+    var href = (el.getAttribute('href') || '').toLowerCase();
+    var file = href.split('#')[0];
+    if (file.indexOf('clips.html') !== -1) return true;
+    if (file.indexOf('about.html') !== -1) return true;
+    // Main shows page only — not booking anchors like shows.html#window-booking
+    if (file.indexOf('shows.html') !== -1 && href.indexOf('#') === -1) return true;
+    return false;
+  }
+
+  function decorateAppLabel(el) {
+    if (el.querySelector('.app-label')) return;
+    var text = (el.textContent || '').trim();
+    if (!text) return;
+    var parts = text.split(/\s+/);
+    var ico = parts[0];
+    var label = parts.slice(1).join(' ');
+    if (!label) {
+      el.innerHTML = '<span class="app-label">' + text + '</span>';
+      return;
+    }
+    el.innerHTML =
+      '<span class="app-ico" aria-hidden="true">' +
+      ico +
+      '</span><span class="app-label">' +
+      label +
+      '</span>';
+  }
+
+  function wireTaskbarOverflow() {
+    var apps = document.querySelector('.taskbar-apps');
+    var taskbar = document.querySelector('.taskbar');
+    if (!apps || !taskbar || apps.dataset.overflowWired) return;
+    apps.dataset.overflowWired = '1';
+
+    var links = Array.prototype.slice.call(apps.querySelectorAll('a.active-app'));
+    links.forEach(decorateAppLabel);
+
+    var primary = [];
+    var secondary = [];
+    links.forEach(function (el) {
+      if (isTaskbarPrimaryApp(el)) primary.push(el);
+      else secondary.push(el);
+    });
+
+    if (!secondary.length) return;
+
+    var wrap = document.createElement('div');
+    wrap.className = 'taskbar-overflow';
+    wrap.innerHTML =
+      '<button type="button" class="active-app taskbar-more-btn" id="taskbar-more-btn" aria-haspopup="true" aria-expanded="false" title="More apps">' +
+      '<span class="app-ico" aria-hidden="true">⋯</span><span class="app-label">More</span></button>' +
+      '<div class="taskbar-more-flyout" id="taskbar-more-flyout" hidden role="menu" aria-label="More apps"></div>';
+
+    var flyout = wrap.querySelector('#taskbar-more-flyout');
+    var moreBtn = wrap.querySelector('#taskbar-more-btn');
+    var desktopSlot = document.createElement('div');
+    desktopSlot.className = 'taskbar-secondary';
+    desktopSlot.setAttribute('aria-hidden', 'false');
+
+    secondary.forEach(function (el) {
+      el.classList.add('active-app--secondary');
+      desktopSlot.appendChild(el);
+    });
+
+    apps.innerHTML = '';
+    primary.forEach(function (el) {
+      apps.appendChild(el);
+    });
+    apps.appendChild(desktopSlot);
+    apps.appendChild(wrap);
+
+    function syncOverflowMode() {
+      var compact = isCompact();
+      taskbar.classList.toggle('is-compact', compact);
+      if (!compact) {
+        closeTaskbarMore();
+        secondary.forEach(function (el) {
+          if (el.parentNode !== desktopSlot) desktopSlot.appendChild(el);
+        });
+        desktopSlot.hidden = false;
+        wrap.classList.remove('is-active');
+      } else {
+        secondary.forEach(function (el) {
+          if (el.parentNode !== flyout) flyout.appendChild(el);
+        });
+        desktopSlot.hidden = true;
+        wrap.classList.add('is-active');
+      }
+      adjustBodyPadding();
+    }
+
+    moreBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var open = flyout.hidden;
+      if (open) {
+        var startMenu = document.getElementById('start-menu');
+        var startBtn = document.getElementById('start-btn');
+        if (startMenu) startMenu.hidden = true;
+        if (startBtn) {
+          startBtn.classList.remove('is-open');
+          startBtn.setAttribute('aria-expanded', 'false');
+        }
+        flyout.hidden = false;
+        moreBtn.classList.add('is-open');
+        moreBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        closeTaskbarMore();
+      }
+    });
+
+    flyout.addEventListener('click', function (e) {
+      if (e.target.closest('a.active-app')) closeTaskbarMore();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!flyout.hidden && !wrap.contains(e.target)) closeTaskbarMore();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeTaskbarMore();
+    });
+
+    syncOverflowMode();
+    window.addEventListener('resize', syncOverflowMode);
+  }
+
   function adjustBodyPadding() {
     var tb = document.querySelector('.taskbar');
     if (!tb) return;
@@ -825,6 +1662,7 @@
   function init() {
     injectMarkup();
     wireStartButton();
+    wireTaskbarOverflow();
     wireFloatWindows();
     wireNotepad();
     wireCalc();
@@ -845,6 +1683,7 @@
           btn.classList.remove('is-open');
           btn.setAttribute('aria-expanded', 'false');
         }
+        closeTaskbarMore();
       }
     };
   }
