@@ -140,17 +140,22 @@
       '<a class="start-item" href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub / hackmods</a>' +
       '<a class="start-item" href="https://www.linkedin.com/in/ryanjamesmorris" target="_blank" rel="noopener">LinkedIn</a>' +
       '</div></div>' +
-      '<div class="start-section-label">Accessories</div>' +
+      '<div class="start-section-label">Apps</div>' +
+      '<div class="start-flyout-wrap">' +
+      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">Accessories ▸</button>' +
+      '<div class="start-flyout" hidden role="menu">' +
       '<button type="button" class="start-item" data-open="notepad">NOTEPAD.EXE</button>' +
       '<button type="button" class="start-item" data-open="clock">CLOCK.EXE</button>' +
       '<button type="button" class="start-item" data-open="calc">CALC.EXE</button>' +
       '<button type="button" class="start-item" data-open="volume">SNDVOL.EXE</button>' +
-      '<div class="start-section-label">Games</div>' +
+      '</div></div>' +
+      '<div class="start-flyout-wrap">' +
+      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">Games ▸</button>' +
+      '<div class="start-flyout" hidden role="menu">' +
       '<button type="button" class="start-item" data-open="solitaire">SOLITAIRE.EXE</button>' +
-      '<div class="start-section-label">Dashboard</div>' +
-      '<button type="button" class="start-item" data-open="saber">LIGHTSABER.WDGT</button>' +
       '<button type="button" class="start-item" data-open="duckhunt">DUCKHUNT.WDGT</button>' +
-      '<div class="start-section-label">Dev</div>' +
+      '<button type="button" class="start-item" data-open="saber">LIGHTSABER.WDGT</button>' +
+      '</div></div>' +
       '<button type="button" class="start-item" data-open="hackmods">HACKMODS.EXE</button>' +
       '<div class="start-section-label">Documents</div>' +
       '<a class="start-item" role="menuitem" href="about.html">Press kit / bio</a>' +
@@ -286,20 +291,29 @@
     }
 
     var menu = document.getElementById('start-menu');
+    var suppressDocClose = false;
+
+    function closeAllFlyouts() {
+      menu.querySelectorAll('.start-flyout').forEach(function (fly) {
+        fly.hidden = true;
+      });
+      menu.querySelectorAll('.start-flyout-trigger').forEach(function (trig) {
+        trig.setAttribute('aria-expanded', 'false');
+      });
+    }
+
     function closeMenu() {
       menu.hidden = true;
       btn.classList.remove('is-open');
       btn.setAttribute('aria-expanded', 'false');
-      var fly = menu.querySelector('.start-flyout');
-      var trig = menu.querySelector('.start-flyout-trigger');
-      if (fly) fly.hidden = true;
-      if (trig) trig.setAttribute('aria-expanded', 'false');
+      closeAllFlyouts();
     }
     function openMenu() {
       closeTaskbarMore();
       menu.hidden = false;
       btn.classList.add('is-open');
       btn.setAttribute('aria-expanded', 'true');
+      adjustBodyPadding();
     }
     function toggleMenu() {
       if (menu.hidden) openMenu();
@@ -307,12 +321,18 @@
     }
 
     btn.addEventListener('click', function (e) {
+      e.preventDefault();
       e.stopPropagation();
+      suppressDocClose = true;
       toggleMenu();
+      setTimeout(function () {
+        suppressDocClose = false;
+      }, 50);
     });
 
     document.addEventListener('click', function (e) {
-      if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) closeMenu();
+      if (suppressDocClose) return;
+      if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) closeMenu();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeMenu();
@@ -330,8 +350,11 @@
       if (flyTrig) {
         e.preventDefault();
         e.stopPropagation();
-        var fly = menu.querySelector('.start-flyout');
+        var wrap = flyTrig.closest('.start-flyout-wrap');
+        var fly = wrap ? wrap.querySelector('.start-flyout') : null;
+        if (!fly) return;
         var open = fly.hidden;
+        closeAllFlyouts();
         fly.hidden = !open;
         flyTrig.setAttribute('aria-expanded', open ? 'true' : 'false');
         return;
@@ -1524,7 +1547,6 @@
     var file = href.split('#')[0];
     if (file.indexOf('clips.html') !== -1) return true;
     if (file.indexOf('about.html') !== -1) return true;
-    // Main shows page only — not booking anchors like shows.html#window-booking
     if (file.indexOf('shows.html') !== -1 && href.indexOf('#') === -1) return true;
     return false;
   }
@@ -1557,6 +1579,18 @@
     var links = Array.prototype.slice.call(apps.querySelectorAll('a.active-app'));
     links.forEach(decorateAppLabel);
 
+    var wrap = document.createElement('div');
+    wrap.className = 'taskbar-overflow';
+    wrap.innerHTML =
+      '<button type="button" class="active-app taskbar-more-btn" id="taskbar-more-btn" aria-haspopup="true" aria-expanded="false" title="More pages">' +
+      '<span class="app-ico" aria-hidden="true">☰</span><span class="app-label">Apps</span></button>' +
+      '<div class="taskbar-more-flyout" id="taskbar-more-flyout" hidden role="menu" aria-label="Site pages"></div>';
+
+    var flyout = wrap.querySelector('#taskbar-more-flyout');
+    var moreBtn = wrap.querySelector('#taskbar-more-btn');
+    var desktopSlot = document.createElement('div');
+    desktopSlot.className = 'taskbar-secondary';
+
     var primary = [];
     var secondary = [];
     links.forEach(function (el) {
@@ -1564,24 +1598,8 @@
       else secondary.push(el);
     });
 
-    if (!secondary.length) return;
-
-    var wrap = document.createElement('div');
-    wrap.className = 'taskbar-overflow';
-    wrap.innerHTML =
-      '<button type="button" class="active-app taskbar-more-btn" id="taskbar-more-btn" aria-haspopup="true" aria-expanded="false" title="More apps">' +
-      '<span class="app-ico" aria-hidden="true">⋯</span><span class="app-label">More</span></button>' +
-      '<div class="taskbar-more-flyout" id="taskbar-more-flyout" hidden role="menu" aria-label="More apps"></div>';
-
-    var flyout = wrap.querySelector('#taskbar-more-flyout');
-    var moreBtn = wrap.querySelector('#taskbar-more-btn');
-    var desktopSlot = document.createElement('div');
-    desktopSlot.className = 'taskbar-secondary';
-    desktopSlot.setAttribute('aria-hidden', 'false');
-
     secondary.forEach(function (el) {
       el.classList.add('active-app--secondary');
-      desktopSlot.appendChild(el);
     });
 
     apps.innerHTML = '';
@@ -1591,22 +1609,44 @@
     apps.appendChild(desktopSlot);
     apps.appendChild(wrap);
 
+    var suppressDocClose = false;
+
     function syncOverflowMode() {
       var compact = isCompact();
+      var mobile = isNarrow();
       taskbar.classList.toggle('is-compact', compact);
+      taskbar.classList.toggle('is-mobile-nav', mobile);
+
       if (!compact) {
         closeTaskbarMore();
+        primary.forEach(function (el) {
+          if (el.parentNode !== apps) apps.insertBefore(el, desktopSlot);
+        });
         secondary.forEach(function (el) {
           if (el.parentNode !== desktopSlot) desktopSlot.appendChild(el);
         });
         desktopSlot.hidden = false;
         wrap.classList.remove('is-active');
+        moreBtn.querySelector('.app-label').textContent = 'More';
+      } else if (mobile) {
+        // Phone: keep bar minimal — Start + Apps + clock
+        primary.concat(secondary).forEach(function (el) {
+          if (el.parentNode !== flyout) flyout.appendChild(el);
+        });
+        desktopSlot.hidden = true;
+        wrap.classList.add('is-active');
+        moreBtn.querySelector('.app-label').textContent = 'Apps';
       } else {
+        // Tablet: keep primary destinations, overflow the rest
+        primary.forEach(function (el) {
+          if (el.parentNode !== apps) apps.insertBefore(el, desktopSlot);
+        });
         secondary.forEach(function (el) {
           if (el.parentNode !== flyout) flyout.appendChild(el);
         });
         desktopSlot.hidden = true;
         wrap.classList.add('is-active');
+        moreBtn.querySelector('.app-label').textContent = 'More';
       }
       adjustBodyPadding();
     }
@@ -1614,21 +1654,25 @@
     moreBtn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
+      suppressDocClose = true;
       var open = flyout.hidden;
+      var startMenu = document.getElementById('start-menu');
+      var startBtn = document.getElementById('start-btn');
+      if (startMenu) startMenu.hidden = true;
+      if (startBtn) {
+        startBtn.classList.remove('is-open');
+        startBtn.setAttribute('aria-expanded', 'false');
+      }
       if (open) {
-        var startMenu = document.getElementById('start-menu');
-        var startBtn = document.getElementById('start-btn');
-        if (startMenu) startMenu.hidden = true;
-        if (startBtn) {
-          startBtn.classList.remove('is-open');
-          startBtn.setAttribute('aria-expanded', 'false');
-        }
         flyout.hidden = false;
         moreBtn.classList.add('is-open');
         moreBtn.setAttribute('aria-expanded', 'true');
       } else {
         closeTaskbarMore();
       }
+      setTimeout(function () {
+        suppressDocClose = false;
+      }, 50);
     });
 
     flyout.addEventListener('click', function (e) {
@@ -1636,6 +1680,7 @@
     });
 
     document.addEventListener('click', function (e) {
+      if (suppressDocClose) return;
       if (!flyout.hidden && !wrap.contains(e.target)) closeTaskbarMore();
     });
     document.addEventListener('keydown', function (e) {
