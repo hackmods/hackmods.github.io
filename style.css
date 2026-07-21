@@ -1143,18 +1143,22 @@ button:active,
 .taskbar {
     --taskbar-pad-y: 4px;
     --taskbar-chrome-h: 40px;
+    --taskbar-max-rows: 1;
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    /* Fixed chrome height — never let menus stretch the bar */
+    /* Single-row chrome by default — menus must not stretch this */
     height: calc(var(--taskbar-chrome-h) + env(safe-area-inset-bottom, 0px));
     min-height: calc(var(--taskbar-chrome-h) + env(safe-area-inset-bottom, 0px));
-    max-height: calc(var(--taskbar-chrome-h) + env(safe-area-inset-bottom, 0px));
+    max-height: calc(
+        (var(--taskbar-chrome-h) * var(--taskbar-max-rows)) + env(safe-area-inset-bottom, 0px)
+    );
     background: #c0c0c0;
     border-top: 2px outset #fff;
     display: flex;
     align-items: center;
+    align-content: center;
     flex-wrap: nowrap;
     gap: 4px;
     z-index: 9999;
@@ -1162,6 +1166,89 @@ button:active,
     padding-bottom: max(var(--taskbar-pad-y), env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
     overflow: visible;
+}
+
+/* Classic Win95 multi-row taskbar when icons would otherwise clip */
+.taskbar.is-stacked {
+    --taskbar-max-rows: 2;
+    height: auto;
+    /* Keep Start | apps | tray as columns; apps wrap inside their zone */
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    align-content: flex-end;
+    row-gap: 4px;
+}
+
+.taskbar.is-stacked .start-btn {
+    align-self: flex-start;
+    padding: 4px 8px;
+    min-width: 36px;
+    justify-content: center;
+    margin-right: 2px;
+}
+
+.taskbar.is-stacked .taskbar-apps {
+    flex: 1 1 0;
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: none;
+    align-content: flex-start;
+    align-items: center;
+    align-self: stretch;
+    row-gap: 4px;
+    /* Leave room for Start + tray so icons wrap instead of shoving them off-screen */
+    width: 0;
+}
+
+.taskbar.is-stacked .taskbar-secondary {
+    flex-wrap: wrap;
+    row-gap: 4px;
+}
+
+.taskbar.is-stacked .taskbar-overflow {
+    flex-shrink: 0;
+}
+
+.taskbar.is-stacked .system-tray {
+    margin-left: 4px;
+    align-self: flex-end;
+    height: auto;
+    min-height: 32px;
+}
+
+/* Icon-only buttons — fits more per row like a short Win95 taskbar */
+.taskbar.is-stacked .active-app {
+    padding: 4px 8px;
+    min-width: 36px;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.taskbar.is-stacked .active-app .app-label,
+.taskbar.is-stacked .start-btn .start-label {
+    display: none;
+}
+
+.taskbar.is-stacked .system-tray .tray-btn {
+    display: none;
+}
+
+/* Extreme narrow: clock on its own row under Start/Apps */
+.taskbar.is-stacked.is-mobile-nav {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.taskbar.is-stacked.is-mobile-nav .taskbar-apps {
+    flex: 0 1 auto;
+    width: auto;
+}
+
+.taskbar.is-stacked.is-mobile-nav .system-tray {
+    flex: 1 1 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+    order: 3;
 }
 
 .start-btn {
@@ -1368,6 +1455,53 @@ button:active,
         gap: 4px;
     }
 
+    /* No-JS / pre-hydrate: wrap icon buttons instead of clipping off-screen */
+    .taskbar:not(.is-mobile-nav) {
+        --taskbar-max-rows: 2;
+        height: auto;
+        flex-wrap: nowrap;
+        align-items: flex-end;
+    }
+
+    .taskbar:not(.is-mobile-nav) .start-btn {
+        align-self: flex-start;
+    }
+
+    .taskbar:not(.is-mobile-nav) .start-btn .start-label {
+        display: none;
+    }
+
+    .taskbar:not(.is-mobile-nav) .taskbar-apps {
+        flex: 1 1 0;
+        width: 0;
+        min-width: 0;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        align-self: stretch;
+        row-gap: 4px;
+    }
+
+    .taskbar:not(.is-mobile-nav) .active-app .app-label {
+        display: none;
+    }
+
+    .taskbar:not(.is-mobile-nav) .active-app {
+        padding: 4px 8px;
+        min-width: 36px;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .taskbar:not(.is-mobile-nav) .system-tray {
+        margin-left: 4px;
+        align-self: flex-end;
+        height: auto;
+    }
+
+    .taskbar:not(.is-mobile-nav) .system-tray .tray-btn {
+        display: none;
+    }
+
     .taskbar.is-mobile-nav .taskbar-apps {
         flex: 0 0 auto;
         min-width: 0;
@@ -1492,5 +1626,11 @@ button:active,
     .tray-clock {
         font-size: 0.75rem;
         padding: 4px 4px;
+    }
+
+    /* Extra-narrow: allow a third icon row so buttons don't clip */
+    .taskbar.is-stacked,
+    .taskbar:not(.is-mobile-nav) {
+        --taskbar-max-rows: 3;
     }
 }

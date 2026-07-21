@@ -1618,9 +1618,22 @@
 
     var suppressDocClose = false;
 
-    function syncOverflowMode() {
-      var compact = isCompact();
-      var mobile = isNarrow();
+    function taskbarOverflows() {
+      if (taskbar.scrollWidth > taskbar.clientWidth + 2) return true;
+      var tray = taskbar.querySelector('.system-tray');
+      if (!tray) return false;
+      var trayLeft = tray.getBoundingClientRect().left;
+      var nodes = taskbar.querySelectorAll('.start-btn, .taskbar-apps .active-app, .taskbar-overflow');
+      for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        if (el.hidden || el.offsetParent === null) continue;
+        var right = el.getBoundingClientRect().right;
+        if (right > trayLeft - 2) return true;
+      }
+      return false;
+    }
+
+    function applyPlacement(compact, mobile) {
       taskbar.classList.toggle('is-compact', compact);
       taskbar.classList.toggle('is-mobile-nav', mobile);
 
@@ -1655,6 +1668,28 @@
         wrap.classList.add('is-active');
         moreBtn.querySelector('.app-label').textContent = 'More';
       }
+    }
+
+    function syncOverflowMode() {
+      var compact = isCompact();
+      var mobile = isNarrow();
+
+      // Measure in a single row first so we know whether to stack
+      taskbar.classList.remove('is-stacked');
+      applyPlacement(compact, mobile);
+
+      // Classic Win95: if buttons would clip, grow to a 2-row icon stack
+      if (taskbarOverflows()) {
+        taskbar.classList.add('is-stacked');
+      }
+
+      // Still clipping after a 2-row stack? Collapse to Apps menu
+      if (!mobile && taskbarOverflows()) {
+        taskbar.classList.remove('is-stacked');
+        applyPlacement(true, true);
+        if (taskbarOverflows()) taskbar.classList.add('is-stacked');
+      }
+
       adjustBodyPadding();
     }
 
@@ -1705,8 +1740,11 @@
     if (!tb) return;
     // Prefer the pinned chrome height; clamp so a leaked in-flow menu can't
     // blow out --taskbar-h and shove overlays off-screen.
+    // Allow up to ~3 classic taskbar rows when is-stacked on tiny screens.
     var h = Math.round(tb.getBoundingClientRect().height) || 48;
-    if (h > 80) h = 52;
+    var stacked = tb.classList.contains('is-stacked');
+    var maxH = stacked ? 140 : 56;
+    if (h > maxH) h = stacked ? 120 : 52;
     document.body.style.paddingBottom = Math.max(100, h + 24) + 'px';
     document.documentElement.style.setProperty('--taskbar-h', h + 'px');
     var menu = document.getElementById('start-menu');
