@@ -156,6 +156,42 @@ body {
     }
 }
 
+/* Free-float desktop stage (index, desktop widths) */
+
+body.desktop-freefloat .desktop-canvas--home {
+    position: relative;
+    display: block;
+    width: min(100% - 24px, 1280px);
+    min-height: calc(100vh - var(--taskbar-h, 48px) - 48px);
+    margin: 0 auto;
+    padding: 12px 0 80px;
+    gap: 0;
+}
+
+body.desktop-freefloat .desktop-canvas--home .window {
+    position: absolute;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    z-index: 10;
+    overflow: visible;
+}
+
+body.desktop-freefloat .desktop-canvas--home .window[hidden] {
+    display: none !important;
+}
+
+body.desktop-freefloat .desktop-canvas--home .window.is-maximized {
+    position: fixed !important;
+    left: 8px !important;
+    top: 8px !important;
+    right: 8px !important;
+    bottom: calc(var(--taskbar-h, 48px) + 8px) !important;
+    width: auto !important;
+    height: auto !important;
+    z-index: 10040 !important;
+}
+
 .title-bar {
     background: linear-gradient(90deg, #000080, #1084d0);
     color: white;
@@ -163,6 +199,29 @@ body {
     font-weight: bold;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+}
+
+.title-bar > span:first-child {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.title-bar-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+body.desktop-freefloat .desktop-canvas--home .title-bar,
+.float-window .title-bar {
+    cursor: move;
 }
 
 .content {
@@ -728,6 +787,8 @@ button:active,
     border: 2px outset #fff;
     box-shadow: 4px 4px 0 #000;
     z-index: 10050;
+    overflow: visible;
+    box-sizing: border-box;
 }
 
 .float-window[hidden] {
@@ -740,7 +801,19 @@ button:active,
     align-items: center;
 }
 
-.win-close {
+.float-window.is-maximized {
+    left: 8px !important;
+    top: 8px !important;
+    right: 8px !important;
+    bottom: calc(var(--taskbar-h, 48px) + 8px) !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: none;
+}
+
+.win-btn,
+.win-close,
+.win-max {
     width: auto;
     min-width: 22px;
     min-height: 22px;
@@ -748,13 +821,151 @@ button:active,
     padding: 0 6px;
     font-size: 1rem;
     line-height: 1;
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
     background: #c0c0c0;
     border: 2px outset #fff;
+    color: #000;
     cursor: pointer;
 }
 
-.win-close:active {
+.win-btn:active,
+.win-close:active,
+.win-max:active {
     border-style: inset;
+}
+
+.win-max {
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Resize grips */
+
+.win-grip {
+    position: absolute;
+    z-index: 6;
+    background: transparent;
+}
+
+.win-grip-n {
+    top: -2px;
+    left: 8px;
+    right: 8px;
+    height: 6px;
+    cursor: n-resize;
+}
+
+.win-grip-s {
+    bottom: -2px;
+    left: 8px;
+    right: 8px;
+    height: 6px;
+    cursor: s-resize;
+}
+
+.win-grip-e {
+    top: 8px;
+    right: -2px;
+    bottom: 8px;
+    width: 6px;
+    cursor: e-resize;
+}
+
+.win-grip-w {
+    top: 8px;
+    left: -2px;
+    bottom: 8px;
+    width: 6px;
+    cursor: w-resize;
+}
+
+.win-grip-ne {
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    cursor: ne-resize;
+}
+
+.win-grip-nw {
+    top: -2px;
+    left: -2px;
+    width: 12px;
+    height: 12px;
+    cursor: nw-resize;
+}
+
+.win-grip-se {
+    right: 0;
+    bottom: 0;
+    width: 14px;
+    height: 14px;
+    cursor: se-resize;
+    background:
+        linear-gradient(135deg, transparent 45%, #808080 45%, #808080 55%, transparent 55%),
+        linear-gradient(135deg, transparent 60%, #fff 60%, #fff 70%, transparent 70%),
+        linear-gradient(135deg, transparent 75%, #808080 75%, #808080 85%, transparent 85%);
+}
+
+.win-grip-sw {
+    left: -2px;
+    bottom: -2px;
+    width: 12px;
+    height: 12px;
+    cursor: sw-resize;
+}
+
+.window.is-dragging,
+.window.is-resizing,
+.float-window.is-dragging,
+.float-window.is-resizing {
+    user-select: none;
+}
+
+body.is-win-interact iframe {
+    pointer-events: none !important;
+}
+
+body.is-win-interact {
+    cursor: inherit;
+    user-select: none;
+}
+
+@media (max-width: 640px) {
+    .win-grip {
+        display: none !important;
+    }
+
+    body.desktop-freefloat .desktop-canvas--home {
+        position: static;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        width: calc(100% - 16px);
+        gap: 12px;
+        padding: 6px 0 20px;
+    }
+
+    body.desktop-freefloat .desktop-canvas--home .window {
+        position: static;
+        left: auto !important;
+        top: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible;
+    }
+
+    body.desktop-freefloat .desktop-canvas--home .window.is-maximized {
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+    }
+
+    body.desktop-freefloat .desktop-canvas--home .title-bar {
+        cursor: default;
+    }
 }
 
 .notepad-area {
@@ -1016,6 +1227,30 @@ button:active,
     outline: 2px solid #ffff00;
     outline-offset: 1px;
     z-index: 5;
+}
+
+.sol-card.is-drag-source {
+    opacity: 0.35;
+}
+
+.sol-drag-ghost {
+    position: fixed;
+    z-index: 12000;
+    pointer-events: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sol-drag-ghost .sol-card {
+    position: absolute;
+    left: 0;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.sol-pile.is-drop-target {
+    outline: 2px dashed #ffff00;
+    outline-offset: 2px;
 }
 
 .sol-card.is-back {
@@ -1556,11 +1791,22 @@ button:active,
         right: 0 !important;
         top: auto !important;
         bottom: var(--taskbar-h, 48px);
-        width: 100%;
+        width: 100% !important;
+        height: auto !important;
         max-height: 70vh;
         overflow-y: auto;
         border-radius: 0;
         z-index: 10050;
+    }
+
+    .float-window.is-maximized {
+        left: 0 !important;
+        right: 0 !important;
+        top: auto !important;
+        bottom: var(--taskbar-h, 48px) !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: 70vh;
     }
 
     .float-window .title-bar {

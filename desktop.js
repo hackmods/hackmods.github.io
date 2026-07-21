@@ -2,6 +2,8 @@
   'use strict';
 
   var NOTEPAD_KEY = 'comedy-notepad';
+  var LAYOUT_KEY = 'comedy-desktop-layout-v2';
+  var LAYOUT_KEY_LEGACY = 'comedy-desktop-layout';
   var NOTEPAD_SEED =
     'SET NOTES\n---------\n- Crowd work opener\n- Buffalo Fan Bill callback\n- Kill the puppet bit if room is quiet\n\nDocument the craft. Ship the next set.';
   var zTop = 10050;
@@ -12,11 +14,18 @@
   var duckHuntRaf = null;
   var duckHuntState = null;
   var solitaireState = null;
+  var layoutCache = null;
+  var layoutSaveTimer = null;
+  var pageWindowsWired = false;
+  var GRIP_DIRS = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
   var isNarrow = function () {
     return window.matchMedia('(max-width: 640px)').matches;
   };
   var isCompact = function () {
     return window.matchMedia('(max-width: 900px)').matches;
+  };
+  var prefersReducedMotion = function () {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   };
 
   function pageBase() {
@@ -39,6 +48,715 @@
     h = h % 12 || 12;
     m = m < 10 ? '0' + m : m;
     return h + ':' + m + ' ' + ampm;
+  }
+
+  function taskbarHeight() {
+    var tb = document.querySelector('.taskbar');
+    return (tb && tb.offsetHeight) || 48;
+  }
+
+  function loadLayout() {
+    if (layoutCache) return layoutCache;
+    try {
+      localStorage.removeItem(LAYOUT_KEY_LEGACY);
+    } catch (e) {}
+    try {
+      var raw = localStorage.getItem(LAYOUT_KEY);
+      layoutCache = raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      layoutCache = {};
+    }
+    if (!layoutCache || typeof layoutCache !== 'object') layoutCache = {};
+    return layoutCache;
+  }
+
+  function saveLayoutSoon() {
+    if (layoutSaveTimer) clearTimeout(layoutSaveTimer);
+    layoutSaveTimer = setTimeout(saveLayoutNow, 120);
+  }
+
+  function saveLayoutNow() {
+    layoutSaveTimer = null;
+    try {
+      localStorage.setItem(LAYOUT_KEY, JSON.stringify(loadLayout()));
+    } catch (e) {}
+  }
+
+  function getWinRecord(id) {
+    var layout = loadLayout();
+    if (!layout[id]) layout[id] = {};
+    return layout[id];
+  }
+
+  function captureWinGeometry(el, opts) {
+    opts = opts || {};
+    var id = el.id;
+    if (!id) return;
+    var rec = getWinRecord(id);
+    if (el.classList.contains('is-maximized')) {
+      rec.maximized = true;
+      return;
+    }
+    var rect = el.getBoundingClientRect();
+    var isFloat = el.classList.contains('float-window');
+    var left;
+    var top;
+    if (isFloat) {
+      left = rect.left;
+      top = rect.top;
+    } else {
+      var canvas = getHomeCanvas();
+      var cr = canvas ? canvas.getBoundingClientRect() : { left: 0, top: 0 };
+      left = rect.left - cr.left;
+      top = rect.top - cr.top;
+    }
+    var maxs = maxSizeFor(el);
+    var w = Math.round(Math.min(Math.max(rect.width, minSizeFor(el).w), maxs.w));
+    rec.left = Math.round(left);
+    rec.top = Math.round(top);
+    if (opts.sizes) {
+      rec.width = w;
+      rec.height = Math.round(Math.min(Math.max(rect.height, minSizeFor(el).h), maxs.h));
+      rec.userSized = true;
+    } else {
+      if (rec.width == null || rec.width > maxs.w) {
+        rec.width = w || defaultWidthForWindow(el);
+      }
+      if (!rec.userSized) delete rec.height;
+    }
+    rec.maximized = false;
+    rec.z = parseInt(el.style.zIndex, 10) || undefined;
+    if (el.classList.contains('window') && !isFloat) {
+      rec.hidden = !!el.hidden;
+    }
+  }
+
+  function getCanvasOffset() {
+    var canvas = getHomeCanvas();
+    if (!canvas) return { left: 0, top: 0 };
+    var r = canvas.getBoundingClientRect();
+    return { left: r.left, top: r.top };
+  }
+
+  function getHomeCanvas() {
+    return document.querySelector('.desktop-canvas--home');
+  }
+
+  function isFreeFloatActive() {
+    return document.body.classList.contains('desktop-freefloat') && !isNarrow();
+  }
+
+  function defaultWidthForWindow(el) {
+    if (el.id === 'window-shorts') return 640;
+    if (el.classList.contains('window-wide')) return 620;
+    if (el.classList.contains('window-hero')) return 420;
+    if (el.classList.contains('window-narrow')) return 300;
+    if (el.classList.contains('window-media')) return 520;
+    if (el.id === 'widget-solitaire') return 560;
+    if (el.classList.contains('float-window')) return 340;
+    return 400;
+  }
+
+  function minSizeFor(el) {
+    if (el.id === 'widget-solitaire') return { w: 320, h: 280 };
+    if (el.classList.contains('window-media') || el.id === 'window-shorts' || el.id === 'window-latest' || el.id === 'window-set') {
+      return { w: 280, h: 200 };
+    }
+    if (el.classList.contains('float-window')) return { w: 220, h: 140 };
+    return { w: 240, h: 120 };
+  }
+
+  function maxSizeFor(el) {
+    var canvas = getHomeCanvas();
+    var canvasCap = canvas ? Math.max(320, canvas.clientWidth - 16) : window.innerWidth - 32;
+    var vwCap = window.innerWidth - 24;
+    var stageCap = Math.min(canvasCap, vwCap);
+    var typeMax = 720;
+    if (el.id === 'window-shorts') typeMax = 680;
+    else if (el.classList.contains('window-wide')) typeMax = 720;
+    else if (el.classList.contains('window-hero')) typeMax = 520;
+    else if (el.classList.contains('window-narrow')) typeMax = 380;
+    else if (el.classList.contains('window-media')) typeMax = 640;
+    else if (el.id === 'widget-solitaire') typeMax = 640;
+    else if (el.classList.contains('float-window')) typeMax = 480;
+    var tb = taskbarHeight();
+    return {
+      w: Math.min(typeMax, stageCap),
+      h: Math.min(window.innerHeight - tb - 24, 900)
+    };
+  }
+
+  function sanitizeWinRecord(el, rec) {
+    if (!rec) return rec;
+    var maxs = maxSizeFor(el);
+    var defW = defaultWidthForWindow(el);
+    if (rec.width != null && rec.width > maxs.w) {
+      rec.width = defW;
+      delete rec.height;
+      rec.userSized = false;
+    }
+    if (rec.width != null && rec.width < minSizeFor(el).w) {
+      rec.width = defW;
+    }
+    if (!rec.userSized) {
+      delete rec.height;
+    }
+    if (rec.restore) {
+      if (rec.restore.width > maxs.w) rec.restore.width = defW;
+      if (!rec.userSized) delete rec.restore.height;
+    }
+    return rec;
+  }
+
+  function clampRect(left, top, width, height, isFloat, el) {
+    var tb = taskbarHeight();
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var minVis = 48;
+    var mins = el ? minSizeFor(el) : { w: 240, h: 120 };
+    var maxs = el ? maxSizeFor(el) : { w: vw - 16, h: vh - tb - 16 };
+    width = Math.min(Math.max(width, mins.w), maxs.w);
+    height = Math.min(Math.max(height, mins.h), maxs.h);
+
+    if (isFloat) {
+      left = Math.min(Math.max(left, 8 - width + minVis), vw - minVis);
+      top = Math.min(Math.max(top, 8), vh - tb - minVis);
+    } else {
+      var canvas = getHomeCanvas();
+      var cw = canvas ? canvas.clientWidth : vw;
+      var ch = Math.max(canvas ? canvas.clientHeight : vh, vh - tb);
+      left = Math.min(Math.max(left, 8 - width + minVis), Math.max(0, cw - minVis));
+      top = Math.min(Math.max(top, 0), Math.max(0, ch - minVis));
+    }
+    return { left: left, top: top, width: width, height: height };
+  }
+
+  function applyGeometry(el, geo, isFloat) {
+    var mins = minSizeFor(el);
+    var width = geo.width != null ? geo.width : defaultWidthForWindow(el);
+    var height = geo.height != null ? geo.height : mins.h;
+    var c = clampRect(geo.left, geo.top, width, height, isFloat, el);
+    el.style.left = c.left + 'px';
+    el.style.top = c.top + 'px';
+    el.style.width = c.width + 'px';
+    if (geo.height != null && geo.height > 0) {
+      el.style.height = c.height + 'px';
+    } else {
+      el.style.height = 'auto';
+    }
+  }
+
+  function setInteractLock(on) {
+    document.body.classList.toggle('is-win-interact', !!on);
+  }
+
+  function focusWindow(el) {
+    zTop += 1;
+    el.style.zIndex = String(zTop);
+    var rec = getWinRecord(el.id);
+    rec.z = zTop;
+    saveLayoutSoon();
+  }
+
+  function ensureGrips(el) {
+    if (el.querySelector('.win-grip')) return;
+    GRIP_DIRS.forEach(function (dir) {
+      var g = document.createElement('div');
+      g.className = 'win-grip win-grip-' + dir;
+      g.setAttribute('data-resize', dir);
+      g.setAttribute('aria-hidden', 'true');
+      el.appendChild(g);
+    });
+  }
+
+  function ensureTitleControls(el) {
+    var bar = el.querySelector('.title-bar');
+    if (!bar) return;
+    var controls = bar.querySelector('.title-bar-controls');
+    if (!controls) {
+      controls = document.createElement('div');
+      controls.className = 'title-bar-controls';
+      bar.appendChild(controls);
+    }
+    if (!controls.querySelector('[data-max]')) {
+      var maxBtn = document.createElement('button');
+      maxBtn.type = 'button';
+      maxBtn.className = 'win-max';
+      maxBtn.setAttribute('data-max', '');
+      maxBtn.setAttribute('aria-label', 'Maximize');
+      maxBtn.innerHTML = '&#9633;';
+      controls.insertBefore(maxBtn, controls.firstChild);
+    }
+    if (!controls.querySelector('[data-close]')) {
+      var closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'win-close';
+      closeBtn.setAttribute('data-close', '');
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.innerHTML = '&times;';
+      controls.appendChild(closeBtn);
+    }
+    var decorative = bar.querySelector('span:last-child');
+    if (decorative && decorative.textContent === '[X]') decorative.remove();
+  }
+
+  function updateMaxButton(el) {
+    var btn = el.querySelector('[data-max]');
+    if (!btn) return;
+    var maxed = el.classList.contains('is-maximized');
+    btn.innerHTML = maxed ? '&#9634;' : '&#9633;';
+    btn.setAttribute('aria-label', maxed ? 'Restore' : 'Maximize');
+  }
+
+  function maximizeWindow(el) {
+    if (isNarrow() && el.classList.contains('float-window')) return;
+    if (isNarrow() && !el.classList.contains('float-window')) return;
+    var rec = getWinRecord(el.id);
+    if (!el.classList.contains('is-maximized')) {
+      captureWinGeometry(el);
+      rec.restore = {
+        left: rec.left,
+        top: rec.top,
+        width: rec.width || defaultWidthForWindow(el),
+        height: rec.userSized ? rec.height : null
+      };
+      el.classList.add('is-maximized');
+      rec.maximized = true;
+    } else {
+      el.classList.remove('is-maximized');
+      rec.maximized = false;
+      var isFloat = el.classList.contains('float-window');
+      var geo = rec.restore || rec;
+      if (geo.left != null) {
+        applyGeometry(
+          el,
+          {
+            left: geo.left,
+            top: geo.top,
+            width: geo.width || defaultWidthForWindow(el),
+            height: rec.userSized ? geo.height : null
+          },
+          isFloat
+        );
+      }
+    }
+    updateMaxButton(el);
+    focusWindow(el);
+    saveLayoutSoon();
+  }
+
+  function hidePageWindow(el) {
+    el.hidden = true;
+    var rec = getWinRecord(el.id);
+    rec.hidden = true;
+    saveLayoutSoon();
+  }
+
+  function showPageWindow(el) {
+    el.hidden = false;
+    var rec = getWinRecord(el.id);
+    rec.hidden = false;
+    focusWindow(el);
+    saveLayoutSoon();
+  }
+
+  function wireWindowChrome(el, opts) {
+    opts = opts || {};
+    var isFloat = !!opts.isFloat || el.classList.contains('float-window');
+    var isPage = !!opts.isPage || (el.classList.contains('window') && !isFloat);
+    if (el.dataset.chromeWired) return;
+    el.dataset.chromeWired = '1';
+
+    ensureTitleControls(el);
+    ensureGrips(el);
+
+    el.addEventListener('mousedown', function () {
+      focusWindow(el);
+    });
+    el.addEventListener(
+      'touchstart',
+      function () {
+        focusWindow(el);
+      },
+      { passive: true }
+    );
+
+    var closeBtn = el.querySelector('[data-close]');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isFloat) closeWidget(el);
+        else hidePageWindow(el);
+      });
+    }
+
+    var maxBtn = el.querySelector('[data-max]');
+    if (maxBtn) {
+      maxBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        maximizeWindow(el);
+      });
+    }
+
+    var bar = el.querySelector('.title-bar');
+    if (!bar) return;
+
+    var drag = null;
+    var resize = null;
+
+    bar.addEventListener('dblclick', function (e) {
+      if (e.target.closest('[data-close], [data-max], .title-bar-controls')) return;
+      if (isNarrow() && isPage) return;
+      if (isNarrow() && isFloat) return;
+      maximizeWindow(el);
+    });
+
+    bar.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('[data-close], [data-max], .title-bar-controls, .win-grip')) return;
+      if (isNarrow()) return;
+      if (isPage && !isFreeFloatActive()) return;
+      if (el.classList.contains('is-maximized')) return;
+      e.preventDefault();
+      drag = {
+        sx: e.clientX,
+        sy: e.clientY,
+        ol: parseFloat(el.style.left) || el.getBoundingClientRect().left - (isFloat ? 0 : getCanvasOffset().left - window.scrollX),
+        ot: parseFloat(el.style.top) || el.getBoundingClientRect().top - (isFloat ? 0 : getCanvasOffset().top - window.scrollY)
+      };
+      if (isFloat) {
+        var fr = el.getBoundingClientRect();
+        drag.ol = fr.left;
+        drag.ot = fr.top;
+      } else {
+        var pr = el.getBoundingClientRect();
+        var off = getHomeCanvas().getBoundingClientRect();
+        drag.ol = pr.left - off.left;
+        drag.ot = pr.top - off.top;
+      }
+      focusWindow(el);
+      el.classList.add('is-dragging');
+      setInteractLock(true);
+      bar.setPointerCapture(e.pointerId);
+    });
+
+    bar.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var nl = drag.ol + (e.clientX - drag.sx);
+      var nt = drag.ot + (e.clientY - drag.sy);
+      var rect = el.getBoundingClientRect();
+      var c = clampRect(nl, nt, rect.width, rect.height, isFloat, el);
+      el.style.left = c.left + 'px';
+      el.style.top = c.top + 'px';
+    });
+
+    function endDrag() {
+      if (!drag) return;
+      drag = null;
+      el.classList.remove('is-dragging');
+      setInteractLock(false);
+      captureWinGeometry(el);
+      saveLayoutSoon();
+    }
+
+    bar.addEventListener('pointerup', endDrag);
+    bar.addEventListener('pointercancel', endDrag);
+
+    el.querySelectorAll('[data-resize]').forEach(function (grip) {
+      grip.addEventListener('pointerdown', function (e) {
+        if (isNarrow()) return;
+        if (isPage && !isFreeFloatActive()) return;
+        if (el.classList.contains('is-maximized')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var dir = grip.getAttribute('data-resize');
+        var rect = el.getBoundingClientRect();
+        var off = isFloat ? { left: 0, top: 0 } : getHomeCanvas().getBoundingClientRect();
+        resize = {
+          dir: dir,
+          sx: e.clientX,
+          sy: e.clientY,
+          left: isFloat ? rect.left : rect.left - off.left,
+          top: isFloat ? rect.top : rect.top - off.top,
+          width: rect.width,
+          height: rect.height
+        };
+        focusWindow(el);
+        el.classList.add('is-resizing');
+        setInteractLock(true);
+        grip.setPointerCapture(e.pointerId);
+      });
+
+      grip.addEventListener('pointermove', function (e) {
+        if (!resize) return;
+        var dx = e.clientX - resize.sx;
+        var dy = e.clientY - resize.sy;
+        var left = resize.left;
+        var top = resize.top;
+        var width = resize.width;
+        var height = resize.height;
+        var dir = resize.dir;
+        var mins = minSizeFor(el);
+
+        if (dir.indexOf('e') !== -1) width = resize.width + dx;
+        if (dir.indexOf('s') !== -1) height = resize.height + dy;
+        if (dir.indexOf('w') !== -1) {
+          width = resize.width - dx;
+          left = resize.left + dx;
+          if (width < mins.w) {
+            left = resize.left + resize.width - mins.w;
+            width = mins.w;
+          }
+        }
+        if (dir.indexOf('n') !== -1) {
+          height = resize.height - dy;
+          top = resize.top + dy;
+          if (height < mins.h) {
+            top = resize.top + resize.height - mins.h;
+            height = mins.h;
+          }
+        }
+
+        width = Math.max(width, mins.w);
+        height = Math.max(height, mins.h);
+        var c = clampRect(left, top, width, height, isFloat, el);
+        el.style.left = c.left + 'px';
+        el.style.top = c.top + 'px';
+        el.style.width = c.width + 'px';
+        el.style.height = c.height + 'px';
+      });
+
+      function endResize() {
+        if (!resize) return;
+        resize = null;
+        el.classList.remove('is-resizing');
+        setInteractLock(false);
+        captureWinGeometry(el, { sizes: true });
+        saveLayoutSoon();
+      }
+
+      grip.addEventListener('pointerup', endResize);
+      grip.addEventListener('pointercancel', endResize);
+    });
+  }
+
+  function cascadeDefaults(windows) {
+    var reduced = prefersReducedMotion();
+    windows.forEach(function (el, i) {
+      var w = defaultWidthForWindow(el);
+      var left = reduced ? 16 + (i % 2) * (w * 0.15) : 24 + (i % 5) * 28;
+      var top = reduced ? 16 + Math.floor(i / 2) * 24 : 20 + i * 26;
+      applyGeometry(el, { left: left, top: top, width: w, height: null }, false);
+      el.style.height = 'auto';
+      el.dataset.placed = '1';
+    });
+  }
+
+  function applyStoredOrDefault(el, isFloat, index) {
+    var rec = sanitizeWinRecord(el, getWinRecord(el.id));
+    if (rec.z) {
+      zTop = Math.max(zTop, rec.z);
+      el.style.zIndex = String(rec.z);
+    }
+    if (!isFloat && rec.hidden) {
+      el.hidden = true;
+    }
+    if (rec.maximized && rec.restore) {
+      applyGeometry(el, {
+        left: rec.restore.left,
+        top: rec.restore.top,
+        width: rec.restore.width || defaultWidthForWindow(el),
+        height: rec.userSized ? rec.restore.height : null
+      }, isFloat);
+      el.classList.add('is-maximized');
+      updateMaxButton(el);
+      el.dataset.placed = '1';
+      return;
+    }
+    if (rec.left != null && rec.top != null) {
+      applyGeometry(
+        el,
+        {
+          left: rec.left,
+          top: rec.top,
+          width: rec.width || defaultWidthForWindow(el),
+          height: rec.userSized && rec.height ? rec.height : null
+        },
+        isFloat
+      );
+      el.dataset.placed = '1';
+      return;
+    }
+    if (isFloat) {
+      var offset = (index || 0) * 18;
+      var maxLeft = el.id === 'widget-solitaire' ? window.innerWidth - 580 : window.innerWidth - 320;
+      applyGeometry(
+        el,
+        {
+          left: Math.min(40 + offset, Math.max(8, maxLeft)),
+          top: Math.min(60 + offset, window.innerHeight - 280),
+          width: defaultWidthForWindow(el),
+          height: null
+        },
+        true
+      );
+      el.style.height = 'auto';
+      el.dataset.placed = '1';
+      return;
+    }
+    // Page window with no stored position — place with cascade-style defaults
+    var i = index || 0;
+    var w = defaultWidthForWindow(el);
+    applyGeometry(
+      el,
+      {
+        left: 24 + (i % 5) * 28,
+        top: 20 + i * 26,
+        width: w,
+        height: null
+      },
+      false
+    );
+    el.style.height = 'auto';
+    el.dataset.placed = '1';
+  }
+
+  function syncFreeFloatMode() {
+    var canvas = getHomeCanvas();
+    if (!canvas) {
+      document.body.classList.remove('desktop-freefloat');
+      return;
+    }
+    var enable = !isNarrow();
+    document.body.classList.toggle('desktop-freefloat', enable);
+    var windows = Array.prototype.slice.call(canvas.querySelectorAll('.window[id]'));
+    if (!enable) {
+      windows.forEach(function (el) {
+        el.classList.remove('is-maximized', 'is-dragging', 'is-resizing');
+        el.style.left = '';
+        el.style.top = '';
+        el.style.width = '';
+        el.style.height = '';
+        el.style.zIndex = '';
+        el.hidden = false;
+      });
+      return;
+    }
+
+    windows.forEach(function (el) {
+      wireWindowChrome(el, { isPage: true });
+    });
+
+    var needsCascade = windows.every(function (el) {
+      var rec = getWinRecord(el.id);
+      return rec.left == null;
+    });
+
+    if (needsCascade) {
+      cascadeDefaults(windows);
+      windows.forEach(function (el) {
+        captureWinGeometry(el);
+      });
+      saveLayoutSoon();
+    } else {
+      windows.forEach(function (el, i) {
+        applyStoredOrDefault(el, false, i);
+      });
+    }
+
+    // Grow canvas so absolute windows aren't clipped oddly
+    var maxBottom = 0;
+    windows.forEach(function (el) {
+      if (el.hidden || el.classList.contains('is-maximized')) return;
+      var top = parseFloat(el.style.top) || 0;
+      var h = el.offsetHeight || 200;
+      maxBottom = Math.max(maxBottom, top + h + 40);
+    });
+    if (maxBottom > 400) canvas.style.minHeight = maxBottom + 'px';
+  }
+
+  function clampAllWindowsIntoView() {
+    if (isNarrow()) return;
+    document.querySelectorAll('.float-window:not([hidden])').forEach(function (el) {
+      if (el.classList.contains('is-maximized')) return;
+      var left = parseFloat(el.style.left);
+      var top = parseFloat(el.style.top);
+      if (isNaN(left) || isNaN(top)) {
+        var rect = el.getBoundingClientRect();
+        left = rect.left;
+        top = rect.top;
+      }
+      var width = parseFloat(el.style.width) || el.offsetWidth;
+      var height = el.style.height === 'auto' || !el.style.height ? el.offsetHeight : parseFloat(el.style.height);
+      var c = clampRect(left, top, width, height, true, el);
+      el.style.left = c.left + 'px';
+      el.style.top = c.top + 'px';
+      el.style.width = c.width + 'px';
+    });
+    if (!isFreeFloatActive()) return;
+    var canvas = getHomeCanvas();
+    if (!canvas) return;
+    canvas.querySelectorAll('.window[id]').forEach(function (el) {
+      if (el.hidden || el.classList.contains('is-maximized')) return;
+      var left = parseFloat(el.style.left) || 0;
+      var top = parseFloat(el.style.top) || 0;
+      var width = parseFloat(el.style.width) || defaultWidthForWindow(el);
+      var height = el.offsetHeight || 200;
+      var c = clampRect(left, top, width, height, false, el);
+      el.style.left = c.left + 'px';
+      el.style.top = c.top + 'px';
+      el.style.width = c.width + 'px';
+      if (!getWinRecord(el.id).userSized) el.style.height = 'auto';
+    });
+  }
+
+  function resetDesktop() {
+    try {
+      localStorage.removeItem(LAYOUT_KEY);
+    } catch (e) {}
+    layoutCache = {};
+    document.querySelectorAll('.float-window').forEach(function (el) {
+      el.classList.remove('is-maximized', 'is-dragging', 'is-resizing');
+      el.hidden = true;
+      el.style.left = '';
+      el.style.top = '';
+      el.style.width = '';
+      el.style.height = '';
+      el.style.zIndex = '';
+      delete el.dataset.placed;
+      updateMaxButton(el);
+    });
+    var canvas = getHomeCanvas();
+    if (canvas) {
+      canvas.querySelectorAll('.window[id]').forEach(function (el) {
+        el.hidden = false;
+        el.classList.remove('is-maximized', 'is-dragging', 'is-resizing');
+        el.style.left = '';
+        el.style.top = '';
+        el.style.width = '';
+        el.style.height = '';
+        el.style.zIndex = '';
+        delete el.dataset.placed;
+        updateMaxButton(el);
+      });
+    }
+    syncFreeFloatMode();
+    playBeep(660, 0.08, 'square');
+  }
+
+  function revealHashTarget() {
+    var hash = (window.location.hash || '').replace(/^#/, '');
+    if (!hash) return;
+    var el = document.getElementById(hash);
+    if (!el) return;
+    if (el.classList.contains('window')) {
+      if (isFreeFloatActive()) showPageWindow(el);
+      else {
+        el.hidden = false;
+        el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      }
+    }
   }
 
   function ensureAudio() {
@@ -159,6 +877,7 @@
       '<button type="button" class="start-item" data-open="hackmods">HACKMODS.EXE</button>' +
       '<div class="start-section-label">Documents</div>' +
       '<a class="start-item" role="menuitem" href="about.html">Press kit / bio</a>' +
+      '<button type="button" class="start-item" data-reset-desktop>Reset Desktop</button>' +
       '</div></div>' +
       floatShell(
         'widget-notepad',
@@ -240,7 +959,7 @@
           '<div class="sol-pile sol-waste" id="sol-waste" aria-label="Waste"></div></div>' +
           '<div class="sol-foundations" id="sol-foundations"></div></div>' +
           '<div class="sol-tableau" id="sol-tableau"></div></div>' +
-          '<p class="muted sol-msg" id="sol-msg">Klondike — click to select, click again to move. Double-click sends to foundation.</p>' +
+          '<p class="muted sol-msg" id="sol-msg">Klondike — drag cards to move, or click to select. Double-click sends to foundation.</p>' +
           '</div>'
       );
 
@@ -256,8 +975,10 @@
       '<span>' +
       title +
       '</span>' +
-      '<button type="button" class="win-close" data-close aria-label="Close">×</button>' +
-      '</div><div class="content">' +
+      '<div class="title-bar-controls">' +
+      '<button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button>' +
+      '<button type="button" class="win-close" data-close aria-label="Close">&times;</button>' +
+      '</div></div><div class="content">' +
       body +
       '</div></div>'
     );
@@ -339,6 +1060,12 @@
     });
 
     menu.addEventListener('click', function (e) {
+      if (e.target.closest('[data-reset-desktop]')) {
+        e.preventDefault();
+        resetDesktop();
+        closeMenu();
+        return;
+      }
       var t = e.target.closest('[data-open]');
       if (t) {
         e.preventDefault();
@@ -384,25 +1111,23 @@
     solitaire: 'widget-solitaire'
   };
 
-  function focusWidget(el) {
-    zTop += 1;
-    el.style.zIndex = String(zTop);
-  }
-
   function openWidget(name) {
     var id = widgetMap[name];
     if (!id) return;
     var el = document.getElementById(id);
     if (!el) return;
     el.hidden = false;
+    wireWindowChrome(el, { isFloat: true });
     if (!isNarrow() && !el.dataset.placed) {
-      var offset = Object.keys(widgetMap).indexOf(name) * 18;
-      var maxLeft = name === 'solitaire' ? window.innerWidth - 580 : window.innerWidth - 320;
-      el.style.left = Math.min(40 + offset, Math.max(8, maxLeft)) + 'px';
-      el.style.top = Math.min(60 + offset, window.innerHeight - 280) + 'px';
-      el.dataset.placed = '1';
+      var idx = Object.keys(widgetMap).indexOf(name);
+      applyStoredOrDefault(el, true, idx);
+    } else if (!isNarrow()) {
+      applyStoredOrDefault(el, true, Object.keys(widgetMap).indexOf(name));
     }
-    focusWidget(el);
+    focusWindow(el);
+    var rec = getWinRecord(id);
+    rec.hidden = false;
+    saveLayoutSoon();
     if (name === 'saber') initSaber(true);
     if (name === 'duckhunt') initDuckHunt(true);
     if (name === 'solitaire') initSolitaire(false);
@@ -411,6 +1136,12 @@
 
   function closeWidget(el) {
     el.hidden = true;
+    el.classList.remove('is-maximized');
+    updateMaxButton(el);
+    var rec = getWinRecord(el.id);
+    rec.hidden = true;
+    rec.maximized = false;
+    saveLayoutSoon();
     if (el.id === 'widget-saber') {
       stopSaberHum();
     }
@@ -424,48 +1155,26 @@
 
   function wireFloatWindows() {
     document.querySelectorAll('.float-window').forEach(function (win) {
-      win.addEventListener('mousedown', function () {
-        focusWidget(win);
-      });
-      win.addEventListener('touchstart', function () {
-        focusWidget(win);
-      }, { passive: true });
+      wireWindowChrome(win, { isFloat: true });
+    });
+  }
 
-      var closeBtn = win.querySelector('[data-close]');
-      if (closeBtn) {
-        closeBtn.addEventListener('click', function () {
-          closeWidget(win);
-        });
+  function wirePageWindows() {
+    if (pageWindowsWired) {
+      syncFreeFloatMode();
+      return;
+    }
+    pageWindowsWired = true;
+    syncFreeFloatMode();
+    window.addEventListener('hashchange', revealHashTarget);
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href^="#window-"]');
+      if (!link) return;
+      var id = (link.getAttribute('href') || '').slice(1);
+      var el = document.getElementById(id);
+      if (el && el.classList.contains('window') && isFreeFloatActive()) {
+        showPageWindow(el);
       }
-
-      var bar = win.querySelector('.title-bar');
-      if (!bar) return;
-      var dragging = false;
-      var sx = 0;
-      var sy = 0;
-      var ol = 0;
-      var ot = 0;
-
-      bar.addEventListener('pointerdown', function (e) {
-        if (e.target.closest('[data-close]')) return;
-        if (isNarrow()) return;
-        dragging = true;
-        focusWidget(win);
-        sx = e.clientX;
-        sy = e.clientY;
-        var rect = win.getBoundingClientRect();
-        ol = rect.left;
-        ot = rect.top;
-        bar.setPointerCapture(e.pointerId);
-      });
-      bar.addEventListener('pointermove', function (e) {
-        if (!dragging) return;
-        win.style.left = ol + (e.clientX - sx) + 'px';
-        win.style.top = ot + (e.clientY - sy) + 'px';
-      });
-      bar.addEventListener('pointerup', function () {
-        dragging = false;
-      });
     });
   }
 
@@ -1211,7 +1920,7 @@
       timerId: null
     };
     solSetMsg(
-      'Klondike — click to select, click again to move. Double-click sends to foundation.'
+      'Klondike — drag cards to move, or click to select. Double-click sends to foundation.'
     );
     solRender();
   }
@@ -1244,6 +1953,198 @@
     solSetMsg('New deal — draw ' + next + '.');
   }
 
+  var solDrag = null;
+  var SOL_DRAG_THRESHOLD = 6;
+
+  function solClearDropTargets() {
+    document.querySelectorAll('.sol-pile.is-drop-target').forEach(function (el) {
+      el.classList.remove('is-drop-target');
+    });
+  }
+
+  function solRemoveGhost() {
+    var ghost = document.getElementById('sol-drag-ghost');
+    if (ghost) ghost.remove();
+    document.querySelectorAll('.sol-card.is-drag-source').forEach(function (el) {
+      el.classList.remove('is-drag-source');
+    });
+    solClearDropTargets();
+  }
+
+  function solBuildGhost(cards, clientX, clientY) {
+    solRemoveGhost();
+    var ghost = document.createElement('div');
+    ghost.id = 'sol-drag-ghost';
+    ghost.className = 'sol-drag-ghost';
+    var overlap = isNarrow() ? 18 : 22;
+    var html = '';
+    var i;
+    for (i = 0; i < cards.length; i++) {
+      html += solCardHtml(cards[i], { offset: i * overlap });
+    }
+    ghost.innerHTML = html;
+    document.body.appendChild(ghost);
+    solPositionGhost(ghost, clientX, clientY);
+    return ghost;
+  }
+
+  function solPositionGhost(ghost, clientX, clientY) {
+    if (!ghost) return;
+    ghost.style.left = clientX - 20 + 'px';
+    ghost.style.top = clientY - 10 + 'px';
+  }
+
+  function solHitPile(clientX, clientY) {
+    var el = document.elementFromPoint(clientX, clientY);
+    if (!el) return null;
+    var foundation = el.closest('[data-foundation]');
+    if (foundation) {
+      return {
+        zone: 'foundation',
+        pile: parseInt(foundation.getAttribute('data-foundation'), 10)
+      };
+    }
+    var tableau = el.closest('[data-tableau]');
+    if (tableau) {
+      return {
+        zone: 'tableau',
+        pile: parseInt(tableau.getAttribute('data-tableau'), 10)
+      };
+    }
+    return null;
+  }
+
+  function solUpdateDropHighlight(clientX, clientY) {
+    solClearDropTargets();
+    var hit = solHitPile(clientX, clientY);
+    if (!hit || !solitaireState || !solitaireState.selection) return;
+    var sel = solitaireState.selection;
+    var moving = sel.cards[0];
+    var destArr;
+    var onto;
+    if (hit.zone === 'foundation') {
+      if (sel.cards.length !== 1) return;
+      destArr = solitaireState.foundations[hit.pile];
+      onto = destArr.length ? destArr[destArr.length - 1] : null;
+      if (!solCanStackFoundation(moving, onto)) return;
+    } else {
+      destArr = solitaireState.tableau[hit.pile];
+      onto = destArr.length ? destArr[destArr.length - 1] : null;
+      if (!solCanStackTableau(moving, onto)) return;
+    }
+    var selEl =
+      hit.zone === 'foundation'
+        ? document.querySelector('[data-foundation="' + hit.pile + '"]')
+        : document.querySelector('[data-tableau="' + hit.pile + '"]');
+    if (selEl) selEl.classList.add('is-drop-target');
+  }
+
+  function solEndDrag(clientX, clientY, didDrag) {
+    if (!solDrag) return;
+    var ghost = document.getElementById('sol-drag-ghost');
+    solRemoveGhost();
+    var active = solDrag;
+    solDrag = null;
+    setInteractLock(false);
+
+    if (!didDrag || !solitaireState || solitaireState.won) {
+      if (ghost) ghost.remove();
+      return;
+    }
+
+    var hit = solHitPile(clientX, clientY);
+    if (hit && solitaireState.selection) {
+      if (solMoveSelectionTo(hit.zone, hit.pile)) return;
+    }
+    solClearSelection();
+    solRender();
+    solSetMsg('Invalid drop.');
+  }
+
+  function solWireCardDrag(root) {
+    root.addEventListener('pointerdown', function (e) {
+      if (!solitaireState || solitaireState.won) return;
+      if (e.button != null && e.button !== 0) return;
+      var cardEl = e.target.closest('[data-card]');
+      if (!cardEl || !root.contains(cardEl)) return;
+      if (e.target.closest('#sol-stock')) return;
+
+      var loc = solFindCard(cardEl.getAttribute('data-card'));
+      if (!loc || !loc.card.faceUp) return;
+      if (loc.zone === 'waste' && loc.index !== solitaireState.waste.length - 1) return;
+      if (loc.zone === 'foundation' && loc.index !== solitaireState.foundations[loc.pile].length - 1) {
+        return;
+      }
+
+      var cards;
+      if (loc.zone === 'tableau') {
+        cards = solGetRunFromTableau(loc.pile, loc.index);
+        if (!cards) return;
+      } else {
+        cards = [loc.card];
+      }
+
+      solitaireState.selection = {
+        zone: loc.zone,
+        pile: loc.pile,
+        index: loc.index,
+        cards: cards
+      };
+
+      solDrag = {
+        pointerId: e.pointerId,
+        sx: e.clientX,
+        sy: e.clientY,
+        didDrag: false,
+        cardIds: cards.map(function (c) {
+          return c.id;
+        }),
+        target: cardEl
+      };
+      try {
+        cardEl.setPointerCapture(e.pointerId);
+      } catch (err) {}
+    });
+
+    root.addEventListener('pointermove', function (e) {
+      if (!solDrag || e.pointerId !== solDrag.pointerId) return;
+      var dx = e.clientX - solDrag.sx;
+      var dy = e.clientY - solDrag.sy;
+      if (!solDrag.didDrag) {
+        if (Math.hypot(dx, dy) < SOL_DRAG_THRESHOLD) return;
+        solDrag.didDrag = true;
+        setInteractLock(true);
+        solDrag.cardIds.forEach(function (id) {
+          var el = root.querySelector('[data-card="' + id + '"]');
+          if (el) el.classList.add('is-drag-source');
+        });
+        solBuildGhost(solitaireState.selection.cards, e.clientX, e.clientY);
+        solSetMsg('Dragging…');
+      }
+      solPositionGhost(document.getElementById('sol-drag-ghost'), e.clientX, e.clientY);
+      solUpdateDropHighlight(e.clientX, e.clientY);
+    });
+
+    root.addEventListener('pointerup', function (e) {
+      if (!solDrag || e.pointerId !== solDrag.pointerId) return;
+      var didDrag = solDrag.didDrag;
+      solEndDrag(e.clientX, e.clientY, didDrag);
+      if (didDrag) {
+        root.dataset.skipClick = '1';
+        setTimeout(function () {
+          delete root.dataset.skipClick;
+        }, 0);
+      }
+    });
+
+    root.addEventListener('pointercancel', function (e) {
+      if (!solDrag || e.pointerId !== solDrag.pointerId) return;
+      solEndDrag(e.clientX, e.clientY, false);
+      solClearSelection();
+      solRender();
+    });
+  }
+
   function initSolitaire(redeal) {
     var root = document.getElementById('solitaire-root');
     if (!root) return;
@@ -1272,7 +2173,10 @@
       solOnStockClick();
     });
 
+    solWireCardDrag(root);
+
     root.addEventListener('click', function (e) {
+      if (root.dataset.skipClick) return;
       if (!solitaireState || solitaireState.won) return;
       var cardEl = e.target.closest('[data-card]');
       var foundation = e.target.closest('[data-foundation]');
@@ -1754,22 +2658,31 @@
     });
   }
 
+  function onViewportChange() {
+    adjustBodyPadding();
+    syncFreeFloatMode();
+    clampAllWindowsIntoView();
+  }
+
   function init() {
     injectMarkup();
     wireStartButton();
     wireTaskbarOverflow();
     wireFloatWindows();
+    wirePageWindows();
     wireNotepad();
     wireCalc();
     wireVolume();
     wireOpenHackmodsButtons();
     tickClocks();
     setInterval(tickClocks, 1000);
-    adjustBodyPadding();
-    window.addEventListener('resize', adjustBodyPadding);
+    onViewportChange();
+    revealHashTarget();
+    window.addEventListener('resize', onViewportChange);
 
     window.ComedyDesktop = {
       openWidget: openWidget,
+      resetDesktop: resetDesktop,
       closeMenu: function () {
         var menu = document.getElementById('start-menu');
         var btn = document.getElementById('start-btn');
