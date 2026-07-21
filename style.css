@@ -224,6 +224,19 @@ body.desktop-freefloat .desktop-canvas--home .title-bar,
     cursor: move;
 }
 
+/* Grid mode: still draggable (promotes to free-float on grab) */
+body:not(.desktop-freefloat) .desktop-canvas--home .title-bar {
+    cursor: move;
+}
+
+body:not(.desktop-freefloat) .desktop-canvas--home .win-grip {
+    display: none;
+}
+
+.desktop-canvas--home .window {
+    position: relative;
+}
+
 .content {
     padding: 18px 20px 22px;
     border: 1px inset #fff;

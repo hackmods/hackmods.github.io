@@ -2,9 +2,13 @@
   'use strict';
 
   var NOTEPAD_KEY = 'comedy-notepad';
-  var LAYOUT_KEY = 'comedy-desktop-layout-v3';
-  var LAYOUT_KEY_LEGACY = 'comedy-desktop-layout-v2';
-  var LAYOUT_KEYS_PURGE = ['comedy-desktop-layout', 'comedy-desktop-layout-v2'];
+  var LAYOUT_KEY = 'comedy-desktop-layout-v4';
+  var LAYOUT_KEY_LEGACY = 'comedy-desktop-layout-v3';
+  var LAYOUT_KEYS_PURGE = [
+    'comedy-desktop-layout',
+    'comedy-desktop-layout-v2',
+    'comedy-desktop-layout-v3'
+  ];
   var NOTEPAD_SEED =
     'SET NOTES\n---------\n- Crowd work opener\n- Buffalo Fan Bill callback\n- Kill the puppet bit if room is quiet\n\nDocument the craft. Ship the next set.';
   var zTop = 10050;
@@ -317,6 +321,9 @@
   function maximizeWindow(el) {
     if (isNarrow() && el.classList.contains('float-window')) return;
     if (isNarrow() && !el.classList.contains('float-window')) return;
+    if (el.classList.contains('window') && !el.classList.contains('float-window')) {
+      promoteToFreeFloat();
+    }
     var rec = getWinRecord(el.id);
     if (!el.classList.contains('is-maximized')) {
       captureWinGeometry(el);
@@ -362,7 +369,10 @@
     el.hidden = false;
     var rec = getWinRecord(el.id);
     rec.hidden = false;
-    focusWindow(el);
+    if (isFreeFloatActive()) focusWindow(el);
+    else if (!isNarrow()) {
+      el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+    }
     saveLayoutSoon();
   }
 
@@ -377,12 +387,12 @@
     ensureGrips(el);
 
     el.addEventListener('mousedown', function () {
-      focusWindow(el);
+      if (isFreeFloatActive() || isFloat) focusWindow(el);
     });
     el.addEventListener(
       'touchstart',
       function () {
-        focusWindow(el);
+        if (isFreeFloatActive() || isFloat) focusWindow(el);
       },
       { passive: true }
     );
@@ -422,26 +432,27 @@
     bar.addEventListener('pointerdown', function (e) {
       if (e.target.closest('[data-close], [data-max], .title-bar-controls, .win-grip')) return;
       if (isNarrow()) return;
+      if (isPage && !isFreeFloatActive()) {
+        promoteToFreeFloat();
+      }
       if (isPage && !isFreeFloatActive()) return;
       if (el.classList.contains('is-maximized')) return;
       e.preventDefault();
-      drag = {
-        sx: e.clientX,
-        sy: e.clientY,
-        ol: parseFloat(el.style.left) || el.getBoundingClientRect().left - (isFloat ? 0 : getCanvasOffset().left - window.scrollX),
-        ot: parseFloat(el.style.top) || el.getBoundingClientRect().top - (isFloat ? 0 : getCanvasOffset().top - window.scrollY)
-      };
-      if (isFloat) {
-        var fr = el.getBoundingClientRect();
-        drag.ol = fr.left;
-        drag.ot = fr.top;
-      } else {
-        var pr = el.getBoundingClientRect();
-        var off = getHomeCanvas().getBoundingClientRect();
-        drag.ol = pr.left - off.left;
-        drag.ot = pr.top - off.top;
-      }
       focusWindow(el);
+      var fr;
+      if (isFloat) {
+        fr = el.getBoundingClientRect();
+        drag = { sx: e.clientX, sy: e.clientY, ol: fr.left, ot: fr.top };
+      } else {
+        fr = el.getBoundingClientRect();
+        var off = getHomeCanvas().getBoundingClientRect();
+        drag = {
+          sx: e.clientX,
+          sy: e.clientY,
+          ol: fr.left - off.left,
+          ot: fr.top - off.top
+        };
+      }
       el.classList.add('is-dragging');
       setInteractLock(true);
       bar.setPointerCapture(e.pointerId);
@@ -472,6 +483,9 @@
     el.querySelectorAll('[data-resize]').forEach(function (grip) {
       grip.addEventListener('pointerdown', function (e) {
         if (isNarrow()) return;
+        if (isPage && !isFreeFloatActive()) {
+          promoteToFreeFloat();
+        }
         if (isPage && !isFreeFloatActive()) return;
         if (el.classList.contains('is-maximized')) return;
         e.preventDefault();
@@ -560,7 +574,116 @@
     return el.classList.contains('window-wide') || el.classList.contains('window-hero');
   }
 
+  function clearPageLayoutRecords() {
+    var canvas = getHomeCanvas();
+    if (!canvas) return;
+    var layout = loadLayout();
+    delete layout.__freefloat;
+    canvas.querySelectorAll('.window[id]').forEach(function (el) {
+      delete layout[el.id];
+    });
+  }
+
+  function exitFreeFloatStyles() {
+    var canvas = getHomeCanvas();
+    document.body.classList.remove('desktop-freefloat');
+    if (!canvas) return;
+    canvas.style.minHeight = '';
+    canvas.querySelectorAll('.window[id]').forEach(function (el) {
+      el.classList.remove('is-maximized', 'is-dragging', 'is-resizing');
+      el.style.left = '';
+      el.style.top = '';
+      el.style.width = '';
+      el.style.height = '';
+      el.style.zIndex = '';
+      delete el.dataset.placed;
+      updateMaxButton(el);
+    });
+  }
+
+  function hasSavedFreeFloatLayout() {
+    var layout = loadLayout();
+    if (layout.__freefloat) return true;
+    var canvas = getHomeCanvas();
+    if (!canvas) return false;
+    var windows = canvas.querySelectorAll('.window[id]');
+    var i;
+    for (i = 0; i < windows.length; i++) {
+      var rec = layout[windows[i].id];
+      if (rec && rec.left != null && rec.top != null) return true;
+    }
+    return false;
+  }
+
+  function windowsOverlapSignificantly(windows) {
+    var visible = windows.filter(function (el) {
+      return !el.hidden;
+    });
+    var i;
+    var j;
+    for (i = 0; i < visible.length; i++) {
+      var a = visible[i].getBoundingClientRect();
+      if (a.width < 8 || a.height < 8) continue;
+      for (j = i + 1; j < visible.length; j++) {
+        var b = visible[j].getBoundingClientRect();
+        var overlapW = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+        var overlapH = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        if (overlapW > 48 && overlapH > 48) return true;
+      }
+    }
+    return false;
+  }
+
+  /** Snapshot the CSS grid into absolute free-float positions. */
+  function promoteToFreeFloat() {
+    if (isNarrow()) return false;
+    var canvas = getHomeCanvas();
+    if (!canvas) return false;
+    if (document.body.classList.contains('desktop-freefloat')) return true;
+
+    var windows = Array.prototype.slice.call(canvas.querySelectorAll('.window[id]'));
+    var cr = canvas.getBoundingClientRect();
+    var snapshots = windows.map(function (el) {
+      var rect = el.getBoundingClientRect();
+      return {
+        el: el,
+        left: rect.left - cr.left,
+        top: rect.top - cr.top,
+        width: rect.width,
+        height: rect.height
+      };
+    });
+
+    document.body.classList.add('desktop-freefloat');
+    loadLayout().__freefloat = true;
+
+    var maxBottom = 0;
+    snapshots.forEach(function (s) {
+      applyGeometry(
+        s.el,
+        {
+          left: Math.max(0, s.left),
+          top: Math.max(0, s.top),
+          width: Math.max(minSizeFor(s.el).w, s.width),
+          height: null
+        },
+        false
+      );
+      s.el.style.height = 'auto';
+      s.el.dataset.placed = '1';
+      captureWinGeometry(s.el);
+      var rec = getWinRecord(s.el.id);
+      rec.width = Math.round(Math.max(minSizeFor(s.el).w, s.width));
+      maxBottom = Math.max(maxBottom, s.top + Math.max(s.height, s.el.offsetHeight) + 40);
+    });
+
+    if (maxBottom > 400) canvas.style.minHeight = maxBottom + 'px';
+    saveLayoutSoon();
+    return true;
+  }
+
   function cascadeDefaults(windows) {
+    // Fallback tile layout if we must invent positions without a grid snapshot
     var canvas = getHomeCanvas();
     var cw = canvas ? Math.max(320, canvas.clientWidth) : Math.min(window.innerWidth - 24, 1280);
     var gap = 16;
@@ -572,16 +695,15 @@
       var left;
       var top;
       var w;
-      var h;
+      var h = Math.max(el.offsetHeight || 0, estimateWindowHeight(el));
 
       if (isFullRowWindow(el)) {
-        w = Math.min(Math.max(defaultWidthForWindow(el), Math.min(cw - pad * 2, 720)), cw - pad * 2);
+        w = Math.min(cw - pad * 2, Math.max(defaultWidthForWindow(el), Math.min(cw - pad * 2, 900)));
         left = pad;
         top = Math.max(colTop[0], colTop[1]);
         applyGeometry(el, { left: left, top: top, width: w, height: null }, false);
         el.style.height = 'auto';
-        // Force layout so we can stack the next row under real height
-        h = el.offsetHeight || 220;
+        h = Math.max(el.offsetHeight || 0, estimateWindowHeight(el));
         colTop[0] = colTop[1] = top + h + gap;
       } else {
         var col = colTop[0] <= colTop[1] ? 0 : 1;
@@ -590,7 +712,7 @@
         top = colTop[col];
         applyGeometry(el, { left: left, top: top, width: w, height: null }, false);
         el.style.height = 'auto';
-        h = el.offsetHeight || 180;
+        h = Math.max(el.offsetHeight || 0, estimateWindowHeight(el));
         colTop[col] = top + h + gap;
       }
 
@@ -600,6 +722,16 @@
     if (canvas) {
       canvas.style.minHeight = Math.max(colTop[0], colTop[1], window.innerHeight * 0.7) + 'px';
     }
+  }
+
+  function estimateWindowHeight(el) {
+    if (el.id === 'window-bio') return 480;
+    if (el.id === 'window-nav') return 420;
+    if (el.id === 'window-shorts') return 520;
+    if (el.id === 'window-booking') return 380;
+    if (el.classList.contains('window-media')) return 440;
+    if (el.classList.contains('window-narrow')) return 160;
+    return 200;
   }
 
   function layoutLooksStacked(windows) {
@@ -620,7 +752,6 @@
     lefts.sort(function (a, b) {
       return a - b;
     });
-    // Classic cascade: tops rise by ~26px and lefts by ~28px — span stays tiny vs window size
     var topSpan = tops[tops.length - 1] - tops[0];
     var leftSpan = lefts[lefts.length - 1] - lefts[0];
     return topSpan < 80 && leftSpan < 120;
@@ -689,55 +820,46 @@
       document.body.classList.remove('desktop-freefloat');
       return;
     }
-    var enable = !isNarrow();
-    document.body.classList.toggle('desktop-freefloat', enable);
+
     var windows = Array.prototype.slice.call(canvas.querySelectorAll('.window[id]'));
-    if (!enable) {
+    windows.forEach(function (el) {
+      wireWindowChrome(el, { isPage: true });
+    });
+
+    if (isNarrow()) {
+      exitFreeFloatStyles();
       windows.forEach(function (el) {
-        el.classList.remove('is-maximized', 'is-dragging', 'is-resizing');
-        el.style.left = '';
-        el.style.top = '';
-        el.style.width = '';
-        el.style.height = '';
-        el.style.zIndex = '';
         el.hidden = false;
       });
       return;
     }
 
-    windows.forEach(function (el) {
-      wireWindowChrome(el, { isPage: true });
-    });
-
-    var needsCascade = windows.every(function (el) {
-      var rec = getWinRecord(el.id);
-      return rec.left == null;
-    });
-
-    if (!needsCascade && layoutLooksStacked(windows)) {
-      needsCascade = true;
-      windows.forEach(function (el) {
-        var rec = getWinRecord(el.id);
-        delete rec.left;
-        delete rec.top;
-        delete rec.width;
-        delete rec.height;
-        delete rec.userSized;
-        delete rec.maximized;
-        delete rec.restore;
-      });
+    // Default: readable CSS grid. Free-float only with a saved custom layout.
+    if (!hasSavedFreeFloatLayout()) {
+      exitFreeFloatStyles();
+      return;
     }
 
-    if (needsCascade) {
-      cascadeDefaults(windows);
-      windows.forEach(function (el) {
-        captureWinGeometry(el);
-      });
+    document.body.classList.add('desktop-freefloat');
+
+    // Bad/legacy piles → fall back to grid
+    if (layoutLooksStacked(windows)) {
+      clearPageLayoutRecords();
+      exitFreeFloatStyles();
       saveLayoutSoon();
-    } else {
-      windows.forEach(function (el, i) {
-        applyStoredOrDefault(el, false, i);
-      });
+      return;
+    }
+
+    windows.forEach(function (el, i) {
+      applyStoredOrDefault(el, false, i);
+    });
+
+    // If absolute positions still collide, abandon free-float for this session
+    if (windowsOverlapSignificantly(windows)) {
+      clearPageLayoutRecords();
+      exitFreeFloatStyles();
+      saveLayoutSoon();
+      return;
     }
 
     var maxBottom = 0;
@@ -789,6 +911,11 @@
     try {
       localStorage.removeItem(LAYOUT_KEY);
     } catch (e) {}
+    LAYOUT_KEYS_PURGE.forEach(function (key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {}
+    });
     layoutCache = {};
     document.querySelectorAll('.float-window').forEach(function (el) {
       el.classList.remove('is-maximized', 'is-dragging', 'is-resizing');
@@ -805,17 +932,9 @@
     if (canvas) {
       canvas.querySelectorAll('.window[id]').forEach(function (el) {
         el.hidden = false;
-        el.classList.remove('is-maximized', 'is-dragging', 'is-resizing');
-        el.style.left = '';
-        el.style.top = '';
-        el.style.width = '';
-        el.style.height = '';
-        el.style.zIndex = '';
-        delete el.dataset.placed;
-        updateMaxButton(el);
       });
     }
-    syncFreeFloatMode();
+    exitFreeFloatStyles();
     playBeep(660, 0.08, 'square');
   }
 
