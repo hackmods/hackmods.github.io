@@ -2,8 +2,9 @@
   'use strict';
 
   var NOTEPAD_KEY = 'comedy-notepad';
-  var LAYOUT_KEY = 'comedy-desktop-layout-v2';
-  var LAYOUT_KEY_LEGACY = 'comedy-desktop-layout';
+  var LAYOUT_KEY = 'comedy-desktop-layout-v3';
+  var LAYOUT_KEY_LEGACY = 'comedy-desktop-layout-v2';
+  var LAYOUT_KEYS_PURGE = ['comedy-desktop-layout', 'comedy-desktop-layout-v2'];
   var NOTEPAD_SEED =
     'SET NOTES\n---------\n- Crowd work opener\n- Buffalo Fan Bill callback\n- Kill the puppet bit if room is quiet\n\nDocument the craft. Ship the next set.';
   var zTop = 10050;
@@ -57,6 +58,11 @@
 
   function loadLayout() {
     if (layoutCache) return layoutCache;
+    LAYOUT_KEYS_PURGE.forEach(function (key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {}
+    });
     try {
       localStorage.removeItem(LAYOUT_KEY_LEGACY);
     } catch (e) {}
@@ -541,16 +547,83 @@
     });
   }
 
+  function isFullRowWindow(el) {
+    if (!el) return false;
+    if (
+      el.id === 'window-bio' ||
+      el.id === 'window-nav' ||
+      el.id === 'window-shorts' ||
+      el.id === 'window-booking'
+    ) {
+      return true;
+    }
+    return el.classList.contains('window-wide') || el.classList.contains('window-hero');
+  }
+
   function cascadeDefaults(windows) {
-    var reduced = prefersReducedMotion();
-    windows.forEach(function (el, i) {
-      var w = defaultWidthForWindow(el);
-      var left = reduced ? 16 + (i % 2) * (w * 0.15) : 24 + (i % 5) * 28;
-      var top = reduced ? 16 + Math.floor(i / 2) * 24 : 20 + i * 26;
-      applyGeometry(el, { left: left, top: top, width: w, height: null }, false);
-      el.style.height = 'auto';
+    var canvas = getHomeCanvas();
+    var cw = canvas ? Math.max(320, canvas.clientWidth) : Math.min(window.innerWidth - 24, 1280);
+    var gap = 16;
+    var pad = 12;
+    var colW = Math.floor((cw - pad * 2 - gap) / 2);
+    var colTop = [pad, pad];
+
+    windows.forEach(function (el) {
+      var left;
+      var top;
+      var w;
+      var h;
+
+      if (isFullRowWindow(el)) {
+        w = Math.min(Math.max(defaultWidthForWindow(el), Math.min(cw - pad * 2, 720)), cw - pad * 2);
+        left = pad;
+        top = Math.max(colTop[0], colTop[1]);
+        applyGeometry(el, { left: left, top: top, width: w, height: null }, false);
+        el.style.height = 'auto';
+        // Force layout so we can stack the next row under real height
+        h = el.offsetHeight || 220;
+        colTop[0] = colTop[1] = top + h + gap;
+      } else {
+        var col = colTop[0] <= colTop[1] ? 0 : 1;
+        w = Math.min(defaultWidthForWindow(el), colW);
+        left = pad + col * (colW + gap);
+        top = colTop[col];
+        applyGeometry(el, { left: left, top: top, width: w, height: null }, false);
+        el.style.height = 'auto';
+        h = el.offsetHeight || 180;
+        colTop[col] = top + h + gap;
+      }
+
       el.dataset.placed = '1';
     });
+
+    if (canvas) {
+      canvas.style.minHeight = Math.max(colTop[0], colTop[1], window.innerHeight * 0.7) + 'px';
+    }
+  }
+
+  function layoutLooksStacked(windows) {
+    if (windows.length < 3) return false;
+    var tops = [];
+    var lefts = [];
+    windows.forEach(function (el) {
+      if (el.hidden) return;
+      var rec = getWinRecord(el.id);
+      if (rec.left == null || rec.top == null) return;
+      lefts.push(rec.left);
+      tops.push(rec.top);
+    });
+    if (tops.length < 3) return false;
+    tops.sort(function (a, b) {
+      return a - b;
+    });
+    lefts.sort(function (a, b) {
+      return a - b;
+    });
+    // Classic cascade: tops rise by ~26px and lefts by ~28px — span stays tiny vs window size
+    var topSpan = tops[tops.length - 1] - tops[0];
+    var leftSpan = lefts[lefts.length - 1] - lefts[0];
+    return topSpan < 80 && leftSpan < 120;
   }
 
   function applyStoredOrDefault(el, isFloat, index) {
@@ -563,12 +636,16 @@
       el.hidden = true;
     }
     if (rec.maximized && rec.restore) {
-      applyGeometry(el, {
-        left: rec.restore.left,
-        top: rec.restore.top,
-        width: rec.restore.width || defaultWidthForWindow(el),
-        height: rec.userSized ? rec.restore.height : null
-      }, isFloat);
+      applyGeometry(
+        el,
+        {
+          left: rec.restore.left,
+          top: rec.restore.top,
+          width: rec.restore.width || defaultWidthForWindow(el),
+          height: rec.userSized ? rec.restore.height : null
+        },
+        isFloat
+      );
       el.classList.add('is-maximized');
       updateMaxButton(el);
       el.dataset.placed = '1';
@@ -603,23 +680,7 @@
       );
       el.style.height = 'auto';
       el.dataset.placed = '1';
-      return;
     }
-    // Page window with no stored position — place with cascade-style defaults
-    var i = index || 0;
-    var w = defaultWidthForWindow(el);
-    applyGeometry(
-      el,
-      {
-        left: 24 + (i % 5) * 28,
-        top: 20 + i * 26,
-        width: w,
-        height: null
-      },
-      false
-    );
-    el.style.height = 'auto';
-    el.dataset.placed = '1';
   }
 
   function syncFreeFloatMode() {
@@ -653,6 +714,20 @@
       return rec.left == null;
     });
 
+    if (!needsCascade && layoutLooksStacked(windows)) {
+      needsCascade = true;
+      windows.forEach(function (el) {
+        var rec = getWinRecord(el.id);
+        delete rec.left;
+        delete rec.top;
+        delete rec.width;
+        delete rec.height;
+        delete rec.userSized;
+        delete rec.maximized;
+        delete rec.restore;
+      });
+    }
+
     if (needsCascade) {
       cascadeDefaults(windows);
       windows.forEach(function (el) {
@@ -665,7 +740,6 @@
       });
     }
 
-    // Grow canvas so absolute windows aren't clipped oddly
     var maxBottom = 0;
     windows.forEach(function (el) {
       if (el.hidden || el.classList.contains('is-maximized')) return;
