@@ -59,6 +59,9 @@ body {
     max-width: 100%;
     margin: 16px auto;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .window-wide {
@@ -174,7 +177,7 @@ body.desktop-freefloat .desktop-canvas--home .window {
     max-width: none;
     margin: 0;
     z-index: 10;
-    overflow: visible;
+    overflow: hidden;
 }
 
 body.desktop-freefloat .desktop-canvas--home .window[hidden] {
@@ -202,6 +205,7 @@ body.desktop-freefloat .desktop-canvas--home .window.is-maximized {
     align-items: center;
     gap: 6px;
     user-select: none;
+    flex-shrink: 0;
 }
 
 .title-bar > span:first-child {
@@ -241,6 +245,13 @@ body:not(.desktop-freefloat) .desktop-canvas--home .win-grip {
     padding: 18px 20px 22px;
     border: 1px inset #fff;
     margin: 3px;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
 }
 
 .content h1 {
@@ -285,6 +296,8 @@ body:not(.desktop-freefloat) .desktop-canvas--home .win-grip {
 
 .lead {
     margin-bottom: 1rem;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
 }
 
 .video-frame {
@@ -800,8 +813,10 @@ button:active,
     border: 2px outset #fff;
     box-shadow: 4px 4px 0 #000;
     z-index: 10050;
-    overflow: visible;
+    overflow: hidden;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 .float-window[hidden] {
@@ -861,7 +876,7 @@ button:active,
 }
 
 .win-grip-n {
-    top: -2px;
+    top: 0;
     left: 8px;
     right: 8px;
     height: 6px;
@@ -869,7 +884,7 @@ button:active,
 }
 
 .win-grip-s {
-    bottom: -2px;
+    bottom: 0;
     left: 8px;
     right: 8px;
     height: 6px;
@@ -878,7 +893,7 @@ button:active,
 
 .win-grip-e {
     top: 8px;
-    right: -2px;
+    right: 0;
     bottom: 8px;
     width: 6px;
     cursor: e-resize;
@@ -886,23 +901,23 @@ button:active,
 
 .win-grip-w {
     top: 8px;
-    left: -2px;
+    left: 0;
     bottom: 8px;
     width: 6px;
     cursor: w-resize;
 }
 
 .win-grip-ne {
-    top: -2px;
-    right: -2px;
+    top: 0;
+    right: 0;
     width: 12px;
     height: 12px;
     cursor: ne-resize;
 }
 
 .win-grip-nw {
-    top: -2px;
-    left: -2px;
+    top: 0;
+    left: 0;
     width: 12px;
     height: 12px;
     cursor: nw-resize;
@@ -921,8 +936,8 @@ button:active,
 }
 
 .win-grip-sw {
-    left: -2px;
-    bottom: -2px;
+    left: 0;
+    bottom: 0;
     width: 12px;
     height: 12px;
     cursor: sw-resize;
@@ -965,7 +980,7 @@ body.is-win-interact {
         top: auto !important;
         width: 100% !important;
         height: auto !important;
-        overflow: visible;
+        overflow: hidden;
     }
 
     body.desktop-freefloat .desktop-canvas--home .window.is-maximized {
@@ -1807,7 +1822,7 @@ body.is-win-interact {
         width: 100% !important;
         height: auto !important;
         max-height: 70vh;
-        overflow-y: auto;
+        overflow: hidden;
         border-radius: 0;
         z-index: 10050;
     }

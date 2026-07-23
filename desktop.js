@@ -172,6 +172,9 @@
     if (el.classList.contains('window-media') || el.id === 'window-shorts' || el.id === 'window-latest' || el.id === 'window-set') {
       return { w: 280, h: 200 };
     }
+    if (el.classList.contains('window-hero') || el.id === 'window-bio') {
+      return { w: 280, h: 260 };
+    }
     if (el.classList.contains('float-window')) return { w: 220, h: 140 };
     return { w: 240, h: 120 };
   }
