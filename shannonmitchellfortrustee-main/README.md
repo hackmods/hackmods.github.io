@@ -1,0 +1,53 @@
+# Re-Elect Shannon Mitchell
+
+Campaign website for Shannon Mitchell, Public School Board Trustee — District School Board of Niagara (Niagara Falls).
+
+**Website:** [shannonmitchellfortrustee.com](https://shannonmitchellfortrustee.com)
+
+**Campaign reference:** See [CAMPAIGN_REFERENCE.md](./CAMPAIGN_REFERENCE.md) for bio, messaging, branding, Instagram research, and source material.
+
+## About
+
+Static HTML, CSS, and JavaScript site built from official Mitchell 2026 campaign branding and content. No build step required — upload the files to any web host.
+
+## Local preview
+
+Open `index.html` in a browser, or serve locally:
+
+```bash
+python3 -m http.server 8080
+```
+
+Then visit `http://localhost:8080`.
+
+## Project structure
+
+```
+├── index.html              # Main page
+├── css/styles.css          # Mitchell 2026 brand styles
+├── js/main.js              # Navigation, scroll animations
+├── CAMPAIGN_REFERENCE.md   # Research, messaging, and source notes
+├── assets/
+│   ├── favicon.svg
+│   ├── instagram-posts.json
+│   └── images/
+│       ├── shannon-0.jpeg          # Headshot (from campaign PDF)
+│       ├── campaign-sign-page.png  # Sign artwork (from campaign PDF)
+│       └── instagram/              # Community photos from @shannonmitchellnf
+```
+
+## Brand colors
+
+| Color   | Hex       | Usage              |
+|---------|-----------|--------------------|
+| Orange  | `#F16538` | Primary accent     |
+| Navy    | `#203F4A` | Text, dark sections|
+| Yellow  | `#FEC720` | Highlights         |
+| Cream   | `#F8F4E8` | Background         |
+| Rust    | `#C6401A` | Hover states       |
+
+Fonts: **Roboto Black** (headings), **Roboto Regular** (body) — loaded via Google Fonts.
+
+## License
+
+Campaign materials © Shannon Mitchell Campaign. All rights reserved.
