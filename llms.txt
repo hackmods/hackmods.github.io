@@ -2,12 +2,12 @@
 
 > Niagara-based stand-up comedian documenting live sets across Southern Ontario. Brand: COMEDY.EXE.
 
-Ryan Morris performs observational, self-aware stand-up with crowd work, act-outs, and experimental open-mic bits. He tracks every set, records everything, and treats comedy like a craft. By day he works in tech (systems / data); by night he ships sets. Dual identity: comedian + developer at github.com/hackmods. Based in the Niagara Region (Niagara Falls / St. Catharines), performing venues including Laugh Lab / Bomb Comedy Tour, Spotlight Comedy Club, Local Laughs, Failed To Render, and Rose City Comedy Collective.
+"I don't repeat jokes, I repeat mistakes." Ryan Morris performs unhinged crowd work, experimental anti-comedy, and dad-life material, with puppets and props. He numbers and films every set and treats comedy like a craft. He is a Monday regular at The Bomb Comedy Show (Niagara Falls), co-hosts The Green Room podcast, and performs VR comedy at Failed To Render VR. Clean sets and roast battles available. By day he works in tech (systems / data); by night he ships sets. Dual identity: comedian + developer at github.com/hackmods. Based in the Niagara Region (Niagara Falls / St. Catharines), performing venues including Laugh Lab / Bomb Comedy Tour, Spotlight Comedy Club, Local Laughs, Failed To Render, and Rose City Comedy Collective.
 
 ## Pages
 
-- [Home](https://ryanmorris.ca/): Bio, featured sets, booking CTA, desktop widgets
-- [Clips](https://ryanmorris.ca/clips.html): Curated YouTube set archive
+- [Home](https://ryanmorris.ca/): Bio, greatest-hits shorts, latest and featured sets, podcast, VR comedy, booker info, booking form
+- [Clips](https://ryanmorris.ca/clips.html): Searchable numbered set archive, filterable by type (?tag=clean, ?tag=roast) and room (?room=bomb, ?room=vr)
 - [Shows](https://ryanmorris.ca/shows.html): Upcoming dates, venues, booking form
 - [About / Press](https://ryanmorris.ca/about.html): Bio, press kit, headshots
 

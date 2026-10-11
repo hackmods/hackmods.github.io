@@ -83,7 +83,7 @@
 
     <div class="marquee-container" aria-hidden="true">
         <div class="marquee-text" data-marquee-site>
-          ⚡ RYAN MORRIS COMEDY ⚡ SET COUNT: 139 ⚡ NIAGARA FALLS ⚡ EVERY MONDAY @ THE BOMB COMEDY SHOW ⚡ NO CLICKBAIT ⚡ JUST GROWTH ⚡ SUPPORT LOCAL COMEDY ⚡
+          ⚡ RYAN MORRIS COMEDY ⚡ SET COUNT: 139 ⚡ NIAGARA FALLS ⚡ EVERY MONDAY @ THE BOMB COMEDY SHOW ⚡ CROWD WORK DISASTERS ⚡ DAD LIFE RANTS ⚡ THE GREEN ROOM PODCAST ⚡ SUPPORT LOCAL COMEDY ⚡
         </div>
     </div>
 
@@ -97,14 +97,43 @@
             <h1>RYAN MORRIS</h1>
             <p class="hero-tagline" data-bind="tagline">I don’t repeat jokes, I repeat mistakes.</p>
             <a class="next-show" id="next-show" href="shows.html" hidden></a>
-            <p class="lead">Niagara Falls stand-up comedian: unhinged crowd work, experimental anti-comedy, and the absolute worst dad-life advice on the internet. Ryan numbers every set, films everything, and treats comedy like a craft instead of a lottery — find him most Mondays at The Bomb Comedy Show / Laugh Lab and in rooms across Southern Ontario and the Buffalo corridor.</p>
+            <p class="lead">Niagara Falls stand-up comedian bringing unhinged crowd work, experimental anti-comedy, and the absolute worst dad-life advice on the internet. No polished, network-safe special here — this is a running archive of raw Canadian indie comedy, filmed live and numbered one set at a time.</p>
+            <p class="hero-count">
+                <span class="visitor-counter" data-bind="sets-padded" data-count-up>000139</span>
+                <span>sets filmed, numbered and reviewed — the way a programmer ships code.</span>
+            </p>
             <div class="btn-row">
-                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy">YouTube</a>
+                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy?sub_confirmation=1">Subscribe on YouTube</a>
                 <a class="btn" href="https://www.instagram.com/ryanmorriscomedy/">Instagram</a>
                 <a class="btn" href="clips.html">Clips</a>
                 <a class="btn" href="shows.html">Shows</a>
-                <a class="btn btn-primary" href="shows.html#window-booking">Book Ryan</a>
+                <a class="btn btn-primary" href="#window-bookers">Book Ryan</a>
             </div>
+        </div>
+    </div>
+
+    <div class="window window-wide" id="window-shorts" data-icon="phone">
+        <div class="title-bar"><span>GREATEST_HITS.EXE — Shorts</span></div>
+        <div class="content">
+            <h2>Start here: the greatest hits</h2>
+            <p class="muted">The most-watched moments, sixty seconds at a time — roasts, puppets, and crowd work going sideways.</p>
+            <div class="shorts-layout">
+                <div>
+                    <ul class="shorts-list" id="shorts-list" role="listbox" aria-label="Ryan Morris YouTube Shorts">
+                        <li><a href="https://www.youtube.com/@RyanMorrisComedy/shorts">Watch the Shorts feed on YouTube</a></li>
+                    </ul>
+                </div>
+                <div class="shorts-player">
+                    <h3 id="short-title">Shorts</h3>
+                    <div class="short-frame" id="short-frame"></div>
+                </div>
+            </div>
+            <p class="transport">
+                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy/shorts">All Shorts on YouTube</a>
+                <a class="btn" href="https://www.youtube.com/playlist?list=PLY2zp5JNUtbRCOnavzzDyXgah3_j7du-L">The Open Mic Survival Guide</a>
+                <a class="btn" href="clips.html">Full set archive</a>
+            </p>
+            <div class="status-bar"><span class="status-field" id="shorts-status">Shorts</span></div>
         </div>
     </div>
 
@@ -122,7 +151,6 @@
             <p data-slot="notes" hidden></p>
             <p class="transport">
                 <a class="btn" href="clips.html">Open clip library</a>
-                <a class="btn" href="#window-shorts">Watch Shorts</a>
             </p>
         </div>
     </div>
@@ -130,16 +158,16 @@
     <div class="window window-media" id="window-set" data-icon="film" data-player="featured">
         <div class="title-bar"><span>MEDIA_PLAYER.EXE — FEATURED</span></div>
         <div class="content">
-            <h2 data-slot="title">Featured: Ryan Reads Classic Literature (#66)</h2>
+            <h2 data-slot="title">Featured: Fast-Talking Comedian Roasts French Immersion &amp; Cat Cafes (#131)</h2>
             <div class="video-frame" data-slot="frame">
-                <a href="https://www.youtube.com/watch?v=V-DcIs_8KWg">Watch set #66 on YouTube</a>
+                <a href="https://www.youtube.com/watch?v=YdDSdbrCmnQ">Watch set #131 on YouTube</a>
             </div>
             <div class="media-meta">
-                <span class="status-field" data-slot="meta">Set #66 · Laugh Lab / Bomb Comedy Tour</span>
-                <span class="status-field" data-slot="length" hidden></span>
+                <span class="status-field" data-slot="meta">Set #131 · Taps Apps &amp; Laughs</span>
+                <span class="status-field" data-slot="length">Length 10:01</span>
             </div>
-            <p data-slot="notes">Reading classic monster jokes at Laugh Lab. Act outs. Crowd work.</p>
-            <p class="transport"><a class="btn" href="clips.html?set=66">More sets in the clip library</a></p>
+            <p data-slot="notes" hidden></p>
+            <p class="transport"><a class="btn" href="clips.html?tag=dad">More dad-life sets</a></p>
         </div>
     </div>
 
@@ -156,27 +184,37 @@
                 <a class="nav-tile" href="#window-shorts">
                     <span class="nav-icon" data-icon="phone">📱</span>
                     <span class="nav-label">Shorts</span>
-                    <span class="nav-desc">Vertical clips</span>
+                    <span class="nav-desc">Greatest hits</span>
                 </a>
                 <a class="nav-tile" href="shows.html">
                     <span class="nav-icon" data-icon="calendar">📅</span>
                     <span class="nav-label">Shows</span>
                     <span class="nav-desc">Dates &amp; venues</span>
                 </a>
+                <a class="nav-tile" href="#window-podcast">
+                    <span class="nav-icon" data-icon="speaker">🎧</span>
+                    <span class="nav-label">Podcast</span>
+                    <span class="nav-desc">The Green Room</span>
+                </a>
+                <a class="nav-tile" href="#window-vr">
+                    <span class="nav-icon" data-icon="computer">🥽</span>
+                    <span class="nav-label">VR Comedy</span>
+                    <span class="nav-desc">Metaverse sets</span>
+                </a>
                 <a class="nav-tile" href="about.html">
                     <span class="nav-icon" data-icon="doc">📰</span>
                     <span class="nav-label">About</span>
                     <span class="nav-desc">Press kit &amp; bio</span>
                 </a>
-                <a class="nav-tile" href="shows.html#window-booking">
+                <a class="nav-tile" href="#window-bookers">
                     <span class="nav-icon" data-icon="mail">📩</span>
                     <span class="nav-label">Booking</span>
                     <span class="nav-desc">Book a show</span>
                 </a>
-                <a class="nav-tile" href="https://www.youtube.com/@RyanMorrisComedy">
+                <a class="nav-tile" href="https://www.youtube.com/@RyanMorrisComedy?sub_confirmation=1">
                     <span class="nav-icon" data-icon="play">▶️</span>
                     <span class="nav-label">YouTube</span>
-                    <span class="nav-desc">Full archive</span>
+                    <span class="nav-desc">Subscribe</span>
                 </a>
                 <a class="nav-tile" href="https://www.instagram.com/ryanmorriscomedy/">
                     <span class="nav-icon" data-icon="camera">📷</span>
@@ -186,7 +224,7 @@
                 <button type="button" class="nav-tile" data-open-widget="hackmods">
                     <span class="nav-icon" data-icon="terminal">💻</span>
                     <span class="nav-label">Hackmods</span>
-                    <span class="nav-desc">Dev desktop</span>
+                    <span class="nav-desc">The day job</span>
                 </button>
                 <button type="button" class="nav-tile" data-open-widget="solitaire">
                     <span class="nav-icon" data-icon="cards">🃏</span>
@@ -209,81 +247,68 @@
                     <span class="nav-desc">Wallpaper &amp; CRT</span>
                 </button>
             </div>
-            <div class="status-bar"><span class="status-field">12 object(s)</span><span class="status-field">COMEDY.EXE</span></div>
+            <div class="status-bar"><span class="status-field">14 object(s)</span><span class="status-field">COMEDY.EXE</span></div>
         </div>
     </div>
 
-    <div class="window window--doc" id="window-log" data-icon="doc">
-        <div class="title-bar"><span>SYSTEM_INFO.LOG — Notepad</span></div>
+    <div class="window" id="window-podcast" data-icon="speaker">
+        <div class="title-bar"><span>GREEN_ROOM.WAV — Podcast</span></div>
         <div class="content">
-            <h2>Current status</h2>
-            <ul>
-                <li><b>Location:</b> Niagara Region, ON, CA — <a href="shows.html">see rooms</a></li>
-                <li><b>Topics:</b> <a href="clips.html">Dad life, crowd work, puppets, props, topical bits</a></li>
-                <li><b>Sets completed:</b> <span data-bind="sets">139</span> — <a href="clips.html">watch clips</a></li>
-                <li><b>Standing gig:</b> <a href="shows.html">Mondays, The Bomb Comedy Show</a></li>
-                <li><b>Recurring bit:</b> <a href="about.html">Buffalo Fan Bill</a></li>
-                <li><b>Podcast:</b> co-host on The Green Room</li>
+            <h2>The Green Room podcast</h2>
+            <p>Ryan is a regular co-host on The Green Room, the Bomb Comedy Tour podcast — writing guides, breaking down the local scene, and whatever went wrong on stage that week.</p>
+            <ul class="shorts-list" id="podcast-list" aria-label="Recent episodes of The Green Room">
+                <li><a href="https://www.youtube.com/playlist?list=PLY2zp5JNUtbT4aR6XqgmBgNhrljPZGn2L">Listen to The Green Room on YouTube</a></li>
             </ul>
-            <p>Documenting the craft one bomb and one kill at a time. <a href="about.html">Read the full bio →</a></p>
-        </div>
-    </div>
-
-    <div class="window" id="window-hackmods" data-icon="terminal">
-        <div class="title-bar"><span>HACKMODS.TXT</span></div>
-        <div class="content">
-            <h2>Programming side</h2>
-            <p>By day Ryan works in tech (systems / data). By night he treats stand-up like a repo: number the set, film it, review it, ship the next one. The brand is COMEDY.EXE — craft over virality.</p>
-            <div class="btn-row btn-row--start">
-                <a class="btn" href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub</a>
-                <a class="btn" href="https://www.linkedin.com/in/ryanjamesmorris" target="_blank" rel="noopener">LinkedIn</a>
-                <button type="button" class="btn btn-primary" data-open-widget="hackmods">Open HACKMODS.EXE</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="window window-narrow" id="window-counter" data-icon="computer">
-        <div class="title-bar"><span>SET_COUNTER.EXE</span></div>
-        <div class="content">
-            <span class="visitor-counter counter-big" data-bind="sets-padded" data-count-up>000139</span>
-            <p>Stand-up sets performed (and counting).</p>
-        </div>
-    </div>
-
-    <div class="window window-narrow" id="window-stats" data-icon="computer">
-        <div class="title-bar"><span>System Resources</span></div>
-        <div class="content">
-            <strong>Set pacing:</strong>
-            <div class="resource-bar"><div class="resource-fill" style="width: 35%;"></div></div>
-            <strong>Self-editing:</strong>
-            <div class="resource-bar"><div class="resource-fill" style="width: 78%;"></div></div>
-            <strong>Set momentum:</strong>
-            <div class="resource-bar"><div class="resource-fill" style="width: 85%;"></div></div>
-            <p class="muted">Status: Reputation &gt; viral hooks. Crediting hosts &amp; venues daily.</p>
-        </div>
-    </div>
-
-    <div class="window window-wide" id="window-shorts" data-icon="phone">
-        <div class="title-bar"><span>SHORTS_PLAYER.EXE</span></div>
-        <div class="content">
-            <h2>YouTube Shorts</h2>
-            <p class="muted">Quick vertical hits — puppets, crowd work, and chaos between full sets.</p>
-            <div class="shorts-layout">
-                <div>
-                    <ul class="shorts-list" id="shorts-list" role="listbox" aria-label="Ryan Morris YouTube Shorts">
-                        <li><a href="https://www.youtube.com/@RyanMorrisComedy/shorts">Watch the Shorts feed on YouTube</a></li>
-                    </ul>
-                </div>
-                <div class="shorts-player">
-                    <h3 id="short-title">Shorts</h3>
-                    <div class="short-frame" id="short-frame"></div>
-                </div>
-            </div>
             <p class="transport">
-                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy/shorts">All Shorts on YouTube</a>
-                <a class="btn" href="clips.html">Full set archive</a>
+                <a class="btn" href="https://www.youtube.com/playlist?list=PLY2zp5JNUtbT4aR6XqgmBgNhrljPZGn2L">All episodes</a>
             </p>
-            <div class="status-bar"><span class="status-field" id="shorts-status">Shorts</span></div>
+            <div class="status-bar"><span class="status-field" id="podcast-status">Podcast</span></div>
+        </div>
+    </div>
+
+    <div class="window" id="window-vr" data-icon="computer" data-player="vr">
+        <div class="title-bar"><span>METAVERSE.EXE — VR Comedy</span></div>
+        <div class="content">
+            <h2>Stand-up in the metaverse</h2>
+            <p>Open mics and anchor shows performed in virtual reality at Failed To Render VR and Bomb Voyage — often with Gary the puppet doing the talking.</p>
+            <div class="video-frame" data-slot="frame">
+                <a href="https://www.youtube.com/playlist?list=PLY2zp5JNUtbRCax_C5mozqHEDPPqBtcyZ">Watch the VR sets on YouTube</a>
+            </div>
+            <div class="media-meta">
+                <span class="status-field" data-slot="title">VR comedy sets</span>
+                <span class="status-field" data-slot="length" hidden></span>
+            </div>
+            <ul class="shorts-list vr-list" id="vr-list" role="listbox" aria-label="VR comedy sets">
+                <li><a href="https://www.youtube.com/playlist?list=PLY2zp5JNUtbRCax_C5mozqHEDPPqBtcyZ">VR sets playlist on YouTube</a></li>
+            </ul>
+            <p class="transport">
+                <a class="btn" href="clips.html?room=vr">Open all <span data-bind="vr-sets">20</span> in the clip library</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="window" id="window-bookers" data-icon="doc">
+        <div class="title-bar"><span>For Bookers — Properties</span></div>
+        <div class="content">
+            <h2>For bookers</h2>
+            <p>Crowd work that goes off the rails on purpose, dad-life rants, and props that should not be on a stage — with <span data-bind="sets">139</span> numbered sets on tape to prove it. Watch before you book:</p>
+            <ul class="fact-list">
+                <li><b>Club sets</b> <span><a href="clips.html?room=bomb">Bomb Comedy Tour / Laugh Lab</a> · <a href="clips.html?room=spotlight">Spotlight Comedy Club</a> · <a href="clips.html?room=taps">Taps Apps &amp; Laughs</a></span></li>
+                <li><b>Headlining</b> <span><a href="clips.html?set=100">16-minute headline spot</a> for set #100</span></li>
+                <li><b>Clean</b> <span><a href="clips.html?tag=clean">Family-friendly sets</a>, no swearing</span></li>
+                <li><b>Roasts</b> <span><a href="clips.html?tag=roast">Roast battles</a> at Spotlight and Rose City Comedy Collective</span></li>
+                <li><b>Online</b> <span><a href="clips.html?room=vr">VR shows</a> at Failed To Render VR</span></li>
+                <li><b>Area</b> <span>Niagara Falls, St. Catharines, Hamilton, and the Buffalo corridor</span></li>
+                <li data-booking-fact="lengths" hidden><b>Set lengths</b> <span></span></li>
+                <li data-booking-fact="hosting" hidden><b>Hosting</b> <span></span></li>
+                <li data-booking-fact="tech" hidden><b>Tech</b> <span></span></li>
+                <li data-booking-fact="travel" hidden><b>Travel</b> <span></span></li>
+                <li data-booking-fact="credits" hidden><b>Credits</b> <span></span></li>
+            </ul>
+            <p class="transport">
+                <a class="btn" href="about.html">Press kit &amp; bios</a>
+                <a class="btn" href="shows.html">Show calendar</a>
+            </p>
         </div>
     </div>
 
@@ -291,7 +316,7 @@
         <div class="title-bar"><span>New Message — Booking</span></div>
         <div class="content">
             <h2>Bookings &amp; inquiries</h2>
-            <p>Looking to book Ryan for a show, showcase, or event in Niagara, St. Catharines, Hamilton, or the Buffalo corridor? Use the form below.</p>
+            <p>Tell Ryan the night, the room, and how long you need him up there.</p>
             <p class="muted">(No heckling through the contact form. It’s been tried.)</p>
             <form action="https://formspree.io/f/mdaanbzk" method="POST" data-booking>
                 <label for="name"><strong>Name/Club:</strong></label>
@@ -299,10 +324,9 @@
                 <label for="email"><strong>Email:</strong></label>
                 <input id="email" type="email" name="email" autocomplete="email" required>
                 <label for="message"><strong>Message:</strong></label>
-                <textarea id="message" name="message" rows="3"></textarea>
+                <textarea id="message" name="message" rows="4" placeholder="Date, venue, set length, clean or not…"></textarea>
                 <button type="submit">SEND TRANSMISSION</button>
             </form>
-            <p><a href="shows.html">Full show calendar &amp; booking page →</a></p>
         </div>
     </div>
     </main>

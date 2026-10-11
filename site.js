@@ -62,11 +62,23 @@
   }, 0);
 
   function clipLabel(clip) {
-    return isNumberedSet(clip) ? 'Set #' + clip.set : '#' + clip.set;
+    return isNumberedSet(clip) ? 'Set #' + clip.set : String(clip.set);
   }
 
   function clipHeading(clip) {
-    return clip.title === clipLabel(clip) ? clip.title : clip.title + ' (#' + clip.set + ')';
+    if (clip.title === clipLabel(clip)) return clip.title;
+    return clip.title + ' (' + (isNumberedSet(clip) ? '#' : '') + clip.set + ')';
+  }
+
+  function clipVenue(clip) {
+    return clip.venue || (SITE.rooms && SITE.rooms[clip.room]) || '';
+  }
+
+  function findClipById(id) {
+    for (var i = 0; i < SITE.clips.length; i++) {
+      if (SITE.clips[i].id === id) return SITE.clips[i];
+    }
+    return null;
   }
 
   function findClip(set) {
@@ -346,7 +358,7 @@
       title: 'About ' + SITE.brand,
       icon: 'mic',
       html:
-        '<p><strong>' + esc(SITE.name) + ' Comedy 95</strong><br>Build ' + setCount + '</p>' +
+        '<p><strong>' + esc(SITE.name) + ' Comedy 91</strong><br>Build ' + setCount + '</p>' +
         '<p>“' + esc(SITE.tagline) + '”</p>' +
         '<p>Sets in memory: ' + setCount + '<br>Clips on disk: ' + SITE.clips.length +
         '<br>This product is licensed to:<br>the front row.</p>'
@@ -354,6 +366,20 @@
   }
 
   /* ---------- boot + shutdown ---------- */
+
+  // Splash backdrop: a teal brush swipe with a purple scribble over it, paper-cup style.
+  var JAZZ_SVG =
+    '<svg class="boot-jazz" viewBox="0 0 800 500" preserveAspectRatio="{fit}" aria-hidden="true">' +
+    '<defs><filter id="jazz-brush" x="-5%" y="-20%" width="110%" height="140%">' +
+    '<feTurbulence type="fractalNoise" baseFrequency="0.012 0.09" numOctaves="2" seed="7"/>' +
+    '<feDisplacementMap in="SourceGraphic" scale="16"/></filter></defs>' +
+    '<g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#jazz-brush)">' +
+    '<path class="jazz-teal" stroke-width="78" d="M-60 395 C 110 300, 250 470, 410 380 S 690 300, 870 372"/>' +
+    '<path class="jazz-teal" stroke-width="7" opacity="0.75" d="M-40 338 C 120 250, 250 415, 410 326 S 690 248, 860 318"/>' +
+    '<path class="jazz-teal" stroke-width="4" opacity="0.6" d="M-20 452 C 130 362, 260 525, 420 438 S 700 360, 860 428"/>' +
+    '<path class="jazz-purple" stroke-width="13" d="M70 420 L205 318 L178 398 L330 300 L300 384 L462 290 L432 372 L600 276 L572 356 L748 262"/>' +
+    '<path class="jazz-purple" stroke-width="5" opacity="0.8" d="M112 440 L232 352 L214 414 L352 330 L330 398 L486 318"/>' +
+    '</g></svg>';
 
   function endBootHold() {
     root.classList.remove('booting');
@@ -368,7 +394,7 @@
     writeStore(sessionStorage, BOOT_KEY, '1');
 
     var lines = [
-      'HACKMODS BIOS v' + (setCount / 100).toFixed(2) + '   (C) 1995 Morris Microsystems',
+      'HACKMODS BIOS v' + (setCount / 100).toFixed(2) + '   (C) 1991 Morris Microsystems',
       '',
       'CPU: Dad-Life 486DX2-66 ................ OK',
       'Memory test: ' + setCount + ' sets ................. OK',
@@ -405,13 +431,14 @@
       var el = document.createElement('div');
       el.className = 'boot-splash';
       el.innerHTML =
-        '<div class="boot-splash-name">' + esc(SITE.name) + ' <b>Comedy</b>95</div>' +
+        JAZZ_SVG.replace('{fit}', window.innerWidth / window.innerHeight < 1.6 ? 'xMidYMax meet' : 'xMidYMid slice') +
+        '<div class="boot-splash-name">' + esc(SITE.name) + ' <b>Comedy</b>91</div>' +
         '<div class="boot-splash-sub">' + esc(SITE.tagline) + '</div>' +
         '<div class="boot-splash-bar"></div>';
       var icon = iconImg('mic', true);
-      if (icon) el.insertBefore(icon, el.firstChild);
+      if (icon) el.insertBefore(icon, el.firstChild.nextSibling);
       screen.appendChild(el);
-      timers.push(setTimeout(finish, 1400));
+      timers.push(setTimeout(finish, 1900));
     }
 
     lines.forEach(function (line, i) {
@@ -513,6 +540,10 @@
       if (key === 'sets') el.textContent = String(setCount);
       else if (key === 'sets-padded') el.textContent = padCount(setCount);
       else if (key === 'tagline') el.textContent = SITE.tagline;
+      else if (key === 'clips') el.textContent = String(SITE.clips.length);
+      else if (key === 'vr-sets') {
+        el.textContent = String(SITE.clips.filter(function (clip) { return clip.room === 'vr'; }).length);
+      } else if (key === 'episodes' && SITE.podcast) el.textContent = String(SITE.podcast.episodes.length);
     });
   }
 
@@ -582,7 +613,7 @@
 
   function clipMeta(clip) {
     var parts = [clipLabel(clip)];
-    if (clip.venue) parts.push(clip.venue);
+    if (clipVenue(clip)) parts.push(clipVenue(clip));
     return parts.join(' · ');
   }
 
@@ -617,8 +648,83 @@
     var latest = $('[data-player="latest"]');
     if (latest && latestClip()) fillPlayer(latest, latestClip(), { prefix: 'Latest: ' });
     var featured = $('[data-player="featured"]');
-    var featuredClip = findClip(SITE.featuredSet);
+    var featuredClip = findClipById(SITE.featured);
     if (featured && featuredClip) fillPlayer(featured, featuredClip, { prefix: 'Featured: ' });
+    var vr = $('[data-player="vr"]');
+    var vrClip = findClipById(SITE.featuredVr);
+    if (vr && vrClip) fillPlayer(vr, vrClip);
+    renderVrList(vr, vrClip);
+  }
+
+  /** Every VR-numbered video, playable in the VR window. */
+  function renderVrList(player, current) {
+    var list = $('#vr-list');
+    if (!list || !player) return;
+    var sets = SITE.clips.filter(function (clip) {
+      return clip.room === 'vr';
+    });
+    if (!sets.length) return;
+    list.innerHTML = '';
+    sets.forEach(function (clip) {
+      var li = document.createElement('li');
+      li.setAttribute('role', 'presentation');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'shorts-row';
+      btn.setAttribute('role', 'option');
+      btn.title = clipHeading(clip);
+      btn.innerHTML =
+        '<span class="col-set">' + esc(clip.set) + '</span><span class="col-name">' + esc(clip.title) + '</span>';
+      function mark(on) {
+        btn.classList.toggle('is-selected', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      }
+      mark(clip === current);
+      btn.addEventListener('click', function () {
+        $$('.shorts-row', list).forEach(function (row) {
+          row.classList.remove('is-selected');
+          row.setAttribute('aria-selected', 'false');
+        });
+        mark(true);
+        fillPlayer(player, clip, { autoplay: true });
+      });
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+    wireListKeys(list);
+  }
+
+  function renderPodcast() {
+    var list = $('#podcast-list');
+    var pod = SITE.podcast;
+    if (!list || !pod || !pod.episodes.length) return;
+    list.innerHTML = pod.episodes
+      .slice(0, 6)
+      .map(function (ep) {
+        return (
+          '<li><a class="pod-row" href="https://www.youtube.com/watch?v=' + esc(ep.id) + '">' +
+          '<span class="col-name">' + esc(ep.title) + '</span>' +
+          '<span class="col-len">' + esc(ep.length || '') + '</span></a></li>'
+        );
+      })
+      .join('');
+    $$('.pod-row', list).forEach(function (row) {
+      var icon = iconImg('speaker');
+      if (icon) row.insertBefore(icon, row.firstChild);
+    });
+    var status = $('#podcast-status');
+    if (status) status.textContent = pod.episodes.length + ' episode(s) on tape';
+  }
+
+  /** "For bookers" lines only appear once site-data.js has something to say. */
+  function renderBookingFacts() {
+    $$('[data-booking-fact]').forEach(function (row) {
+      var value = (SITE.booking || {})[row.getAttribute('data-booking-fact')];
+      var slot = $('span', row);
+      if (!value || !slot) return;
+      slot.textContent = value;
+      row.hidden = false;
+    });
   }
 
   function renderShorts() {
@@ -780,6 +886,7 @@
       var next = upcoming[0];
       ticker.textContent =
         (next.isToday ? 'Tonight' : 'Next show: ' + showDateText(next)) +
+        (next.show.time ? ', ' + next.show.time : '') +
         ' — ' + next.show.title + (next.show.city ? ', ' + next.show.city.replace(/,.*$/, '') : '');
       ticker.hidden = false;
     }
@@ -807,7 +914,18 @@
           (badge ? '<span class="show-badge">' + badge + '</span>' : '') + '</strong>' +
           '<p><span class="sr-only">' + showDateText(entry) + ' — </span>' + where + '</p>' +
           (show.note ? '<p class="muted">' + esc(show.note) + '</p>' : '') +
-          (show.tickets ? '<p><a class="btn" href="' + esc(show.tickets) + '">Tickets</a></p>' : '') +
+          (show.tickets || show.link || show.map
+            ? '<p class="transport">' +
+              (show.tickets ? '<a class="btn btn-primary" href="' + esc(show.tickets) + '">Tickets</a>' : '') +
+              (show.link
+                ? '<a class="btn" href="' + esc(show.link) + '" target="_blank" rel="noopener">' +
+                  esc(show.linkLabel || 'Show info') + '</a>'
+                : '') +
+              (show.map
+                ? '<a class="btn" href="' + esc(show.map) + '" target="_blank" rel="noopener">Map</a>'
+                : '') +
+              '</p>'
+            : '') +
           '</div></li>'
         );
       })
@@ -847,7 +965,9 @@
     var player = $('[data-player="library"]');
     if (!list || !player) return;
 
-    var state = { query: '', tag: '', sort: '', dir: 1, current: null };
+    var state = { query: '', tag: '', room: '', sort: '', dir: 1, current: null };
+    var params = new URLSearchParams(window.location.search);
+    var roomSelect = $('#clip-room');
     var search = $('#clip-search');
     var tagBar = $('#clip-tags');
     var head = $('#clip-head');
@@ -861,8 +981,9 @@
 
     function matches(clip) {
       if (state.tag && (clip.tags || []).indexOf(state.tag) === -1) return false;
+      if (state.room && clip.room !== state.room) return false;
       if (!state.query) return true;
-      var hay = [clip.title, clipLabel(clip), clip.venue, clip.notes].join(' ').toLowerCase();
+      var hay = [clip.title, clipLabel(clip), clipVenue(clip), clip.notes].join(' ').toLowerCase();
       return state.query.split(/\s+/).every(function (word) {
         return hay.indexOf(word) !== -1;
       });
@@ -887,13 +1008,13 @@
       state.current = clip;
       fillPlayer(player, clip, { autoplay: opts.autoplay });
       $$('.clip-row', list).forEach(function (row) {
-        var on = row.getAttribute('data-set') === String(clip.set);
+        var on = row.getAttribute('data-id') === clip.id;
         row.classList.toggle('is-selected', on);
         row.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       if (statusNow) statusNow.textContent = clipLabel(clip) + (clip.length ? ' · ' + clip.length : '');
       if (opts.updateUrl && window.history.replaceState) {
-        window.history.replaceState(null, '', '?set=' + encodeURIComponent(clip.set));
+        window.history.replaceState(null, '', '?v=' + encodeURIComponent(clip.id));
       }
       updateStepButtons();
     }
@@ -925,7 +1046,7 @@
         btn.type = 'button';
         btn.className = 'clip-row';
         btn.setAttribute('role', 'option');
-        btn.setAttribute('data-set', clip.set);
+        btn.setAttribute('data-id', clip.id);
         var on = clip === state.current;
         btn.classList.toggle('is-selected', on);
         btn.setAttribute('aria-selected', on ? 'true' : 'false');
@@ -948,7 +1069,10 @@
           visible.length === total
             ? total + ' object(s)'
             : visible.length + ' of ' + total + ' object(s)' +
-              (state.tag ? ' — ' + SITE.tags[state.tag] : '');
+              [state.tag && SITE.tags[state.tag], state.room && SITE.rooms[state.room]]
+                .filter(Boolean)
+                .map(function (name) { return ' — ' + name; })
+                .join('');
       }
       if (head) {
         $$('button', head).forEach(function (btn) {
@@ -958,6 +1082,24 @@
         });
       }
       updateStepButtons();
+    }
+
+    // Deep links: clips.html?tag=clean, ?room=vr, ?v=<video id>, ?set=121
+    if (SITE.tags[params.get('tag')]) state.tag = params.get('tag');
+    if (SITE.rooms[params.get('room')]) state.room = params.get('room');
+
+    if (roomSelect) {
+      Object.keys(SITE.rooms).forEach(function (key) {
+        var option = document.createElement('option');
+        option.value = key;
+        option.textContent = SITE.rooms[key];
+        roomSelect.appendChild(option);
+      });
+      roomSelect.value = state.room;
+      roomSelect.addEventListener('change', function () {
+        state.room = roomSelect.value;
+        render();
+      });
     }
 
     if (tagBar) {
@@ -971,7 +1113,7 @@
         btn.type = 'button';
         btn.className = 'btn';
         btn.textContent = def[1];
-        btn.setAttribute('aria-pressed', def[0] === '' ? 'true' : 'false');
+        btn.setAttribute('aria-pressed', def[0] === state.tag ? 'true' : 'false');
         btn.addEventListener('click', function () {
           state.tag = def[0];
           $$('button', tagBar).forEach(function (other) {
@@ -1010,9 +1152,12 @@
     if (next) next.addEventListener('click', function () { step(1); });
     wireListKeys(list);
 
-    var wanted = new URLSearchParams(window.location.search).get('set');
-    var first = (wanted && findClip(wanted)) || latestClip();
+    var wanted = params.get('v') || params.get('set');
     render();
+    var first =
+      (params.get('v') && findClipById(params.get('v'))) ||
+      (params.get('set') && findClip(params.get('set'))) ||
+      (state.tag || state.room ? visible[0] : latestClip());
     if (first) {
       select(first);
       var row = $('.clip-row.is-selected', list);
@@ -1133,6 +1278,8 @@
   buildMarquee();
   renderHomePlayers();
   renderShorts();
+  renderPodcast();
+  renderBookingFacts();
   renderShows();
   renderClipLibrary();
   wireBookingForms();

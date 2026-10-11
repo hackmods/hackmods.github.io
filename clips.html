@@ -8,7 +8,7 @@
     <link rel="canonical" href="https://ryanmorris.ca/clips.html">
     <link rel="icon" href="./favicon.png" sizes="16x16">
     <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-    <meta name="description" content="Stand-up clips from Ryan Morris Comedy — crowd work, puppets, props, divorced-dad bits, and Niagara open mics. Search and filter the numbered set archive.">
+    <meta name="description" content="Stand-up clips from Ryan Morris Comedy — crowd work disasters, dad-life rants, puppets, roast battles, and VR sets. Search the numbered archive by type or by room.">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Ryan Morris">
 
@@ -42,12 +42,16 @@
         <div class="title-bar"><span>Clip Library — C:\COMEDY\SETS</span></div>
         <div class="content">
             <h1>Comedy Clips &amp; Set Archive</h1>
-            <p class="lead">Every set gets a number and a camera. Pick one from the file list — owl puppets, keyboards, paper bags, and divorced-dad bits from Niagara rooms.</p>
+            <p class="lead">Every set gets a number and a camera — from set #1 at Taps to this week’s Monday spot. Search it, filter by what kind of chaos you’re after, or browse by room.</p>
 
             <div class="toolbar" data-js-only hidden>
                 <label for="clip-search">Find:</label>
                 <input type="search" id="clip-search" placeholder="puppet, roast, Christmas…" autocomplete="off">
                 <span class="btn-row btn-row--start" id="clip-tags" role="group" aria-label="Filter by type" style="margin-top: 0; gap: 4px;"></span>
+                <label for="clip-room">Room:</label>
+                <select id="clip-room">
+                    <option value="">All rooms</option>
+                </select>
             </div>
 
             <div class="clip-layout">
@@ -102,13 +106,16 @@
         <div class="content">
             <h2>What’s in the archive</h2>
             <ul>
-                <li><strong>Crowd work</strong> — front-row roasts, birthday roasts, and rooms going off the rails.</li>
-                <li><strong>Puppets &amp; props</strong> — owl, ghost, keyboard, paper bag, ketchup packet.</li>
-                <li><strong>Dad life</strong> — Half Christmas, PTA meetings, French immersion.</li>
-                <li><strong>VR shows</strong> — sets performed in virtual-reality comedy rooms.</li>
+                <li><strong><a href="clips.html?tag=crowd">Crowd work disasters</a></strong> — front-row roasts, birthday roasts, and rooms going off the rails.</li>
+                <li><strong><a href="clips.html?tag=dad">Dad-life rants &amp; bad advice</a></strong> — Half Christmas, PTA meetings, French immersion.</li>
+                <li><strong><a href="clips.html?tag=puppets">Puppets</a> &amp; <a href="clips.html?tag=props">props</a></strong> — owl, ghost, Gary, keyboard, paper bag, ketchup packet.</li>
+                <li><strong><a href="clips.html?tag=clean">Clean sets</a></strong> — family-friendly, no swearing.</li>
+                <li><strong><a href="clips.html?tag=roast">Roast battles</a></strong> — Spotlight Comedy Club and Rose City Comedy Collective.</li>
+                <li><strong><a href="clips.html?room=vr">Stand-up in VR</a></strong> — open mics and anchor shows at Failed To Render VR.</li>
+                <li><strong>Trader Jokes</strong> — joke-swap shows where comics read each other’s unseen material (search “Trader Jokes”).</li>
             </ul>
             <p>
-                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy">Full archive on YouTube</a>
+                <a class="btn btn-primary" href="https://www.youtube.com/@RyanMorrisComedy?sub_confirmation=1">Subscribe on YouTube</a>
                 <a class="btn" href="index.html#window-shorts">Shorts</a>
                 <a class="btn" href="shows.html">See upcoming shows</a>
             </p>

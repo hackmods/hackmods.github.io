@@ -592,8 +592,7 @@
     if (
       el.id === 'window-bio' ||
       el.id === 'window-nav' ||
-      el.id === 'window-shorts' ||
-      el.id === 'window-booking'
+      el.id === 'window-shorts'
     ) {
       return true;
     }
