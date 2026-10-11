@@ -292,40 +292,53 @@
       controls.className = 'title-bar-controls';
       bar.appendChild(controls);
     }
-    if (!controls.querySelector('[data-max]')) {
-      var maxBtn = document.createElement('button');
-      maxBtn.type = 'button';
-      maxBtn.className = 'win-max';
-      maxBtn.setAttribute('data-max', '');
-      maxBtn.setAttribute('aria-label', 'Maximize');
-      maxBtn.innerHTML = '&#9633;';
-      controls.insertBefore(maxBtn, controls.firstChild);
-    }
-    if (!controls.querySelector('[data-close]')) {
-      var closeBtn = document.createElement('button');
-      closeBtn.type = 'button';
-      closeBtn.className = 'win-close';
-      closeBtn.setAttribute('data-close', '');
-      closeBtn.setAttribute('aria-label', 'Close');
-      closeBtn.innerHTML = '&times;';
-      controls.appendChild(closeBtn);
-    }
-    var decorative = bar.querySelector('span:last-child');
-    if (decorative && decorative.textContent === '[X]') decorative.remove();
+    // Glyphs are drawn in CSS; the buttons only need a name.
+    [
+      ['min', 'Minimize'],
+      ['max', 'Maximize'],
+      ['close', 'Close']
+    ].forEach(function (def) {
+      if (controls.querySelector('[data-' + def[0] + ']')) return;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'win-' + def[0];
+      btn.setAttribute('data-' + def[0], '');
+      btn.setAttribute('aria-label', def[1]);
+      controls.appendChild(btn);
+    });
   }
 
   function updateMaxButton(el) {
     var btn = el.querySelector('[data-max]');
     if (!btn) return;
     var maxed = el.classList.contains('is-maximized');
-    btn.innerHTML = maxed ? '&#9634;' : '&#9633;';
     btn.setAttribute('aria-label', maxed ? 'Restore' : 'Maximize');
+  }
+
+  /** Minimize rolls the window up to its title bar; again to restore. */
+  function minimizeWindow(el) {
+    var minimized = el.classList.toggle('is-minimized');
+    var btn = el.querySelector('[data-min]');
+    if (btn) btn.setAttribute('aria-label', minimized ? 'Restore' : 'Minimize');
+    if (minimized) {
+      el.dataset.fullHeight = el.style.height || '';
+      if (el.style.height) el.style.height = 'auto';
+    } else if (el.dataset.fullHeight) {
+      el.style.height = el.dataset.fullHeight;
+    }
   }
 
   function maximizeWindow(el) {
     if (isNarrow() && el.classList.contains('float-window')) return;
     if (isNarrow() && !el.classList.contains('float-window')) return;
+    el.classList.remove('is-minimized');
     if (el.classList.contains('window') && !el.classList.contains('float-window')) {
+      if (!getHomeCanvas()) {
+        // Sub-pages have no free-float stage: maximize is a plain toggle.
+        el.classList.toggle('is-maximized');
+        updateMaxButton(el);
+        return;
+      }
       promoteToFreeFloat();
     }
     var rec = getWinRecord(el.id);
@@ -411,6 +424,15 @@
       });
     }
 
+    var minBtn = el.querySelector('[data-min]');
+    if (minBtn) {
+      minBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        minimizeWindow(el);
+      });
+    }
+
     var maxBtn = el.querySelector('[data-max]');
     if (maxBtn) {
       maxBtn.addEventListener('click', function (e) {
@@ -427,14 +449,14 @@
     var resize = null;
 
     bar.addEventListener('dblclick', function (e) {
-      if (e.target.closest('[data-close], [data-max], .title-bar-controls')) return;
+      if (e.target.closest('.title-bar-controls')) return;
       if (isNarrow() && isPage) return;
       if (isNarrow() && isFloat) return;
       maximizeWindow(el);
     });
 
     bar.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('[data-close], [data-max], .title-bar-controls, .win-grip')) return;
+      if (e.target.closest('.title-bar-controls, .win-grip')) return;
       if (isNarrow()) return;
       if (isPage && !isFreeFloatActive()) {
         promoteToFreeFloat();
@@ -826,6 +848,9 @@
     var canvas = getHomeCanvas();
     if (!canvas) {
       document.body.classList.remove('desktop-freefloat');
+      document.querySelectorAll('.desktop-canvas .window[id]').forEach(function (el) {
+        wireWindowChrome(el, { isPage: true });
+      });
       return;
     }
 
@@ -1041,16 +1066,15 @@
       '<div id="start-menu" class="start-menu" hidden role="menu" aria-label="Start menu">' +
       '<div class="start-menu-sidebar">COMEDY.EXE</div>' +
       '<div class="start-menu-body">' +
-      '<div class="start-section-label">Programs</div>' +
-      '<a class="start-item" role="menuitem" href="' + homeHref('#window-nav') + '">PROGRAM_MANAGER</a>' +
-      '<a class="start-item" role="menuitem" href="clips.html">clips.exe</a>' +
-      '<a class="start-item" role="menuitem" href="' + homeHref('#window-shorts') + '">shorts.vlc</a>' +
-      '<a class="start-item" role="menuitem" href="shows.html">shows.sys</a>' +
-      '<a class="start-item" role="menuitem" href="about.html">about.txt</a>' +
-      '<a class="start-item" role="menuitem" href="shows.html#window-booking">booking</a>' +
-      '<div class="start-section-label">Links</div>' +
+      startLink(homeHref('#window-nav'), 'folder', 'Program Manager') +
+      startLink('clips.html', 'film', 'Clip Library') +
+      startLink(homeHref('#window-shorts'), 'phone', 'Shorts Player') +
+      startLink('shows.html', 'calendar', 'Show Calendar') +
+      startLink('about.html', 'doc', 'About / Press Kit') +
+      startLink('shows.html#window-booking', 'mail', 'Book Ryan') +
+      '<div class="start-sep" role="separator"></div>' +
       '<div class="start-flyout-wrap">' +
-      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">Links ▸</button>' +
+      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">' + startIco('play') + 'Links</button>' +
       '<div class="start-flyout" hidden role="menu">' +
       '<a class="start-item" href="https://www.instagram.com/ryanmorriscomedy/" target="_blank" rel="noopener">Instagram</a>' +
       '<a class="start-item" href="https://www.youtube.com/@RyanMorrisComedy" target="_blank" rel="noopener">YouTube</a>' +
@@ -1059,9 +1083,8 @@
       '<a class="start-item" href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub / hackmods</a>' +
       '<a class="start-item" href="https://www.linkedin.com/in/ryanjamesmorris" target="_blank" rel="noopener">LinkedIn</a>' +
       '</div></div>' +
-      '<div class="start-section-label">Apps</div>' +
       '<div class="start-flyout-wrap">' +
-      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">Accessories ▸</button>' +
+      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">' + startIco('folder') + 'Accessories</button>' +
       '<div class="start-flyout" hidden role="menu">' +
       '<button type="button" class="start-item" data-open="notepad">NOTEPAD.EXE</button>' +
       '<button type="button" class="start-item" data-open="clock">CLOCK.EXE</button>' +
@@ -1069,17 +1092,38 @@
       '<button type="button" class="start-item" data-open="volume">SNDVOL.EXE</button>' +
       '</div></div>' +
       '<div class="start-flyout-wrap">' +
-      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">Games ▸</button>' +
+      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">' + startIco('cards') + 'Games</button>' +
       '<div class="start-flyout" hidden role="menu">' +
       '<button type="button" class="start-item" data-open="solitaire">SOLITAIRE.EXE</button>' +
       '<button type="button" class="start-item" data-open="duckhunt">DUCKHUNT.WDGT</button>' +
       '<button type="button" class="start-item" data-open="saber">LIGHTSABER.WDGT</button>' +
       '</div></div>' +
-      '<button type="button" class="start-item" data-open="hackmods">HACKMODS.EXE</button>' +
-      '<div class="start-section-label">Documents</div>' +
-      '<a class="start-item" role="menuitem" href="about.html">Press kit / bio</a>' +
+      '<button type="button" class="start-item" data-open="hackmods">' + startIco('terminal') + 'HACKMODS.EXE</button>' +
+      '<div class="start-sep" role="separator"></div>' +
+      '<div class="start-flyout-wrap">' +
+      '<button type="button" class="start-item start-flyout-trigger" aria-expanded="false" aria-haspopup="true">' + startIco('computer') + 'Settings</button>' +
+      '<div class="start-flyout" hidden role="menu">' +
+      '<button type="button" class="start-item" data-open="display">Display</button>' +
+      '<button type="button" class="start-item" data-open="volume">Sound</button>' +
       '<button type="button" class="start-item" data-reset-desktop>Reset Desktop</button>' +
       '</div></div>' +
+      '<button type="button" class="start-item" data-shell="about">' + startIco('info') + 'About COMEDY.EXE</button>' +
+      '<div class="start-sep" role="separator"></div>' +
+      '<button type="button" class="start-item" data-shell="shutdown">' + startIco('computer') + 'Shut Down…</button>' +
+      '</div></div>' +
+      floatShell(
+        'widget-display',
+        'Display Properties',
+        '<div class="display-preview"><div class="display-preview-screen"></div></div>' +
+          '<fieldset class="display-options"><legend>Wallpaper</legend>' +
+          '<label><input type="radio" name="wallpaper" value="teal"> (None) — classic teal</label>' +
+          '<label><input type="radio" name="wallpaper" value="brick"> Comedy club brick</label>' +
+          '<label><input type="radio" name="wallpaper" value="tiles"> Tiles</label>' +
+          '<label><input type="radio" name="wallpaper" value="stage"> Spotlight</label></fieldset>' +
+          '<fieldset class="display-options"><legend>Monitor</legend>' +
+          '<label><input type="checkbox" id="display-crt"> CRT scanlines</label></fieldset>',
+        'computer'
+      ) +
       floatShell(
         'widget-notepad',
         'NOTEPAD.EXE',
@@ -1087,7 +1131,8 @@
           '<div class="btn-row" style="justify-content:flex-start;margin-top:8px;">' +
           '<button type="button" class="btn" id="notepad-save">Save</button>' +
           '<button type="button" class="btn" id="notepad-clear">Clear</button></div>' +
-          '<p class="muted">Notes save in this browser (localStorage).</p>'
+          '<p class="muted">Notes save in this browser (localStorage).</p>',
+        'doc'
       ) +
       floatShell(
         'widget-clock',
@@ -1096,20 +1141,23 @@
           '<canvas id="clock-canvas" width="160" height="160" aria-hidden="true"></canvas>' +
           '<div class="clock-digital" id="clock-digital">--:-- --</div>' +
           '<div class="muted" id="clock-date"></div>' +
-          '<div class="muted">Timezone: America/Toronto (Niagara)</div></div>'
+          '<div class="muted">Timezone: America/Toronto (Niagara)</div></div>',
+        'calendar'
       ) +
       floatShell(
         'widget-calc',
         'CALC.EXE',
         '<div class="calc-display" id="calc-display">0</div>' +
-          '<div class="calc-grid" id="calc-grid"></div>'
+          '<div class="calc-grid" id="calc-grid"></div>',
+        'computer'
       ) +
       floatShell(
         'widget-volume',
         'SNDVOL.EXE',
         '<label for="vol-slider"><strong>Master volume</strong></label>' +
           '<input type="range" id="vol-slider" min="0" max="100" value="35">' +
-          '<p class="muted" id="vol-status">Volume: 35% — widget beeps &amp; saber hum</p>'
+          '<p class="muted" id="vol-status">Volume: 35% — widget beeps &amp; saber hum</p>',
+        'speaker'
       ) +
       floatShell(
         'widget-hackmods',
@@ -1122,7 +1170,8 @@
           '<li><a href="Simpsons/index.html">Simpsons Infographic</a></li>' +
           '<li><a href="strongtowns-nf-radar-tracker/index.html">Strong Towns Radar Tracker</a></li>' +
           '<li><a href="TraderJokes.html">TraderJokes</a></li>' +
-          '<li><a href="CloudCity/index.html">Cloud City</a></li></ul>'
+          '<li><a href="CloudCity/index.html">Cloud City</a></li></ul>',
+        'terminal'
       ) +
       floatShell(
         'widget-saber',
@@ -1132,7 +1181,8 @@
           '<button type="button" class="btn saber-color is-active" data-color="green">Green</button>' +
           '<button type="button" class="btn saber-color" data-color="blue">Blue</button>' +
           '<button type="button" class="btn saber-color" data-color="red">Red</button></div>' +
-          '<canvas id="saber-canvas" class="saber-canvas" width="300" height="200"></canvas>'
+          '<canvas id="saber-canvas" class="saber-canvas" width="300" height="200"></canvas>',
+        'saber'
       ) +
       floatShell(
         'widget-duckhunt',
@@ -1140,7 +1190,8 @@
         '<div class="duck-hud"><span id="duck-score">Score: 0</span><span id="duck-ammo">Ammo: 3</span><span id="duck-round">Duck 1/5</span></div>' +
           '<canvas id="duck-canvas" class="duck-canvas" width="360" height="240"></canvas>' +
           '<p class="muted" id="duck-msg">Tap/click to shoot. Original geometric ducks — no ROM packs.</p>' +
-          '<button type="button" class="btn" id="duck-restart">Restart</button>'
+          '<button type="button" class="btn" id="duck-restart">Restart</button>',
+        'duck'
       ) +
       floatShell(
         'widget-solitaire',
@@ -1161,25 +1212,34 @@
           '<div class="sol-foundations" id="sol-foundations"></div></div>' +
           '<div class="sol-tableau" id="sol-tableau"></div></div>' +
           '<p class="muted sol-msg" id="sol-msg">Klondike — drag cards to move, or click to select. Double-click sends to foundation.</p>' +
-          '</div>'
+          '</div>',
+        'cards'
       );
 
     document.body.appendChild(wrap);
   }
 
-  function floatShell(id, title, body) {
+  function startIco(icon) {
+    return '<span class="start-item-ico" data-icon="' + icon + '" aria-hidden="true"></span>';
+  }
+
+  function startLink(href, icon, label) {
+    return '<a class="start-item" role="menuitem" href="' + href + '">' + startIco(icon) + label + '</a>';
+  }
+
+  function floatShell(id, title, body, icon) {
     return (
       '<div class="float-window" id="' +
       id +
-      '" hidden data-widget>' +
+      '" hidden data-widget' +
+      (icon ? ' data-icon="' + icon + '"' : '') +
+      '>' +
       '<div class="title-bar">' +
       '<span>' +
       title +
       '</span>' +
-      '<div class="title-bar-controls">' +
-      '<button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button>' +
-      '<button type="button" class="win-close" data-close aria-label="Close">&times;</button>' +
-      '</div></div><div class="content">' +
+      '<div class="title-bar-controls"></div>' +
+      '</div><div class="content">' +
       body +
       '</div></div>'
     );
@@ -1197,7 +1257,7 @@
     btn.setAttribute('aria-haspopup', 'true');
     btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML =
-      '<span class="start-ico" aria-hidden="true">🏁</span><span class="start-label">Start</span>';
+      '<span class="start-ico" data-icon="mic" aria-hidden="true">🏁</span><span class="start-label">Start</span>';
     if (old) {
       old.replaceWith(btn);
     } else {
@@ -1207,8 +1267,8 @@
     var tray = taskbar.querySelector('.system-tray');
     if (tray) {
       tray.innerHTML =
-        '<button type="button" class="tray-btn" id="tray-volume" title="Volume" aria-label="Volume">🔊</button>' +
-        '<button type="button" class="tray-btn" id="tray-github" title="Hackmods" aria-label="Hackmods">⌘</button>' +
+        '<button type="button" class="tray-btn" id="tray-volume" title="Volume" aria-label="Volume" data-icon="speaker">🔊</button>' +
+        '<button type="button" class="tray-btn" id="tray-github" title="Hackmods" aria-label="Hackmods" data-icon="terminal">⌘</button>' +
         '<button type="button" class="tray-clock" id="clock" title="Clock">12:00 PM</button>';
     }
 
@@ -1267,6 +1327,14 @@
         closeMenu();
         return;
       }
+      var shell = e.target.closest('[data-shell]');
+      if (shell && window.Win95) {
+        e.preventDefault();
+        closeMenu();
+        if (shell.getAttribute('data-shell') === 'about') window.Win95.about();
+        else window.Win95.shutdown();
+        return;
+      }
       var t = e.target.closest('[data-open]');
       if (t) {
         e.preventDefault();
@@ -1307,6 +1375,7 @@
     calc: 'widget-calc',
     volume: 'widget-volume',
     hackmods: 'widget-hackmods',
+    display: 'widget-display',
     saber: 'widget-saber',
     duckhunt: 'widget-duckhunt',
     solitaire: 'widget-solitaire'
@@ -1325,7 +1394,9 @@
     } else if (!isNarrow()) {
       applyStoredOrDefault(el, true, Object.keys(widgetMap).indexOf(name));
     }
+    el.classList.remove('is-minimized');
     focusWindow(el);
+    if (window.Win95) window.Win95.activate(el);
     var rec = getWinRecord(id);
     rec.hidden = false;
     saveLayoutSoon();
@@ -1337,7 +1408,7 @@
 
   function closeWidget(el) {
     el.hidden = true;
-    el.classList.remove('is-maximized');
+    el.classList.remove('is-maximized', 'is-minimized');
     updateMaxButton(el);
     var rec = getWinRecord(el.id);
     rec.hidden = true;
@@ -1373,9 +1444,10 @@
       if (!link) return;
       var id = (link.getAttribute('href') || '').slice(1);
       var el = document.getElementById(id);
-      if (el && el.classList.contains('window') && isFreeFloatActive()) {
-        showPageWindow(el);
-      }
+      if (!el || !el.classList.contains('window')) return;
+      el.classList.remove('is-minimized');
+      if (isFreeFloatActive()) showPageWindow(el);
+      else el.hidden = false;
     });
   }
 
@@ -2868,6 +2940,8 @@
   function init() {
     injectMarkup();
     wireStartButton();
+    // Swap emoji for pixel icons before the taskbar measures itself.
+    if (window.Win95) window.Win95.hydrateIcons(document);
     wireTaskbarOverflow();
     wireFloatWindows();
     wirePageWindows();
@@ -2884,6 +2958,7 @@
     window.ComedyDesktop = {
       openWidget: openWidget,
       resetDesktop: resetDesktop,
+      beep: playBeep,
       closeMenu: function () {
         var menu = document.getElementById('start-menu');
         var btn = document.getElementById('start-btn');

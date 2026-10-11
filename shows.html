@@ -8,7 +8,7 @@
     <link rel="canonical" href="https://ryanmorris.ca/shows.html">
     <link rel="icon" href="./favicon.png" sizes="16x16">
     <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-    <meta name="description" content="Upcoming comedy shows and booking for Ryan Morris — Niagara Falls, St. Catharines, Laugh Lab / Bomb Comedy Tour, Spotlight Comedy Club, and Southern Ontario dates.">
+    <meta name="description" content="Upcoming comedy shows and booking for Ryan Morris — every Monday at The Bomb Comedy Show in Niagara Falls, plus Laugh Lab, Spotlight Comedy Club, and Southern Ontario dates.">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Ryan Morris">
 
@@ -25,6 +25,7 @@
     <meta name="twitter:description" content="Book Niagara stand-up comedian Ryan Morris for clubs, showcases, and events.">
     <meta name="twitter:image" content="https://ryanmorris.ca/RyanMorrisGroupPhoto.jpg">
 
+    <script>document.documentElement.className += ' js';</script>
     <link rel="stylesheet" href="style.css">
 
     <script type="application/ld+json">
@@ -60,30 +61,33 @@
 
     <div class="marquee-container" aria-hidden="true">
         <div class="marquee-text">
-          ⚡ SHOW_CALENDAR.SYS ⚡ NIAGARA FALLS ⚡ ST. CATHARINES ⚡ LAUGH LAB ⚡ BOOK LOCAL COMEDY ⚡
+          ⚡ SHOW CALENDAR ⚡ EVERY MONDAY @ THE BOMB COMEDY SHOW ⚡ NIAGARA FALLS ⚡ ST. CATHARINES ⚡ LAUGH LAB ⚡ BOOK LOCAL COMEDY ⚡
         </div>
     </div>
 
     <main class="desktop-canvas desktop-canvas--shows">
-    <div class="window window-wide" id="window-calendar">
-        <div class="title-bar"><span>SHOW_CALENDAR.SYS</span><span>[X]</span></div>
+    <div class="window window-wide" id="window-calendar" data-icon="calendar">
+        <div class="title-bar"><span>Show Calendar</span></div>
         <div class="content">
             <h1>Shows &amp; Dates</h1>
-            <p class="lead">Live stand-up across the Niagara Region and Southern Ontario. Dates update as gigs lock in — follow Instagram for last-minute rooms.</p>
+            <p class="lead">Live stand-up across the Niagara Region and Southern Ontario. Dates update as gigs lock in — follow <a href="https://www.instagram.com/ryanmorriscomedy/">@ryanmorriscomedy</a> for last-minute rooms.</p>
 
             <h2>Upcoming</h2>
-            <ul class="show-list">
+            <ul class="show-list" id="show-list">
                 <li class="show-row">
-                    <strong>Next gig loading…</strong>
-                    Check <a href="https://www.instagram.com/ryanmorriscomedy/">@ryanmorriscomedy</a> for the latest night, venue, and ticket links. Regular rooms include Laugh Lab / Bomb Comedy Tour and Spotlight Comedy Club.
+                    <div class="show-body">
+                        <strong>Every Monday — The Bomb Comedy Show</strong>
+                        <p>Laugh Lab / Bomb Comedy Tour · Niagara Falls, ON</p>
+                        <p class="muted">Regular spot, every Monday. Start time and lineup go up on Instagram.</p>
+                    </div>
                 </li>
             </ul>
-            <p class="muted">When you have a firm date, add it here as a <code>show-row</code> (date · venue · city · tickets) and optionally add Event JSON-LD in the page head.</p>
+            <div class="status-bar"><span class="status-field" id="show-status">Calendar</span><span class="status-field">Niagara time (ET)</span></div>
         </div>
     </div>
 
-    <div class="window" id="window-venues">
-        <div class="title-bar"><span>VENUE_MAP.DAT</span><span>[X]</span></div>
+    <div class="window" id="window-venues" data-icon="folder">
+        <div class="title-bar"><span>VENUES.DAT</span></div>
         <div class="content">
             <h2>Rooms &amp; scenes</h2>
             <p>Where you’ll usually find Ryan Morris on a mic in Niagara and nearby:</p>
@@ -108,24 +112,24 @@
         </div>
     </div>
 
-    <div class="window" id="window-booking">
-        <div class="title-bar"><span>MAIL_CLIENT.EXE</span><span>[X]</span></div>
+    <div class="window" id="window-booking" data-icon="mail">
+        <div class="title-bar"><span>New Message — Booking</span></div>
         <div class="content">
             <h2>Book Ryan Morris</h2>
             <p>Book a Niagara / Southern Ontario stand-up comedian for clubs, showcases, corporate-adjacent nights, and community events. Service area: Niagara Falls, St. Catharines, Hamilton, and the Buffalo corridor.</p>
             <p class="muted">(No heckling through the contact form. It’s been tried.)</p>
-            <form action="https://formspree.io/f/mdaanbzk" method="POST">
+            <form action="https://formspree.io/f/mdaanbzk" method="POST" data-booking>
                 <label for="name"><strong>Name/Club:</strong></label>
-                <input id="name" type="text" name="name" required>
+                <input id="name" type="text" name="name" autocomplete="name" required>
                 <label for="email"><strong>Email:</strong></label>
-                <input id="email" type="email" name="email" required>
+                <input id="email" type="email" name="email" autocomplete="email" required>
                 <label for="event-date"><strong>Event date (if known):</strong></label>
-                <input id="event-date" type="text" name="event_date" placeholder="e.g. Sat Sep 12">
+                <input id="event-date" type="text" name="event_date" placeholder="e.g. Sat Nov 14">
                 <label for="message"><strong>Message:</strong></label>
                 <textarea id="message" name="message" rows="4" placeholder="Venue, format, set length, tech needs…"></textarea>
                 <button type="submit">SEND TRANSMISSION</button>
             </form>
-            <p>
+            <p class="transport">
                 <a class="btn" href="clips.html">Watch clips first</a>
                 <a class="btn" href="about.html">Press kit / bio</a>
             </p>
@@ -136,17 +140,19 @@
     <nav class="taskbar" aria-label="Site navigation">
         <button type="button" class="start-btn" id="start-btn"><span class="start-ico" aria-hidden="true">🏁</span><span class="start-label">Start</span></button>
         <div class="taskbar-apps">
-            <a href="index.html#window-bio" class="active-app"><span class="app-ico" aria-hidden="true">📄</span><span class="app-label">bio.txt</span></a>
-            <a href="index.html#window-nav" class="active-app"><span class="app-ico" aria-hidden="true">🗂️</span><span class="app-label">programs</span></a>
-            <a href="clips.html" class="active-app"><span class="app-ico" aria-hidden="true">🎬</span><span class="app-label">clips.exe</span></a>
-            <a href="index.html#window-shorts" class="active-app"><span class="app-ico" aria-hidden="true">📱</span><span class="app-label">shorts.vlc</span></a>
-            <a href="shows.html" class="active-app is-current"><span class="app-ico" aria-hidden="true">📅</span><span class="app-label">shows.sys</span></a>
-            <a href="about.html" class="active-app"><span class="app-ico" aria-hidden="true">📰</span><span class="app-label">about.txt</span></a>
-            <a href="#window-booking" class="active-app"><span class="app-ico" aria-hidden="true">📩</span><span class="app-label">booking</span></a>
+            <a href="index.html#window-bio" class="active-app"><span class="app-ico" data-icon="mic" aria-hidden="true">📄</span><span class="app-label">Ryan Morris</span></a>
+            <a href="index.html#window-nav" class="active-app"><span class="app-ico" data-icon="folder" aria-hidden="true">🗂️</span><span class="app-label">Programs</span></a>
+            <a href="clips.html" class="active-app"><span class="app-ico" data-icon="film" aria-hidden="true">🎬</span><span class="app-label">Clips</span></a>
+            <a href="index.html#window-shorts" class="active-app"><span class="app-ico" data-icon="phone" aria-hidden="true">📱</span><span class="app-label">Shorts</span></a>
+            <a href="shows.html" class="active-app is-current"><span class="app-ico" data-icon="calendar" aria-hidden="true">📅</span><span class="app-label">Shows</span></a>
+            <a href="about.html" class="active-app"><span class="app-ico" data-icon="doc" aria-hidden="true">📰</span><span class="app-label">About</span></a>
+            <a href="#window-booking" class="active-app"><span class="app-ico" data-icon="mail" aria-hidden="true">📩</span><span class="app-label">Booking</span></a>
         </div>
         <div class="system-tray"><span id="clock">12:00 PM</span></div>
     </nav>
 
+    <script src="site-data.js" defer></script>
+    <script src="site.js" defer></script>
     <script src="desktop.js" defer></script>
 </body>
 

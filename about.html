@@ -25,6 +25,7 @@
     <meta name="twitter:description" content="Bio and press assets for Niagara stand-up comedian Ryan Morris.">
     <meta name="twitter:image" content="https://ryanmorris.ca/RyanMorrisSquare.jpg">
 
+    <script>document.documentElement.className += ' js';</script>
     <link rel="stylesheet" href="style.css">
 
     <script type="application/ld+json">
@@ -64,16 +65,16 @@
 
     <div class="marquee-container" aria-hidden="true">
         <div class="marquee-text">
-          ⚡ PRESS_KIT.ZIP ⚡ RYAN MORRIS COMEDY ⚡ COMEDY.EXE ⚡ NIAGARA STAND-UP ⚡ BOOKING READY ⚡
+          ⚡ PRESS KIT ⚡ RYAN MORRIS COMEDY ⚡ COMEDY.EXE ⚡ EVERY SET DOCUMENTED ⚡ NIAGARA STAND-UP ⚡ BOOKING READY ⚡
         </div>
     </div>
 
     <main class="desktop-canvas desktop-canvas--about">
-    <div class="window window-hero" id="window-about">
-        <div class="title-bar"><span>README.TXT</span><span>[X]</span></div>
+    <div class="window window-hero" id="window-about" data-icon="mic">
+        <div class="title-bar"><span>About Ryan Morris</span></div>
         <div class="content">
             <div class="headshot-box">
-                <img src="RyanMorrisSquare.jpg" alt="Press headshot of Ryan Morris">
+                <img src="RyanMorrisSquare.jpg" alt="Press headshot of Ryan Morris" width="160" height="160">
             </div>
             <h1>About Ryan Morris</h1>
             <p class="lead">Ryan Morris is a Niagara Region stand-up comedian who documents comedy the way a programmer documents code: every set numbered, recorded, and reviewed. By day he works in tech; by night he bombs and kills on purpose — building material through volume at rooms like Laugh Lab / Bomb Comedy Tour, Spotlight Comedy Club, and open mics across Southern Ontario.</p>
@@ -90,63 +91,66 @@
         </div>
     </div>
 
-    <div class="window" id="window-bios">
-        <div class="title-bar"><span>BIO_SNIPPETS.DOC</span><span>[X]</span></div>
+    <div class="window" id="window-bios" data-icon="doc">
+        <div class="title-bar"><span>BIO_SNIPPETS.DOC</span></div>
         <div class="content">
             <h2>Copy-paste bios for promoters</h2>
 
             <div class="bio-block">
-                <label>One-liner</label>
+                <div class="bio-block-head"><span>One-liner</span></div>
                 <p>Ryan Morris is a Niagara-based stand-up who tracks every set and treats comedy like a craft instead of a lottery.</p>
             </div>
 
             <div class="bio-block">
-                <label>Short (≈50 words)</label>
+                <div class="bio-block-head"><span>Short (≈50 words)</span></div>
                 <p>Ryan Morris is a stand-up comedian from the Niagara Region performing across Southern Ontario. He records every set, leans into observational and self-aware material, and thrives on crowd work and experimental open-mic energy. Find him at Laugh Lab / Bomb Comedy Tour, Spotlight Comedy Club, and on YouTube as @RyanMorrisComedy.</p>
             </div>
 
             <div class="bio-block">
-                <label>Long (press / website)</label>
+                <div class="bio-block-head"><span>Long (press / website)</span></div>
                 <p>Ryan Morris is a Niagara Falls–area stand-up comedian building a documented craft practice one set at a time. A working comic with a tech day job, he approaches stage time like iteration: number the set, film it, review it, ship the next one. His material mixes dad-life observation, topical bits, character work (including Buffalo Fan Bill), and high-risk props — puppets, keyboards, paper bags — that turn open mics into memorable chaos. He performs regularly in Niagara and Southern Ontario and shares the full archive on YouTube at @RyanMorrisComedy.</p>
             </div>
         </div>
     </div>
 
-    <div class="window" id="window-press">
-        <div class="title-bar"><span>PRESS_KIT.ZIP</span><span>[X]</span></div>
+    <div class="window" id="window-press" data-icon="folder">
+        <div class="title-bar"><span>PRESS_KIT.ZIP</span></div>
         <div class="content">
             <h2>Headshots &amp; assets</h2>
             <p>Click to open full-size images for flyers, Eventbrite, and media. Credit: Ryan Morris.</p>
             <div class="press-grid">
                 <a class="press-thumb" href="RyanMorrisSquare.jpg" target="_blank" rel="noopener">
-                    <img src="RyanMorrisSquare.jpg" alt="Ryan Morris square headshot">
+                    <img src="RyanMorrisSquare.jpg" alt="Ryan Morris square headshot" loading="lazy">
                     <span>Square headshot</span>
                 </a>
                 <a class="press-thumb" href="RyanMorrisHorizontal.jpg" target="_blank" rel="noopener">
-                    <img src="RyanMorrisHorizontal.jpg" alt="Ryan Morris horizontal photo">
+                    <img src="RyanMorrisHorizontal.jpg" alt="Ryan Morris horizontal photo" loading="lazy">
                     <span>Horizontal</span>
                 </a>
                 <a class="press-thumb" href="RyanMorrisCropped.jpg" target="_blank" rel="noopener">
-                    <img src="RyanMorrisCropped.jpg" alt="Ryan Morris cropped portrait">
+                    <img src="RyanMorrisCropped.jpg" alt="Ryan Morris cropped portrait" loading="lazy">
                     <span>Cropped</span>
                 </a>
                 <a class="press-thumb" href="RyanMorrisGroupPhoto.jpg" target="_blank" rel="noopener">
-                    <img src="RyanMorrisGroupPhoto.jpg" alt="Ryan Morris group photo for social previews">
+                    <img src="RyanMorrisGroupPhoto.jpg" alt="Ryan Morris group photo for social previews" loading="lazy">
                     <span>Group / OG image</span>
                 </a>
             </div>
+            <div class="status-bar"><span class="status-field">4 object(s)</span></div>
         </div>
     </div>
 
-    <div class="window" id="window-facts">
-        <div class="title-bar"><span>SYSTEM_INFO.LOG</span><span>[X]</span></div>
+    <div class="window window--doc" id="window-facts" data-icon="doc">
+        <div class="title-bar"><span>QUICK_FACTS.TXT — Notepad</span></div>
         <div class="content">
             <h2>Quick facts</h2>
             <ul>
                 <li><b>Based:</b> Niagara Region, Ontario, Canada</li>
                 <li><b>Brand:</b> COMEDY.EXE / RyanMorrisComedy</li>
-                <li><b>Sets documented:</b> 125+</li>
+                <li><b>Sets documented:</b> <span data-bind="sets">139</span>+</li>
                 <li><b>Style:</b> Observational, self-aware, crowd work, props</li>
+                <li><b>Standing gig:</b> Mondays at The Bomb Comedy Show, Niagara Falls</li>
+                <li><b>Podcast:</b> regular co-host on The Green Room</li>
                 <li><b>Booking:</b> <a href="shows.html#window-booking">ryanmorris.ca/shows.html</a></li>
                 <li><b>Also:</b> <a href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub / hackmods</a> · programming side projects</li>
             </ul>
@@ -157,17 +161,19 @@
     <nav class="taskbar" aria-label="Site navigation">
         <button type="button" class="start-btn" id="start-btn"><span class="start-ico" aria-hidden="true">🏁</span><span class="start-label">Start</span></button>
         <div class="taskbar-apps">
-            <a href="index.html#window-bio" class="active-app"><span class="app-ico" aria-hidden="true">📄</span><span class="app-label">bio.txt</span></a>
-            <a href="index.html#window-nav" class="active-app"><span class="app-ico" aria-hidden="true">🗂️</span><span class="app-label">programs</span></a>
-            <a href="clips.html" class="active-app"><span class="app-ico" aria-hidden="true">🎬</span><span class="app-label">clips.exe</span></a>
-            <a href="index.html#window-shorts" class="active-app"><span class="app-ico" aria-hidden="true">📱</span><span class="app-label">shorts.vlc</span></a>
-            <a href="shows.html" class="active-app"><span class="app-ico" aria-hidden="true">📅</span><span class="app-label">shows.sys</span></a>
-            <a href="about.html" class="active-app is-current"><span class="app-ico" aria-hidden="true">📰</span><span class="app-label">about.txt</span></a>
-            <a href="shows.html#window-booking" class="active-app"><span class="app-ico" aria-hidden="true">📩</span><span class="app-label">booking</span></a>
+            <a href="index.html#window-bio" class="active-app"><span class="app-ico" data-icon="mic" aria-hidden="true">📄</span><span class="app-label">Ryan Morris</span></a>
+            <a href="index.html#window-nav" class="active-app"><span class="app-ico" data-icon="folder" aria-hidden="true">🗂️</span><span class="app-label">Programs</span></a>
+            <a href="clips.html" class="active-app"><span class="app-ico" data-icon="film" aria-hidden="true">🎬</span><span class="app-label">Clips</span></a>
+            <a href="index.html#window-shorts" class="active-app"><span class="app-ico" data-icon="phone" aria-hidden="true">📱</span><span class="app-label">Shorts</span></a>
+            <a href="shows.html" class="active-app"><span class="app-ico" data-icon="calendar" aria-hidden="true">📅</span><span class="app-label">Shows</span></a>
+            <a href="about.html" class="active-app is-current"><span class="app-ico" data-icon="doc" aria-hidden="true">📰</span><span class="app-label">About</span></a>
+            <a href="shows.html#window-booking" class="active-app"><span class="app-ico" data-icon="mail" aria-hidden="true">📩</span><span class="app-label">Booking</span></a>
         </div>
         <div class="system-tray"><span id="clock">12:00 PM</span></div>
     </nav>
 
+    <script src="site-data.js" defer></script>
+    <script src="site.js" defer></script>
     <script src="desktop.js" defer></script>
 </body>
 

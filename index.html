@@ -9,7 +9,7 @@
     <link rel="icon" href="./favicon.png" sizes="16x16">
     <link rel="apple-touch-icon" href="./apple-touch-icon.png">
     <meta name="msapplication-TileImage" content="./favicon.png">
-    <meta name="description" content="Ryan Morris is a Niagara Falls / St. Catharines stand-up comedian performing across Southern Ontario. Live clips, crowd work, Laugh Lab sets, and booking for local comedy shows.">
+    <meta name="description" content="Ryan Morris is a Niagara Falls stand-up comedian: unhinged crowd work, experimental anti-comedy, and the worst dad-life advice on the internet. Every set numbered and filmed. Clips, shows, and booking.">
     <meta name="keywords" content="Ryan Morris, Ryan Morris Comedy, Stand-up Comedy Niagara, Niagara Falls comedian, St. Catharines comedy, Southern Ontario Comedy, Laugh Lab, Bomb Comedy Tour, Buffalo Fan Bill">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Ryan Morris">
@@ -18,15 +18,24 @@
     <meta property="og:site_name" content="Ryan Morris Comedy">
     <meta property="og:url" content="https://ryanmorris.ca/">
     <meta property="og:title" content="Ryan Morris Comedy | Niagara Stand-Up | COMEDY.EXE">
-    <meta property="og:description" content="Niagara-based stand-up comedian documenting every set. Live clips, crowd work, and booking across Southern Ontario.">
+    <meta property="og:description" content="“I don’t repeat jokes, I repeat mistakes.” Niagara Falls stand-up documenting every set. Live clips, crowd work, and booking across Southern Ontario.">
     <meta property="og:image" content="https://ryanmorris.ca/RyanMorrisGroupPhoto.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@RyanMorrisComedy">
     <meta name="twitter:title" content="Ryan Morris Comedy | Niagara Stand-Up">
-    <meta name="twitter:description" content="Niagara-based stand-up comedian documenting every set. Live clips, crowd work, and booking across Southern Ontario.">
+    <meta name="twitter:description" content="“I don’t repeat jokes, I repeat mistakes.” Niagara Falls stand-up documenting every set.">
     <meta name="twitter:image" content="https://ryanmorris.ca/RyanMorrisGroupPhoto.jpg">
 
+    <script>
+        (function (d) {
+            d.className += ' js';
+            try {
+                if (!sessionStorage.getItem('comedy-boot') && !location.hash &&
+                    !matchMedia('(prefers-reduced-motion: reduce)').matches) d.className += ' booting';
+            } catch (e) {}
+        })(document.documentElement);
+    </script>
     <link rel="stylesheet" href="style.css">
 
     <script type="application/ld+json">
@@ -49,7 +58,7 @@
           "url": "https://ryanmorris.ca/",
           "image": "https://ryanmorris.ca/RyanMorrisSquare.jpg",
           "jobTitle": "Stand-up Comedian",
-          "description": "Niagara-based stand-up comedian performing across Southern Ontario. Tracks every set, records everything, and treats comedy like a craft.",
+          "description": "Niagara Falls stand-up comedian performing across Southern Ontario. Tracks every set, records everything, and treats comedy like a craft.",
           "address": {
             "@type": "PostalAddress",
             "addressRegion": "ON",
@@ -64,15 +73,6 @@
             "https://github.com/hackmods",
             "https://www.linkedin.com/in/ryanjamesmorris"
           ]
-        },
-        {
-          "@type": "VideoObject",
-          "name": "His Christmas In July Bit Went Completely Off The Rails (#125)",
-          "description": "Latest featured set from Ryan Morris Comedy.",
-          "embedUrl": "https://www.youtube.com/embed/upYiwuCMF9M",
-          "thumbnailUrl": "https://i.ytimg.com/vi/upYiwuCMF9M/hqdefault.jpg",
-          "uploadDate": "2026-07-01",
-          "url": "https://www.youtube.com/watch?v=upYiwuCMF9M"
         }
       ]
     }
@@ -82,101 +82,159 @@
 <body>
 
     <div class="marquee-container" aria-hidden="true">
-        <div class="marquee-text">
-          ⚡ RYAN MORRIS COMEDY ⚡ SET COUNT: 125 ⚡ HACKMODS ⚡ GITHUB.COM/HACKMODS ⚡ NO CLICKBAIT ⚡ JUST GROWTH ⚡ LIVE COMEDY ⚡ NIAGARA FALLS ⚡ ST. CATHARINES ⚡ BUFFALO FAN BILL ⚡ LAUGH LAB ⚡ SUPPORT LOCAL COMEDY ⚡
+        <div class="marquee-text" data-marquee-site>
+          ⚡ RYAN MORRIS COMEDY ⚡ SET COUNT: 139 ⚡ NIAGARA FALLS ⚡ EVERY MONDAY @ THE BOMB COMEDY SHOW ⚡ NO CLICKBAIT ⚡ JUST GROWTH ⚡ SUPPORT LOCAL COMEDY ⚡
         </div>
     </div>
 
     <main class="desktop-canvas desktop-canvas--home">
-    <div class="window window-hero" id="window-bio">
-        <div class="title-bar"><span>RYAN_MORRIS_BIO.TXT</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
-        <div class="content" style="text-align: center;">
+    <div class="window window-hero" id="window-bio" data-icon="mic">
+        <div class="title-bar"><span>RYAN_MORRIS.EXE</span></div>
+        <div class="content hero">
             <div class="headshot-box">
-                <img src="RyanMorrisSquare.jpg" alt="Headshot of stand-up comedian Ryan Morris">
+                <img src="RyanMorrisSquare.jpg" alt="Headshot of stand-up comedian Ryan Morris" width="160" height="160">
             </div>
             <h1>RYAN MORRIS</h1>
-            <p class="lead">Ryan is a Niagara-based stand-up comedian performing across Southern Ontario — Niagara Falls, St. Catharines, and the Buffalo corridor. He tracks every set, records everything, and treats comedy like a craft instead of a lottery. Observational, self-aware material with crowd work, act-outs, and experimental open-mic energy from rooms like Laugh Lab / Bomb Comedy Tour and Spotlight Comedy Club.</p>
+            <p class="hero-tagline" data-bind="tagline">I don’t repeat jokes, I repeat mistakes.</p>
+            <a class="next-show" id="next-show" href="shows.html" hidden></a>
+            <p class="lead">Niagara Falls stand-up comedian: unhinged crowd work, experimental anti-comedy, and the absolute worst dad-life advice on the internet. Ryan numbers every set, films everything, and treats comedy like a craft instead of a lottery — find him most Mondays at The Bomb Comedy Show / Laugh Lab and in rooms across Southern Ontario and the Buffalo corridor.</p>
             <div class="btn-row">
-                <a class="btn" href="https://www.instagram.com/ryanmorriscomedy/">Instagram</a>
                 <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy">YouTube</a>
+                <a class="btn" href="https://www.instagram.com/ryanmorriscomedy/">Instagram</a>
                 <a class="btn" href="clips.html">Clips</a>
-                <a class="btn" href="#window-shorts">Shorts</a>
                 <a class="btn" href="shows.html">Shows</a>
-                <a class="btn btn-primary" href="shows.html#window-booking">Book</a>
+                <a class="btn btn-primary" href="shows.html#window-booking">Book Ryan</a>
             </div>
         </div>
     </div>
 
-    <div class="window window-wide" id="window-nav">
-        <div class="title-bar"><span>PROGRAM_MANAGER.EXE</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
+    <div class="window window-media" id="window-latest" data-icon="film" data-player="latest">
+        <div class="title-bar"><span>MEDIA_PLAYER.EXE — LATEST</span></div>
         <div class="content">
-            <h2>Open a program</h2>
+            <h2 data-slot="title">Latest: Set #139</h2>
+            <div class="video-frame" data-slot="frame">
+                <a href="https://www.youtube.com/watch?v=Q7fhoz4e-TA">Watch set #139 on YouTube</a>
+            </div>
+            <div class="media-meta">
+                <span class="status-field" data-slot="meta">Set #139</span>
+                <span class="status-field" data-slot="length">Length 13:42</span>
+            </div>
+            <p data-slot="notes" hidden></p>
+            <p class="transport">
+                <a class="btn" href="clips.html">Open clip library</a>
+                <a class="btn" href="#window-shorts">Watch Shorts</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="window window-media" id="window-set" data-icon="film" data-player="featured">
+        <div class="title-bar"><span>MEDIA_PLAYER.EXE — FEATURED</span></div>
+        <div class="content">
+            <h2 data-slot="title">Featured: Ryan Reads Classic Literature (#66)</h2>
+            <div class="video-frame" data-slot="frame">
+                <a href="https://www.youtube.com/watch?v=V-DcIs_8KWg">Watch set #66 on YouTube</a>
+            </div>
+            <div class="media-meta">
+                <span class="status-field" data-slot="meta">Set #66 · Laugh Lab / Bomb Comedy Tour</span>
+                <span class="status-field" data-slot="length" hidden></span>
+            </div>
+            <p data-slot="notes">Reading classic monster jokes at Laugh Lab. Act outs. Crowd work.</p>
+            <p class="transport"><a class="btn" href="clips.html?set=66">More sets in the clip library</a></p>
+        </div>
+    </div>
+
+    <div class="window window-wide" id="window-nav" data-icon="folder">
+        <div class="title-bar"><span>Program Manager</span></div>
+        <div class="content">
+            <h2 class="sr-only">Open a program</h2>
             <div class="nav-grid">
                 <a class="nav-tile" href="clips.html">
-                    <span class="nav-icon">🎬</span>
-                    <span class="nav-label">clips.exe</span>
-                    <span class="nav-desc">Set archive #66–#125</span>
+                    <span class="nav-icon" data-icon="film">🎬</span>
+                    <span class="nav-label">Clips</span>
+                    <span class="nav-desc">Set archive</span>
                 </a>
                 <a class="nav-tile" href="#window-shorts">
-                    <span class="nav-icon">📱</span>
-                    <span class="nav-label">shorts.vlc</span>
+                    <span class="nav-icon" data-icon="phone">📱</span>
+                    <span class="nav-label">Shorts</span>
                     <span class="nav-desc">Vertical clips</span>
                 </a>
                 <a class="nav-tile" href="shows.html">
-                    <span class="nav-icon">📅</span>
-                    <span class="nav-label">shows.sys</span>
+                    <span class="nav-icon" data-icon="calendar">📅</span>
+                    <span class="nav-label">Shows</span>
                     <span class="nav-desc">Dates &amp; venues</span>
                 </a>
                 <a class="nav-tile" href="about.html">
-                    <span class="nav-icon">📰</span>
-                    <span class="nav-label">about.txt</span>
+                    <span class="nav-icon" data-icon="doc">📰</span>
+                    <span class="nav-label">About</span>
                     <span class="nav-desc">Press kit &amp; bio</span>
                 </a>
                 <a class="nav-tile" href="shows.html#window-booking">
-                    <span class="nav-icon">📩</span>
-                    <span class="nav-label">booking</span>
+                    <span class="nav-icon" data-icon="mail">📩</span>
+                    <span class="nav-label">Booking</span>
                     <span class="nav-desc">Book a show</span>
                 </a>
-                <a class="nav-tile" href="https://www.youtube.com/@RyanMorrisComedy/shorts">
-                    <span class="nav-icon">▶️</span>
-                    <span class="nav-label">YT Shorts</span>
-                    <span class="nav-desc">Full shorts feed</span>
+                <a class="nav-tile" href="https://www.youtube.com/@RyanMorrisComedy">
+                    <span class="nav-icon" data-icon="play">▶️</span>
+                    <span class="nav-label">YouTube</span>
+                    <span class="nav-desc">Full archive</span>
                 </a>
-                <a class="nav-tile" href="https://github.com/hackmods" target="_blank" rel="noopener">
-                    <span class="nav-icon">⌘</span>
-                    <span class="nav-label">hackmods</span>
-                    <span class="nav-desc">GitHub / code</span>
+                <a class="nav-tile" href="https://www.instagram.com/ryanmorriscomedy/">
+                    <span class="nav-icon" data-icon="camera">📷</span>
+                    <span class="nav-label">Instagram</span>
+                    <span class="nav-desc">Gig announcements</span>
                 </a>
-                <button type="button" class="nav-tile" data-open-widget="saber">
-                    <span class="nav-icon">⚔️</span>
-                    <span class="nav-label">lightsaber</span>
-                    <span class="nav-desc">Dashboard widget</span>
-                </button>
-                <button type="button" class="nav-tile" data-open-widget="duckhunt">
-                    <span class="nav-icon">🦆</span>
-                    <span class="nav-label">duckhunt</span>
-                    <span class="nav-desc">Dashboard game</span>
-                </button>
-                <button type="button" class="nav-tile" data-open-widget="solitaire">
-                    <span class="nav-icon">🃏</span>
-                    <span class="nav-label">solitaire</span>
-                    <span class="nav-desc">Klondike classic</span>
-                </button>
                 <button type="button" class="nav-tile" data-open-widget="hackmods">
-                    <span class="nav-icon">💻</span>
-                    <span class="nav-label">HACKMODS.EXE</span>
+                    <span class="nav-icon" data-icon="terminal">💻</span>
+                    <span class="nav-label">Hackmods</span>
                     <span class="nav-desc">Dev desktop</span>
                 </button>
+                <button type="button" class="nav-tile" data-open-widget="solitaire">
+                    <span class="nav-icon" data-icon="cards">🃏</span>
+                    <span class="nav-label">Solitaire</span>
+                    <span class="nav-desc">Klondike classic</span>
+                </button>
+                <button type="button" class="nav-tile" data-open-widget="duckhunt">
+                    <span class="nav-icon" data-icon="duck">🦆</span>
+                    <span class="nav-label">Duck Hunt</span>
+                    <span class="nav-desc">Game</span>
+                </button>
+                <button type="button" class="nav-tile" data-open-widget="saber">
+                    <span class="nav-icon" data-icon="saber">⚔️</span>
+                    <span class="nav-label">Lightsaber</span>
+                    <span class="nav-desc">Widget</span>
+                </button>
+                <button type="button" class="nav-tile" data-open-widget="display">
+                    <span class="nav-icon" data-icon="computer">🖥️</span>
+                    <span class="nav-label">Display</span>
+                    <span class="nav-desc">Wallpaper &amp; CRT</span>
+                </button>
             </div>
+            <div class="status-bar"><span class="status-field">12 object(s)</span><span class="status-field">COMEDY.EXE</span></div>
         </div>
     </div>
 
-    <div class="window" id="window-hackmods">
-        <div class="title-bar"><span>HACKMODS.TXT</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
+    <div class="window window--doc" id="window-log" data-icon="doc">
+        <div class="title-bar"><span>SYSTEM_INFO.LOG — Notepad</span></div>
+        <div class="content">
+            <h2>Current status</h2>
+            <ul>
+                <li><b>Location:</b> Niagara Region, ON, CA — <a href="shows.html">see rooms</a></li>
+                <li><b>Topics:</b> <a href="clips.html">Dad life, crowd work, puppets, props, topical bits</a></li>
+                <li><b>Sets completed:</b> <span data-bind="sets">139</span> — <a href="clips.html">watch clips</a></li>
+                <li><b>Standing gig:</b> <a href="shows.html">Mondays, The Bomb Comedy Show</a></li>
+                <li><b>Recurring bit:</b> <a href="about.html">Buffalo Fan Bill</a></li>
+                <li><b>Podcast:</b> co-host on The Green Room</li>
+            </ul>
+            <p>Documenting the craft one bomb and one kill at a time. <a href="about.html">Read the full bio →</a></p>
+        </div>
+    </div>
+
+    <div class="window" id="window-hackmods" data-icon="terminal">
+        <div class="title-bar"><span>HACKMODS.TXT</span></div>
         <div class="content">
             <h2>Programming side</h2>
             <p>By day Ryan works in tech (systems / data). By night he treats stand-up like a repo: number the set, film it, review it, ship the next one. The brand is COMEDY.EXE — craft over virality.</p>
-            <div class="btn-row" style="justify-content: flex-start;">
+            <div class="btn-row btn-row--start">
                 <a class="btn" href="https://github.com/hackmods" target="_blank" rel="noopener">GitHub</a>
                 <a class="btn" href="https://www.linkedin.com/in/ryanjamesmorris" target="_blank" rel="noopener">LinkedIn</a>
                 <button type="button" class="btn btn-primary" data-open-widget="hackmods">Open HACKMODS.EXE</button>
@@ -184,104 +242,62 @@
         </div>
     </div>
 
-    <div class="window window-narrow" id="window-stats">
-        <div class="title-bar"><span>SYSTEM_RESOURCES.EXE</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
+    <div class="window window-narrow" id="window-counter" data-icon="computer">
+        <div class="title-bar"><span>SET_COUNTER.EXE</span></div>
         <div class="content">
-            <strong>Set Pacing:</strong>
-            <div class="resource-bar"><div class="resource-fill" style="width: 35%;"></div></div>
-            <strong>Self-Editing:</strong>
-            <div class="resource-bar"><div class="resource-fill" style="width: 78%;"></div></div>
-            <strong>Set Momentum:</strong>
-            <div class="resource-bar"><div class="resource-fill" style="width: 85%;"></div></div>
-            <p class="muted">Status: Reputation &gt; Viral Hooks. Crediting hosts &amp; venues daily.</p>
-        </div>
-    </div>
-
-    <div class="window window-narrow" id="window-counter">
-        <div class="title-bar"><span>SET_COUNTER.EXE</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
-        <div class="content" style="text-align: center;">
-            <span class="visitor-counter">000125</span>
+            <span class="visitor-counter counter-big" data-bind="sets-padded" data-count-up>000139</span>
             <p>Stand-up sets performed (and counting).</p>
         </div>
     </div>
 
-    <div class="window" id="window-log">
-        <div class="title-bar"><span>SYSTEM_INFO.LOG</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
+    <div class="window window-narrow" id="window-stats" data-icon="computer">
+        <div class="title-bar"><span>System Resources</span></div>
         <div class="content">
-            <h2>Current Status</h2>
-            <ul>
-                <li><b>Location:</b> Niagara Region, ON, CA — <a href="shows.html">see rooms</a></li>
-                <li><b>Topics:</b> <a href="clips.html">Dad life, cat jokes, topical bits, puppets, crowd work</a></li>
-                <li><b>Sets Completed:</b> <span class="visitor-counter">000125</span> — <a href="clips.html">watch clips</a></li>
-                <li><b>Recurring bit:</b> <a href="about.html">Buffalo Fan Bill</a></li>
-                <li><b>Shorts:</b> <a href="#window-shorts">puppet bits &amp; quick hits</a> · <a href="https://www.youtube.com/@RyanMorrisComedy/shorts">YouTube feed</a></li>
-            </ul>
-            <p>Documenting the craft one bomb and one kill at a time. Authenticity over algorithm chasing. <a href="about.html">Read the full bio →</a></p>
+            <strong>Set pacing:</strong>
+            <div class="resource-bar"><div class="resource-fill" style="width: 35%;"></div></div>
+            <strong>Self-editing:</strong>
+            <div class="resource-bar"><div class="resource-fill" style="width: 78%;"></div></div>
+            <strong>Set momentum:</strong>
+            <div class="resource-bar"><div class="resource-fill" style="width: 85%;"></div></div>
+            <p class="muted">Status: Reputation &gt; viral hooks. Crediting hosts &amp; venues daily.</p>
         </div>
     </div>
 
-    <div class="window window-wide" id="window-shorts">
-        <div class="title-bar"><span>SHORTS_PLAYER.VLC</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
+    <div class="window window-wide" id="window-shorts" data-icon="phone">
+        <div class="title-bar"><span>SHORTS_PLAYER.EXE</span></div>
         <div class="content">
             <h2>YouTube Shorts</h2>
             <p class="muted">Quick vertical hits — puppets, crowd work, and chaos between full sets.</p>
             <div class="shorts-layout">
                 <div>
-                    <ul class="shorts-list" id="shorts-list" role="listbox" aria-label="Ryan Morris YouTube Shorts"></ul>
+                    <ul class="shorts-list" id="shorts-list" role="listbox" aria-label="Ryan Morris YouTube Shorts">
+                        <li><a href="https://www.youtube.com/@RyanMorrisComedy/shorts">Watch the Shorts feed on YouTube</a></li>
+                    </ul>
                 </div>
                 <div class="shorts-player">
-                    <h3 id="short-title">Loading…</h3>
-                    <div class="short-frame">
-                        <iframe id="short-frame" title="Selected Ryan Morris YouTube Short" allowfullscreen></iframe>
-                    </div>
-                    <p id="short-notes" style="margin-top: 10px;"></p>
+                    <h3 id="short-title">Shorts</h3>
+                    <div class="short-frame" id="short-frame"></div>
                 </div>
             </div>
-            <p style="margin-top: 12px;">
-                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy/shorts">All Shorts on YouTube →</a>
+            <p class="transport">
+                <a class="btn" href="https://www.youtube.com/@RyanMorrisComedy/shorts">All Shorts on YouTube</a>
                 <a class="btn" href="clips.html">Full set archive</a>
             </p>
+            <div class="status-bar"><span class="status-field" id="shorts-status">Shorts</span></div>
         </div>
     </div>
 
-    <div class="window window-media" id="window-latest">
-        <div class="title-bar"><span>MEDIA_PLAYER.VLC — LATEST</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
+    <div class="window" id="window-booking" data-icon="mail">
+        <div class="title-bar"><span>New Message — Booking</span></div>
         <div class="content">
-            <h2>Latest Set: #125</h2>
-            <div class="video-frame">
-                <iframe src="https://www.youtube.com/embed/upYiwuCMF9M" title="His Christmas In July Bit Went Completely Off The Rails (#125)" allowfullscreen loading="lazy"></iframe>
-            </div>
-            <p><strong>Notes:</strong> Christmas in July bit goes off the rails. Crowd work. High risk, high reward.</p>
-            <p>
-                <a class="btn" href="clips.html">Open clip library</a>
-                <a class="btn" href="#window-shorts">Watch Shorts</a>
-            </p>
-        </div>
-    </div>
-
-    <div class="window window-media" id="window-set">
-        <div class="title-bar"><span>MEDIA_PLAYER.VLC — FEATURED</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
-        <div class="content">
-            <h2>Featured Set: #66</h2>
-            <div class="video-frame">
-                <iframe src="https://www.youtube.com/embed/V-DcIs_8KWg" title="Set #66 Bomb Comedy Tour Laugh Lab — Ryan Reads Classic Literature" allowfullscreen loading="lazy"></iframe>
-            </div>
-            <p><strong>Notes:</strong> Reading classic monster jokes at Laugh Lab / Bomb Comedy Tour. Act outs. Crowd work.</p>
-            <p><a class="btn" href="clips.html">More sets in clip library →</a></p>
-        </div>
-    </div>
-
-    <div class="window" id="window-booking">
-        <div class="title-bar"><span>MAIL_CLIENT.EXE</span><div class="title-bar-controls"><button type="button" class="win-max" data-max aria-label="Maximize">&#9633;</button><button type="button" class="win-close" data-close aria-label="Close">&times;</button></div></div>
-        <div class="content">
-            <h2>Bookings &amp; Inquiries</h2>
+            <h2>Bookings &amp; inquiries</h2>
             <p>Looking to book Ryan for a show, showcase, or event in Niagara, St. Catharines, Hamilton, or the Buffalo corridor? Use the form below.</p>
             <p class="muted">(No heckling through the contact form. It’s been tried.)</p>
-            <form action="https://formspree.io/f/mdaanbzk" method="POST">
+            <form action="https://formspree.io/f/mdaanbzk" method="POST" data-booking>
                 <label for="name"><strong>Name/Club:</strong></label>
-                <input id="name" type="text" name="name" required>
+                <input id="name" type="text" name="name" autocomplete="name" required>
                 <label for="email"><strong>Email:</strong></label>
-                <input id="email" type="email" name="email" required>
+                <input id="email" type="email" name="email" autocomplete="email" required>
                 <label for="message"><strong>Message:</strong></label>
                 <textarea id="message" name="message" rows="3"></textarea>
                 <button type="submit">SEND TRANSMISSION</button>
@@ -294,57 +310,21 @@
     <nav class="taskbar" aria-label="Site navigation">
         <button type="button" class="start-btn" id="start-btn"><span class="start-ico" aria-hidden="true">🏁</span><span class="start-label">Start</span></button>
         <div class="taskbar-apps">
-            <a href="#window-bio" class="active-app is-current"><span class="app-ico" aria-hidden="true">📄</span><span class="app-label">bio.txt</span></a>
-            <a href="#window-nav" class="active-app"><span class="app-ico" aria-hidden="true">🗂️</span><span class="app-label">programs</span></a>
-            <a href="clips.html" class="active-app"><span class="app-ico" aria-hidden="true">🎬</span><span class="app-label">clips.exe</span></a>
-            <a href="#window-shorts" class="active-app"><span class="app-ico" aria-hidden="true">📱</span><span class="app-label">shorts.vlc</span></a>
-            <a href="shows.html" class="active-app"><span class="app-ico" aria-hidden="true">📅</span><span class="app-label">shows.sys</span></a>
-            <a href="about.html" class="active-app"><span class="app-ico" aria-hidden="true">📰</span><span class="app-label">about.txt</span></a>
-            <a href="#window-booking" class="active-app"><span class="app-ico" aria-hidden="true">📩</span><span class="app-label">booking</span></a>
+            <a href="#window-bio" class="active-app is-current"><span class="app-ico" data-icon="mic" aria-hidden="true">📄</span><span class="app-label">Ryan Morris</span></a>
+            <a href="#window-nav" class="active-app"><span class="app-ico" data-icon="folder" aria-hidden="true">🗂️</span><span class="app-label">Programs</span></a>
+            <a href="clips.html" class="active-app"><span class="app-ico" data-icon="film" aria-hidden="true">🎬</span><span class="app-label">Clips</span></a>
+            <a href="#window-shorts" class="active-app"><span class="app-ico" data-icon="phone" aria-hidden="true">📱</span><span class="app-label">Shorts</span></a>
+            <a href="shows.html" class="active-app"><span class="app-ico" data-icon="calendar" aria-hidden="true">📅</span><span class="app-label">Shows</span></a>
+            <a href="about.html" class="active-app"><span class="app-ico" data-icon="doc" aria-hidden="true">📰</span><span class="app-label">About</span></a>
+            <a href="#window-booking" class="active-app"><span class="app-ico" data-icon="mail" aria-hidden="true">📩</span><span class="app-label">Booking</span></a>
         </div>
         <div class="system-tray" id="system-tray">
             <span id="clock">12:00 PM</span>
         </div>
     </nav>
 
-    <script>
-        const SHORTS = [
-            { id: 'W7DnvQ_2seE', title: 'Seducing the crowd with my puppet', notes: 'Puppet crowd work short.' },
-            { id: 'XvUaf6bDneU', title: 'Replaced my ex with a puppet', notes: 'Puppet bit — relationship chaos.' },
-            { id: 'NPpO1jt1mq0', title: 'Hypnotic puppet eyes?', notes: 'Stand-up comedy short.' },
-            { id: 'xBqvdhGUuig', title: 'The ultimate dry-mouth life hack', notes: 'Quick hit from stage.' },
-            { id: '7l8DlsbEA_o', title: 'Cookie Monster is woke now', notes: 'Character / topical short.' }
-        ];
-
-        const shortsList = document.getElementById('shorts-list');
-        const shortFrame = document.getElementById('short-frame');
-        const shortTitle = document.getElementById('short-title');
-        const shortNotes = document.getElementById('short-notes');
-        let selectedShortBtn = null;
-
-        function selectShort(short, btn) {
-            shortTitle.textContent = short.title;
-            shortNotes.innerHTML = '<strong>Notes:</strong> ' + short.notes;
-            shortFrame.src = 'https://www.youtube.com/embed/' + short.id;
-            shortFrame.title = short.title;
-            if (selectedShortBtn) selectedShortBtn.classList.remove('is-selected');
-            btn.classList.add('is-selected');
-            selectedShortBtn = btn;
-        }
-
-        SHORTS.forEach(function (short, index) {
-            const li = document.createElement('li');
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'shorts-row';
-            btn.setAttribute('role', 'option');
-            btn.textContent = short.title;
-            btn.addEventListener('click', function () { selectShort(short, btn); });
-            li.appendChild(btn);
-            shortsList.appendChild(li);
-            if (index === 0) selectShort(short, btn);
-        });
-    </script>
+    <script src="site-data.js" defer></script>
+    <script src="site.js" defer></script>
     <script src="desktop.js" defer></script>
 </body>
 
